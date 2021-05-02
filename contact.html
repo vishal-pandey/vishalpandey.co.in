@@ -1,0 +1,18 @@
+---
+layout: page
+---
+<link rel="stylesheet" href="assets/css/components/contact.css">
+<section class="container">
+	<br>
+	<h2>CONTACT ME</h2>
+	<section class="content">
+		{% for contact in site.data.contacts %}
+		<div class="contact-c" *ngFor="let contact of contacts">
+			<div class="title">{{contact.title}}</div>
+			<div class="icon">
+				<a href="{{contact.link}}" target="_blank">{{ contact.icon }}</a>
+			</div>
+		</div>
+		{% endfor %}
+	</section>
+</section>

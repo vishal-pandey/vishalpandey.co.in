@@ -1,0 +1,18 @@
+<link rel="stylesheet" href="assets/css/components/header.css">
+<section class="header">
+	<span class="logo">
+		<a href="/"><h1 href="/index.html"><span class="avatar"></span></h1></a>
+		<a href="/"><h1 href="/index.html">Vishal Pandey</h1></a>
+		<div class="profile">
+			<img src="https://avatars.githubusercontent.com/u/19498820" alt="Vishal Pandey" width="250">
+			Vishal Pandey
+			<a href="mail-to:contact@vishalpandey.co.in">contact@vishalpandey.co.in</a>
+			<a href="https://github.com/vishal-pandey">github.com/vishal-pandey</a>
+		</div>
+	</span>
+	<span class="menu">
+		{% for item in site.data.menu %}
+            <a href="{{item.link}}" target="{{item.target}}">{{item.title}}</a>
+        {% endfor %}
+	</span>
+</section>

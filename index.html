@@ -1,0 +1,146 @@
+---
+layout: page
+---
+<link rel="stylesheet" href="assets/css/components/home.css">
+<section class="container">
+	<section class="main">
+		<div class="console" cdkDrag>
+			<div class="bar">
+				<span class="circle green"></span>
+				<span class="circle yellow"></span>
+				<span class="circle red">
+					<span class="tooltip">close</span>
+				</span>
+			</div>
+			<div class="intro-container">
+				<span><span class="promt">C:\Users\Vishal></span>&nbsp;&nbsp;</span>
+				<span>
+					<span class="promt">C:\Users\Vishal></span>&nbsp;&nbsp;
+					<a href="https://github.com/vishal-pandey" class="resume" target="_blank">
+						Github
+						<section class="github-section">
+							<i class="fa fa-github" aria-hidden="true"></i>
+							<span>/vishal-pandey</span>
+						</section>
+					</a>&nbsp;&nbsp;
+					<a href="https://raw.githubusercontent.com/vishal-pandey/www.vishalpandey.xyz/master/Resume.pdf" class="resume">
+						Resume
+						<section class="github-section">
+							<i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+							<span>Download</span>
+						</section>
+					</a>&nbsp;&nbsp;
+					<a href="https://www.youtube.com/channel/UCuGh7fbuAbWWXSn1CCCT3CQ?view_as=subscriber" class="resume">
+						YouTube
+						<section class="github-section">
+							<i class="fa fa-youtube" aria-hidden="true"></i>
+							<span>Subscribe</span>
+						</section>
+					</a>&nbsp;&nbsp;
+
+
+				</span>
+				<span><span class="promt">C:\Users\Vishal></span>&nbsp;&nbsp;</span>
+				<span><span class="promt">C:\Users\Vishal></span>&nbsp;
+				<span class="intro"></span></span>
+			</div>
+		</div>
+		<div class="bringBackButton" style="display: none;">
+			<button style="padding: 10px 15px;">Open</button>
+		</div>
+	</section>
+</section>
+
+
+
+<script>
+	var options = {
+      strings: ["Hi", 
+                "My Name Is Vishal Pandey",
+                "I am Freelance Software Developer",
+                "I provide solutions related to Machine Learning",
+                "I provide solutions related to Computer Vision",
+                "I provide solutions related to Forcasting and Prediction",
+                "Click Contact to Contact Me",
+                "For hiring Call me directly",
+                "Phone no. is below",
+                "Thank You",
+                ],
+      typeSpeed: 40,
+      backSpeed: 50,
+      // loop: true,
+      backDelay: 2000,
+      smartBackspace: true,
+    }
+	var typed = new Typed('.intro', options);
+
+	let closeButton = document.querySelector(".circle.red");
+	let openButton = document.querySelector(".bringBackButton");
+	
+	closeButton.onclick = ()=>{
+		document.querySelector('div.console').setAttribute('style', 'display:none');
+		document.querySelector('div.bringBackButton').setAttribute('style', 'display:inital');
+	}
+
+	openButton.onclick = ()=>{
+		document.querySelector('div.console').setAttribute('style', 'display:initial');
+		document.querySelector('div.bringBackButton').setAttribute('style', 'display:none');
+	}
+
+
+
+	
+window.onload = () => {
+	dragElement(document.querySelector(".console"));
+}
+
+console.log(document.querySelector(".console"))
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    // if present, the header is where you move the DIV from:
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+	  console.log("Reaching here")
+	  console.log(elmnt)
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+	console.log("Checking ehre")
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+
+</script>
+
+

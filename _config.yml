@@ -1,0 +1,139 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+#
+# If you need help with YAML syntax, here are some quick references for you: 
+# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
+# https://learnxinyminutes.com/docs/yaml/
+#
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+
+title: Vishal Pandey
+email: contact@vishalpandey.co.in
+description: >- # this means to ignore newlines until "baseurl:"
+  Vishal Pandey Software Developer, Problem Solver, Entrepreneur by heart. Love to problem through tech.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+twitter_username: jekyllrb
+github_username:  vishal-pandey
+
+# Build settings
+# theme: minima
+# plugins:
+#   - jekyll-feed
+
+# Exclude from processing.
+# The following items will not be processed, by default.
+# Any item listed under the `exclude:` key here will be automatically added to
+# the internal "default list".
+#
+# Excluded items can be processed by explicitly listing the directories or
+# their entries' file path in the `include:` list.
+#
+# exclude:
+#   - .sass-cache/
+#   - .jekyll-cache/
+#   - gemfiles/
+#   - Gemfile
+#   - Gemfile.lock
+#   - node_modules/
+#   - vendor/bundle/
+#   - vendor/cache/
+#   - vendor/gems/
+#   - vendor/ruby/
+
+
+# https://material.io/design/color/the-color-system.html#tools-for-picking-colors Pick color from here
+
+# Theme colors Blue Grey
+# color_50: '#ECEFF1'
+# color_100: '#CFD8DC'
+# color_200: '#B0BEC5'
+# color_300: '#90A4AE'
+# color_400: '#78909C'
+# color_500: '#607D8B'
+# color_600: '#546E7A'
+# color_700: '#455A64'
+# color_800: '#37474F'
+# color_900: '#263238'
+
+
+
+# Theme colors Teal
+# color_50: '#E0F2F1'
+# color_100: '#B2DFDB'
+# color_200: '#80CBC4'
+# color_300: '#4DB6AC'
+# color_400: '#26A69A'
+# color_500: '#009688'
+# color_600: '#00897B'
+# color_700: '#00796B'
+# color_800: '#00695C'
+# color_900: '#004D40'
+
+
+
+
+# Theme colors Brown
+color_50: '#EFEBE9'
+color_100: '#D7CCC8'
+color_200: '#BCAAA4'
+color_300: '#A1887F'
+color_400: '#8D6E63'
+color_500: '#795548'
+color_600: '#6D4C41'
+color_700: '#5D4037'
+color_800: '#4E342E'
+color_900: '#3E2723'
+
+
+
+# Theme colors Deep Orange
+# color_50: '#FBE9E7'
+# color_100: '#FFCCBC'
+# color_200: '#FFAB91'
+# color_300: '#FF8A65'
+# color_400: '#FF7043'
+# color_500: '#FF5722'
+# color_600: '#F4511E'
+# color_700: '#E64A19'
+# color_800: '#D84315'
+# color_900: '#BF360C'
+
+
+# Theme colors purple
+# color_50: '#F3E5F5'
+# color_100: '#E1BEE7'
+# color_200: '#CE93D8'
+# color_300: '#BA68C8'
+# color_400: '#AB47BC'
+# color_500: '#9C27B0'
+# color_600: '#8E24AA'
+# color_700: '#7B1FA2'
+# color_800: '#6A1B9A'
+# color_900: '#4A148C'
+
+
+# Theme colors gray
+
+# color_50: '#FAFAFA'
+# color_100: '#F5F5F5'
+# color_200: '#EEEEEE'
+# color_300: '#E0E0E0'
+# color_400: '#BDBDBD'
+# color_500: '#9E9E9E'
+# color_600: '#757575'
+# color_700: '#616161'
+# color_800: '#424242'
+# color_900: '#212121'
+

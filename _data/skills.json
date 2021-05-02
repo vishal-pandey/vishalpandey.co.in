@@ -1,0 +1,50 @@
+[
+    {
+        "name": "Numpy",
+        "img": "https://user-images.githubusercontent.com/1217238/65366817-d340b780-dbdd-11e9-9eea-6dacf412212b.png"
+    },
+    {
+        "name": "MatPlotLib",
+        "img": "https://matplotlib.org/3.2.0/_static/logo2_compressed.svg"
+    },
+    {
+        "name": "Pandas",
+        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Pandas_logo.svg/1200px-Pandas_logo.svg.png"
+    },
+    {
+        "name": "Scikit Learn",
+        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Scikit_learn_logo_small.svg/1280px-Scikit_learn_logo_small.svg.png"
+    },
+    {
+        "name": "Keras",
+        "img": "https://s3.amazonaws.com/keras.io/img/keras-logo-2018-large-1200.png"
+    },
+    {
+        "name": "Tensorflow",
+        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/TensorFlowLogo.svg/1200px-TensorFlowLogo.svg.png"
+    },
+    {
+        "name": "Django",
+        "img": "https://www.djangoproject.com/m/img/logos/django-logo-negative.png"
+    },
+    {
+        "name": "Angular V4+",
+        "img": "https://angular.io/assets/images/logos/angular/angular.png"
+    },
+    {
+        "name": "IoT",
+        "img": "https://raw.githubusercontent.com/vishal-pandey/cdn/master/iot.png"
+    },
+    {
+        "name": "Amazon Web Services",
+        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/2000px-Amazon_Web_Services_Logo.svg.png"
+    },
+    {
+        "name": "Microsoft Azure",
+        "img": "https://s3.amazonaws.com/dev.assets.neo4j.com/wp-content/uploads/20180821105618/Microsoft_Azure_Logo.png"
+    },
+    {
+        "name": "Digital Ocean",
+        "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/DigitalOcean_logo.svg/1200px-DigitalOcean_logo.svg.png"
+    }
+]

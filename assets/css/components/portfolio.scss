@@ -1,0 +1,106 @@
+---
+# Front matter comment to ensure Jekyll properly reads file.
+---
+.container{
+	width: 100%;
+	min-height: 100vh;
+	background-color: {{site.color_100}};
+}
+h2{
+	margin: 0;
+	text-align: center;
+	color: {{site.color_800}};
+	font-family: 'Bitter', serif;
+}
+.content{
+	max-width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 20px;
+}
+.project{
+	display: flex;
+	width: 100%;
+	/*height: 400px;*/
+	background-color: {{site.color_50}};
+	margin-top: 10px;
+}
+.project:nth-child(even){
+	flex-direction: row;
+}
+.project:nth-child(odd){
+	flex-direction: row-reverse;
+}
+.photo{
+	width: 40%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.photo img{
+	max-width: 100%;
+	max-width: 100%;
+}
+.description{
+	display: inline-block;
+	width: 60%;
+}
+.description h3{
+	margin: 0;
+}
+.d-head{
+	color: {{site.color_900}};
+	background-color: {{site.color_200}};
+	width: 100%;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: 'Roboto';
+}
+.links{
+	border-top: 1px solid grey;
+	color: {{site.color_900}};
+	background-color: {{site.color_200}};
+	height: 30px;
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+}
+.d-head h3 a{
+	color: {{site.color_900}};
+}
+
+.github{
+	font-size: 25px;
+}
+.the-description{
+	padding: 15px;
+	color: {{site.color_600}};
+	font-family: 'Roboto';
+}
+@media only screen and (max-width: 768px) {
+	.project{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 15px;
+		background-color: transparent;
+		/*flex-direction: column;*/
+	}
+	.project:nth-child(even){
+		flex-direction: column;
+	}
+	.project:nth-child(odd){
+		flex-direction: column;
+	}
+	.photo{
+		width: 100%;
+	}
+	.description{
+		width: 100%;
+		background-color: {{site.color_50}};
+	}
+}

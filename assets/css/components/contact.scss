@@ -1,0 +1,61 @@
+---
+# Front matter comment to ensure Jekyll properly reads file.
+---
+.container{
+	width: 100%;
+	min-height: 100vh;
+	background-color: {{site.color_100}};
+}
+h2{
+	margin: 0;
+	text-align: center;
+	color: {{site.color_800}};
+	font-family: 'Bitter', serif;
+}
+.content{
+	max-width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	padding-top: 20px;
+}
+.contact-c{
+	width: 30%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	background-color: {{site.color_50}};
+}
+.contact-c .title{
+	width: 100%;
+	height: 50px;
+	background-color: {{site.color_200}};
+	color: #263238;
+	font-family: 'Roboto Mono', monospace;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.icon{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 20px;
+	height: 300px;
+}
+.icon a{
+	font-size: 170px;
+	color: {{site.color_700}};
+}
+@media only screen and (max-width: 768px) {
+	.contact-c{
+		width: 45%;
+	}
+	.icon{
+		height: 150px;
+	}
+	.icon a{
+		font-size: 100px;
+	}
+}

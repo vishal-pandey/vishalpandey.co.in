@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site.title }}</title>
+    <meta name="description" content="{{site.description}}">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="https://use.fontawesome.com/2c153c4a21.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Bitter|Roboto|Roboto+Mono" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+</head>
+<body>
+    <div class="desktop">
+        {% include header.html %}
+    </div>
+    <div class="mobile">
+        {% include header-mobile.html %}
+    </div>
+    {{content}}
+    {% include footer.html %}
+</body>
+</html>

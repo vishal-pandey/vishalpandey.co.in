@@ -1,0 +1,33 @@
+[
+    {
+        "title": "Home",
+        "link": "/",
+        "target": ""
+    },
+    {
+        "title": "YouTube",
+        "link": "https://www.youtube.com/channel/UCuGh7fbuAbWWXSn1CCCT3CQ?view_as=subscriber",
+        "target": "_blank"
+    },
+    {
+        "title": "Portfolio",
+        "link": "/portfolio",
+        "target": ""
+    },
+    {
+        "title": "Skills",
+        "link": "/skills",
+        "target": ""
+    },
+    {
+        "title": "Contact Me",
+        "link": "/contact",
+        "target": ""
+    },
+    {
+        "title": "<i class='fa fa-github' aria-hidden='true' style='font-size: 25px;'></i>",
+        "link": "https://github.com/vishal-pandey/",
+        "target": "_blank"
+
+    }
+]

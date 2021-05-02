@@ -1,0 +1,19 @@
+---
+layout: page
+---
+<link rel="stylesheet" href="assets/css/components/skills.css">
+<section class="container">
+	<br>
+	<h2>SKILLS</h2>
+	<section class="content">
+		<div class="skill" style="display: none;"></div>
+		{% for skill in site.data.skills %}
+		<div class="skill">
+			<span class="heading">{{skill.name}}</span>
+			<span class="s-content">
+				<img src="{{skill.img}}">
+			</span>
+		</div>
+		{% endfor %}
+	</section>
+</section>

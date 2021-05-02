@@ -1,0 +1,76 @@
+---
+# Front matter comment to ensure Jekyll properly reads file.
+---
+@import url('https://fonts.googleapis.com/css?family=Bitter');
+.header{
+	background-color: {{site.color_500}};
+	color: {{site.color_50}};
+	font-family: 'Bitter', serif;
+	z-index: 1001;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0px 15px;
+	height: 65px;
+	font-size: 14px;
+	font-family: Roboto,"Helvetica Neue",sans-serif;
+}
+h1{
+	font-family: 'Bitter', serif;
+	cursor: pointer;
+	line-height: 100%;
+}
+.menu a, .header a{
+	color: {{site.color_50}};
+	text-decoration: none;
+}
+
+.menu a{
+	padding: 15px;
+	/* margin: 10px 20px; */
+}
+
+.avatar{
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: inline-block;
+	margin-right: 10px;
+	position: relative;
+	background: url('https://avatars.githubusercontent.com/u/19498820');
+	background-size: 100% 100%;
+	background-position: center;
+}
+
+.logo{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+.profile{
+	color: {{site.color_800}};
+	border-radius: 10px;
+	position: absolute;
+	top: 68px;
+	left: 0px;
+	border: 1px solid white;
+	padding: 10px 10px 10px 10px;
+	background-color: white;
+	display: none;
+	a{
+		text-decoration: none;
+		color: {{site.color_800}};
+	}
+}
+.logo:hover .profile{
+	display: block;
+	animation-name: popup1;
+ 	animation-duration: 150ms;
+}
+
+@keyframes popup1{
+	from{
+		top: 1900px;
+	}
+}

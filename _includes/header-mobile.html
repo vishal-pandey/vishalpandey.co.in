@@ -20,15 +20,15 @@
 </section>
 
 <script>
-    let menuButton = document.querySelector(".menu-button");
-    let closeButton = document.querySelector(".menu-close");
+    let menuOpenButton = document.querySelector(".menu-button");
+    let menuCloseButton = document.querySelector(".menu-close");
     let mobileMenuContainer = document.querySelector(".mobile-menu");
-    console.log(menuButton)
-    menuButton.onclick = ()=> {
+    
+    menuOpenButton.onclick = ()=> {
         mobileMenuContainer.style.display = "block"
     }
 
-    closeButton.onclick = ()=> {
+    menuCloseButton.onclick = ()=> {
         mobileMenuContainer.style.display = "none"
     }
 </script>

@@ -17,12 +17,8 @@
 		<a href="https://plus.google.com/u/0/109712308677416674874"><i class="fa fa-google-plus" aria-hidden="true"></i></a>
 	</mat-toolbar>
 	<mat-toolbar class="footer sitemap">
-		<a href="https://www.vishalpandey.xyz/">Home</a>
-		<a href="https://blog.vishalpandey.xyz/">Blog</a>
-		<a href="https://www.vishalpandey.xyz/portfolio">Portfolio</a>
-		<a href="https://www.vishalpandey.xyz/skills">Skills</a>
-		<a href="https://www.vishalpandey.xyz/contact">Contact Me</a>
-		<a href="https://www.vishalpandey.xyz/gallery">Gallery</a>
-		<a href="https://vishal-pandey.github.io/resume/">Resume</a>
+		{% for item in site.data.menu %}
+            <a href="{{item.link}}" target="{{item.target}}">{{item.title}}</a>
+        {% endfor %}
 	</mat-toolbar>
 </footer>

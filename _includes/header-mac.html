@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="assets/css/components/header-mac.css">
+<section class="action-bar">
+    <span class="logo"><img src="/assets/icons/apple.png"></span>
+    <span class="name">{{site.title}}</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    {% for item in site.data.menu %}
+        <a href="{{item.link}}" target="{{item.target}}" class="menu-item">{{item.title}}</a>
+    {% endfor %}
+</section>

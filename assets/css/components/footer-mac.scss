@@ -1,0 +1,42 @@
+---
+---
+
+*{
+    box-sizing: border-box;
+}
+
+.dock{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    background-color: rgba(70,70,70,0.8);
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    border-radius: 4px 4px 0px 0px;
+    z-index: 1000000;
+    box-sizing: border-box;
+    .icon{
+        font-size: 44px;
+        padding: 0px 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        img{
+            width: 50px;
+        }
+        b{
+            height: 5px;
+            width: 5px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+        b.dot{
+            background-color: white;
+        }
+    }
+}

@@ -1,0 +1,33 @@
+---
+---
+
+.action-bar{
+    width: 100vw;
+    height: 25px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    top: 0;
+    background-color: rgb(30, 30, 30);
+    color: white;
+    .logo img{
+        width: 12px;
+        margin-left: 15px;
+    }
+    .name{
+        font-weight: bold;
+        font-family: Roboto;
+        margin-left: 10px;
+    }
+    a.menu-item{
+        text-decoration: none;
+        color: white;
+        font-family: sans-serif;
+        font-weight: normal;
+        margin-right: 10px;
+        margin-left: 10px;
+        font-size: 14px;
+    }
+    
+}

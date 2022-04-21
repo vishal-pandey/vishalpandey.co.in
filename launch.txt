@@ -1,0 +1,110 @@
+http://unifiedbk.chsbc.nonprod.int/bepp-bncsrv/empower/bnc/receipt/submit/v1
+
+
+{
+  "version": "v1",
+  "statusCode": "L20013",
+  "statusMessage": "Receipt Submitted Successfully",
+  "timeTakenForResponse": "280",
+  "response": {
+    "paymentTxnId": "D1118672",
+    "paymentTxnStatus": "SUBMIT",
+    "recieptTimestamp": "1596281945",
+    "isPayorProposer": "BNP001",
+    "hubCode": "109",
+    "hubName": "Calicut",
+    "receiptType": "I",
+    "businessType": "1",
+    "cmsBankCode": "B",
+    "cmsBankName": "B",
+    "payorType": "BPT001",
+    "modeOfReceiptInstrument": "D",
+    "source": "BNS002",
+    "receiptDetails": [
+      {
+        "receiptId": "D112946208",
+        "paymentTxId": "D1118672",
+        "paidAmount": 5466464.0,
+        "receiptTime": "02",
+        "receiptDate": "1596281945",
+        "receiptType": "I",
+        "laName": "SREE  ",
+        "receiptStatus": "RS012",
+        "premiumAmount": 5466464.0,
+        "policyNumber": "9000062111",
+        "amountDue": 5466464.0,
+        "hubCode": "109",
+        "modeOfReceiptInstrument": "D",
+        "cmsBankCode": "B",
+        "approvedAt": "1596281945",
+        "approvedBy": "BNC-AUTO-APPROVAL-ON-SUBMIT"
+      }
+    ],
+    "policyDetails": [
+      {
+        "receiptNo": "D112946208",
+        "receiptStatus": "RS012",
+        "receiptCreateDate": "1596281945",
+        "proposerName": "SREE  ",
+        "laName": "SREE  ",
+        "payorName": "SREE  ",
+        "premiumAmount": 5466464.0,
+        "amountDue": 5466464.0,
+        "policyNo": "9000062111",
+        "bankingType": "1",
+        "paidPolicyAmount": 5466464.0
+      }
+    ],
+    "paymentDetails": {
+      "dateOfReceipt": "1596281945",
+      "timeOfReceipt": "02",
+      "payorType": "BPT001",
+      "payorFullName": "SREE  ",
+      "paymentMethod": [
+        {
+          "instrumentDate": "1632241697",
+          "micrCode": "411037001",
+          "ifscCode": "CITI0000005",
+          "supportingDocuments": [
+            "BNSD001"
+          ],
+          "cmsBankName": "B",
+          "accountNo": "12345",
+          "reenterAccountNo": "12345",
+          "bankName": "CITI BANK",
+          "bankBranch": "PUNE",
+          "accountType": "1",
+          "method": "D",
+          "amount": 5466464.0
+        }
+      ]
+    },
+    "createdAt": "1632241697",
+    "createdBy": "RECEIPT-CREATION-BNC",
+    "updatedAt": "1632241697",
+    "updatedBy": "BNC-AUTO-APPROVAL-ON-SUBMIT"
+  }
+}
+
+
+
+http://unifiedbk.chsbc.nonprod.int/bepp-wfengsrv/workflowEngine/launchApplication
+
+{
+    "applicationAttributes": {
+        "applicationNumber": "1999198701",
+        "source": "TABLET",
+        "launchType": "INITIAL"
+    },
+    "docRef": [
+        "string"
+    ],
+    "userID": "DemoSplit10",
+    "userName": "userAuth",
+    "wfLaunchName": "NBTouchFlow",
+    "wfLaunchVersion": "0.1",
+    "wiPlanName": "dummy",
+    "wiPriority": "0"
+}
+
+http://unified.chsbc.nonprod.int/support_doc/api/deleteApp/7000058954

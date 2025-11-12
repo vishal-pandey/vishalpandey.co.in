@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vishal Pandey - Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Mobile Backdrop -->
+        <div class="mobile-backdrop" id="mobileBackdrop"></div>
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <span class="menu-icon">☰</span>
+                </button>
+                <h1 class="logo">Portfolio</h1>
+            </div>
+
+            <!-- New Chat Button -->
+            <div class="new-chat-section">
+                <button class="new-chat-btn" id="newChatBtn">
+                    <span class="icon">✏️</span>
+                    <span>Home</span>
+                </button>
+            </div>
+
+            <!-- Navigation Menu (styled as chat history) -->
+            <nav class="nav-menu">
+                <div class="menu-section">
+                    <h3 class="section-title">Recent</h3>
+                    <ul class="menu-list">
+                        <li class="menu-item active" data-section="about">
+                            <span class="menu-icon">💬</span>
+                            <span class="menu-text">About Me</span>
+                        </li>
+                        <li class="menu-item" data-section="skills">
+                            <span class="menu-icon">💬</span>
+                            <span class="menu-text">Skills & Expertise</span>
+                        </li>
+                        <li class="menu-item" data-section="experience">
+                            <span class="menu-icon">💬</span>
+                            <span class="menu-text">Work Experience</span>
+                        </li>
+                        <li class="menu-item" data-section="projects">
+                            <span class="menu-icon">💬</span>
+                            <span class="menu-text">Projects</span>
+                        </li>
+                        <li class="menu-item" data-section="education">
+                            <span class="menu-icon">💬</span>
+                            <span class="menu-text">Education</span>
+                        </li>
+                        <li class="menu-item" data-section="contact">
+                            <span class="menu-icon">💬</span>
+                            <span class="menu-text">Contact Me</span>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <button class="settings-btn">
+                    <span class="icon">⚙️</span>
+                    <span>Settings & help</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-container">
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                <h2 class="chat-title">Vishal Pandey</h2>
+                <div class="header-actions">
+                    <button class="theme-toggle-btn" id="themeToggle" title="Toggle theme">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                    <span class="pro-badge">Portfolio</span>
+                </div>
+            </header>
+
+            <!-- Chat Messages Area -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Screen (shown by default) -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <h1 class="welcome-title">Hello, I'm <span class="highlight">Vishal</span></h1>
+                    <p class="welcome-subtitle">Welcome to my interactive portfolio</p>
+                    
+                    <!-- Witty Quote -->
+                    <div class="witty-quote">
+                        <p class="quote-text">
+                            💡 Instead of you asking me "Why we should we hire you"<br>
+                            <span class="quote-highlight">Ask and find it here 😉</span>
+                        </p>
+                    </div>
+                    
+                    <!-- Quick Action Buttons -->
+                    <div class="quick-actions">
+                        <button class="action-btn" data-section="about">
+                            <span class="emoji">👨‍💻</span>
+                            <span>About</span>
+                        </button>
+                        <button class="action-btn" data-section="skills">
+                            <span class="emoji">🚀</span>
+                            <span>Skills</span>
+                        </button>
+                        <button class="action-btn" data-section="projects">
+                            <span class="emoji">💼</span>
+                            <span>Projects</span>
+                        </button>
+                        <button class="action-btn" data-section="contact">
+                            <span class="emoji">📧</span>
+                            <span>Contact</span>
+                        </button>
+                    </div>
+
+                    <div class="learn-section">
+                        <p class="learn-text">Explore the menu to learn more about my work and experience</p>
+                    </div>
+                </div>
+
+                <!-- Content will be dynamically loaded here -->
+                <div class="chat-content" id="chatContent"></div>
+            </div>
+
+            <!-- Chat Input Area (for future interactivity) -->
+            <div class="chat-input-area">
+                <div class="input-container">
+                    <input 
+                        type="text" 
+                        class="chat-input" 
+                        id="chatInput" 
+                        placeholder="Ask me anything (Coming soon...)" 
+                        disabled
+                    >
+                    <button class="send-btn" id="sendBtn" disabled>
+                        <span>🎤</span>
+                    </button>
+                </div>
+                <p class="disclaimer">Interactive chat feature coming soon!</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

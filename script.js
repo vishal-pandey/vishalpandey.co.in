@@ -11,8 +11,8 @@ const portfolioContent = {
             <h3>What I Do</h3>
             <ul>
                 <li>🚀 Lead technical architecture and product development</li>
-                <li>� Build and manage high-performing engineering teams</li>
-                <li>� Design real-time data-driven systems and enterprise solutions</li>
+                <li>👥 Build and manage high-performing engineering teams</li>
+                <li>⚡ Design real-time data-driven systems and enterprise solutions</li>
                 <li>🔧 Implement cloud infrastructure and deployment strategies</li>
                 <li>📊 Drive technical decisions and stakeholder management</li>
             </ul>
@@ -196,7 +196,7 @@ const portfolioContent = {
             </div>
             
             <div class="project-card">
-                <h3 class="project-title">� AirTrik IoT Platform</h3>
+                <h3 class="project-title">🔌 AirTrik IoT Platform</h3>
                 <p class="project-description">
                     A complete PaaS solution for Industrial IoT applications. Includes Android app, NPM packages, Python libraries, and various SDKs for developers to build secure and scalable IoT solutions.
                 </p>
@@ -242,7 +242,7 @@ const portfolioContent = {
                 </div>
                 <div class="project-links">
                     <a href="https://hicard.in" target="_blank" class="project-link">🔗 HiCard Website</a>
-                    <a href="https://hicard.in/vishal" target="_blank" class="project-link">� My Profile</a>
+                    <a href="https://hicard.in/vishal" target="_blank" class="project-link">👤 My Profile</a>
                 </div>
             </div>
             
@@ -338,7 +338,7 @@ const portfolioContent = {
                 </a>
                 
                 <a href="tel:+919717130893" class="contact-item">
-                    <span class="contact-icon">�</span>
+                    <span class="contact-icon">📱</span>
                     <div class="contact-info">
                         <div class="contact-label">Phone</div>
                         <div class="contact-value">+91 97171 30893</div>
@@ -354,7 +354,7 @@ const portfolioContent = {
                 </a>
                 
                 <a href="https://www.linkedin.com/in/thevishalpandey" target="_blank" class="contact-item">
-                    <span class="contact-icon">�</span>
+                    <span class="contact-icon">💼</span>
                     <div class="contact-info">
                         <div class="contact-label">LinkedIn</div>
                         <div class="contact-value">linkedin.com/in/thevishalpandey</div>
@@ -362,7 +362,7 @@ const portfolioContent = {
                 </a>
                 
                 <a href="https://github.com/vishal-pandey" target="_blank" class="contact-item">
-                    <span class="contact-icon">�</span>
+                    <span class="contact-icon">💻</span>
                     <div class="contact-info">
                         <div class="contact-label">GitHub</div>
                         <div class="contact-value">github.com/vishal-pandey</div>

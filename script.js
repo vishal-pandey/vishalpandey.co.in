@@ -520,6 +520,9 @@ function displaySection(section) {
         }
     });
     
+    // Remove active state from home button
+    newChatBtn.classList.remove('active');
+    
     // Close mobile sidebar after selection
     closeMobileSidebar();
 }
@@ -531,6 +534,9 @@ function showWelcomeScreen() {
     
     // Remove active state from all menu items
     menuItems.forEach(item => item.classList.remove('active'));
+    
+    // Add active state to home button
+    newChatBtn.classList.add('active');
     
     // Close mobile sidebar
     closeMobileSidebar();
@@ -616,6 +622,9 @@ document.addEventListener('click', (e) => {
 
 // Smooth scroll behavior
 document.getElementById('chatMessages').style.scrollBehavior = 'smooth';
+
+// Set home button as active on initial load (since welcome screen is shown)
+newChatBtn.classList.add('active');
 
 // Initialize with about section by default (optional)
 // Uncomment the line below if you want to show "About" section on load instead of welcome screen

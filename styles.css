@@ -116,19 +116,29 @@ body {
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: var(--gradient-secondary);
-    border: none;
+    background: transparent;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    color: white;
+    color: var(--text-primary);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(107, 158, 255, 0.2);
 }
 
 .new-chat-btn:hover {
+    background: var(--hover-bg);
     transform: translateY(-1px);
+}
+
+.new-chat-btn.active {
+    background: var(--gradient-secondary);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 2px 8px rgba(107, 158, 255, 0.2);
+}
+
+.new-chat-btn.active:hover {
     box-shadow: 0 4px 12px rgba(107, 158, 255, 0.3);
 }
 

@@ -465,20 +465,36 @@ const ThemeManager = {
 // Initialize theme on page load
 ThemeManager.init();
 
+// Configure marked.js for better rendering
+if (typeof marked !== 'undefined') {
+    marked.setOptions({
+        breaks: true,
+        gfm: true,
+        headerIds: false,
+        mangle: false
+    });
+}
+
 // Function to create message element
-function createMessage(sender, content, isUser = false) {
+function createMessage(sender, content, isUser = false, isMarkdown = false) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message';
     
     const avatar = isUser ? '👤' : '🤖';
     const senderName = isUser ? 'You' : 'Portfolio';
     
+    // Parse markdown if enabled and marked is available
+    let processedContent = content;
+    if (isMarkdown && typeof marked !== 'undefined') {
+        processedContent = marked.parse(content);
+    }
+    
     messageDiv.innerHTML = `
         <div class="message-header">
             <div class="avatar">${avatar}</div>
             <span class="sender-name">${senderName}</span>
         </div>
-        <div class="message-content">${content}</div>
+        <div class="message-content markdown-content">${processedContent}</div>
     `;
     
     return messageDiv;
@@ -678,14 +694,26 @@ CONTACT:
 - LinkedIn: linkedin.com/in/thevishalpandey
 - GitHub: github.com/vishal-pandey
 
+IMPORTANT FORMATTING INSTRUCTIONS:
+- Always format your responses using Markdown
+- Use headers (##, ###) for main sections
+- Use **bold** for emphasis on key points
+- Use bullet points (-) for lists
+- Use numbered lists (1., 2., 3.) for sequential information
+- Use code blocks with language tags for code examples
+- Use > for important notes or quotes
+- Keep paragraphs concise and well-structured
+- Add emojis occasionally to make responses engaging (e.g., 🚀, 💼, 🎯, ✨)
+
 PERSONALITY:
 - Be helpful, professional, and enthusiastic
 - Highlight Vishal's technical expertise and leadership experience
 - Provide specific details from his work history when relevant
 - Encourage visitors to reach out or explore specific sections
 - Be conversational but knowledgeable
+- Format responses beautifully with Markdown for better readability
 
-When answering questions, draw from this context to provide accurate, specific information about Vishal's experience and capabilities.`;
+When answering questions, draw from this context to provide accurate, specific, well-formatted information about Vishal's experience and capabilities.`;
     },
     
     // Check WebGPU support
@@ -865,14 +893,39 @@ When answering questions, draw from this context to provide accurate, specific i
             let reply = '';
             assistantContent.innerHTML = '';
             
+            // Use streaming-markdown for incremental rendering (no flickering)
+            let renderer = null;
+            if (typeof smd !== 'undefined') {
+                // Initialize streaming markdown parser
+                renderer = smd.default_renderer(assistantContent);
+                smd.parser_write(smd.parser(renderer), '');
+            }
+            
+            const parser = typeof smd !== 'undefined' ? smd.parser(renderer) : null;
+            
             for await (const chunk of chunks) {
                 const delta = chunk.choices[0]?.delta?.content || '';
                 reply += delta;
-                assistantContent.textContent = reply;
+                
+                if (parser) {
+                    // Streaming markdown - incremental update, no re-render
+                    smd.parser_write(parser, delta);
+                } else {
+                    // Fallback to plain text
+                    assistantContent.textContent = reply;
+                }
                 
                 // Auto-scroll while streaming
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
+            
+            // End the parser stream
+            if (parser) {
+                smd.parser_end(parser);
+            }
+            
+            // Final scroll
+            chatMessages.scrollTop = chatMessages.scrollHeight;
             
             // Add to conversation history
             this.conversationHistory.push({

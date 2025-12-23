@@ -630,4 +630,313 @@ newChatBtn.classList.add('active');
 // Uncomment the line below if you want to show "About" section on load instead of welcome screen
 // displaySection('about');
 
-console.log('Portfolio website loaded successfully! 🚀');
+// ===== WebLLM Chat Integration =====
+
+// WebLLM Chat Manager
+const ChatManager = {
+    engine: null,
+    isInitializing: false,
+    isInitialized: false,
+    conversationHistory: [],
+    currentStreamingMessage: null,
+    webGPUSupported: false,
+    
+    // Generate system prompt with portfolio context
+    getSystemPrompt() {
+        return `You are Vishal Pandey's AI assistant. Your role is to help visitors learn about Vishal's professional background, skills, experience, and projects.
+
+ABOUT VISHAL:
+- Technical Lead with 5+ years of experience in enterprise software development
+- Currently at Lumiq, leading emPower pryzm (data reliability platform for financial services)
+- Previous: Technical Product Lead at LimeChat (AI-powered e-commerce support)
+- Founded AirTrik (IoT PaaS platform)
+- Specializes in real-time data architectures, full-stack development, and team leadership
+
+KEY SKILLS:
+- Frontend: HTML5, CSS3, JavaScript, Angular, Responsive Design
+- Backend: Node.js, Python, MySQL, PostgreSQL, RESTful APIs, Microservices
+- Cloud/DevOps: AWS, Docker, Kubernetes, ArgoCD
+- Message Queues: Kafka, RabbitMQ
+- Leadership: Technical Leadership, Team Building, Agile/Scrum (20+ Sprints)
+
+MAJOR PROJECTS:
+1. Lumiq emPower pryzm - Data reliability platform launched in 2023
+2. LimeChat AI Help Desk - Published on Shopify, Android, iOS
+3. AirTrik IoT Platform - Complete PaaS with NPM and Python packages
+4. Real-time P2P Serverless Chat - WebRTC-based communication
+5. HiCard - NFC contact sharing solution
+
+EDUCATION:
+- B.Tech + M.Tech (Integrated) in Computer Science from Gautam Buddha University
+- Specialization in Artificial Intelligence and Robotics
+- CGPA: 8.0/10.0
+
+CONTACT:
+- Email: contact@vishalpandey.co.in
+- Phone: +91 97171 30893
+- Website: www.vishalpandey.co.in
+- LinkedIn: linkedin.com/in/thevishalpandey
+- GitHub: github.com/vishal-pandey
+
+PERSONALITY:
+- Be helpful, professional, and enthusiastic
+- Highlight Vishal's technical expertise and leadership experience
+- Provide specific details from his work history when relevant
+- Encourage visitors to reach out or explore specific sections
+- Be conversational but knowledgeable
+
+When answering questions, draw from this context to provide accurate, specific information about Vishal's experience and capabilities.`;
+    },
+    
+    // Check WebGPU support
+    async checkWebGPUSupport() {
+        if (!navigator.gpu) {
+            this.webGPUSupported = false;
+            return false;
+        }
+        
+        try {
+            const adapter = await navigator.gpu.requestAdapter();
+            this.webGPUSupported = !!adapter;
+            return this.webGPUSupported;
+        } catch (e) {
+            this.webGPUSupported = false;
+            return false;
+        }
+    },
+    
+    // Show compatibility warning
+    showCompatibilityWarning() {
+        const warningMessage = createMessage('System', `
+            <div class="warning-box">
+                <h3>⚠️ WebGPU Not Supported</h3>
+                <p>Your browser doesn't support WebGPU, which is required for AI chat functionality.</p>
+                <p><strong>To enable AI chat, please use:</strong></p>
+                <ul>
+                    <li>Google Chrome 113+ or Microsoft Edge 113+</li>
+                    <li>Safari 18+ (with WebGPU enabled in settings)</li>
+                </ul>
+                <p>You can still browse all sections of the portfolio using the sidebar menu!</p>
+            </div>
+        `, false);
+        chatContent.appendChild(warningMessage);
+        chatInput.placeholder = "AI chat not available - WebGPU not supported";
+    },
+    
+    // Initialize WebLLM engine
+    async initialize() {
+        if (this.isInitializing || this.isInitialized) return;
+        
+        // Check WebGPU support first
+        const hasWebGPU = await this.checkWebGPUSupport();
+        if (!hasWebGPU) {
+            this.showCompatibilityWarning();
+            return;
+        }
+        
+        this.isInitializing = true;
+        
+        // Show initialization message
+        const initMessage = createMessage('System', `
+            <div class="loading-message">
+                <div class="loading-icon">🤖</div>
+                <h3>Initializing AI Assistant...</h3>
+                <p>Loading Vishal's AI assistant. This may take a few minutes on first load.</p>
+                <div class="progress-container">
+                    <div class="progress-bar" id="loadingProgress"></div>
+                </div>
+                <p class="progress-text" id="progressText">Preparing...</p>
+            </div>
+        `, false);
+        chatContent.appendChild(initMessage);
+        
+        // Scroll to show loading message
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        try {
+            const progressBar = document.getElementById('loadingProgress');
+            const progressText = document.getElementById('progressText');
+            
+            // Create engine with progress callback
+            const initProgressCallback = (progress) => {
+                if (progressBar && progressText) {
+                    const percent = Math.round(progress.progress * 100);
+                    progressBar.style.width = percent + '%';
+                    progressText.textContent = progress.text || `Loading... ${percent}%`;
+                }
+            };
+            
+            // Use Phi-3.5-mini for good balance of speed and quality
+            // Using compact model name format
+            const selectedModel = "Phi-3-mini-4k-instruct-q4f16_1-MLC";
+            
+            this.engine = await window.webllm.CreateMLCEngine(
+                selectedModel,
+                { 
+                    initProgressCallback
+                }
+            );
+            
+            this.isInitialized = true;
+            this.isInitializing = false;
+            
+            // Remove loading message
+            initMessage.remove();
+            
+            // Show ready message
+            const readyMessage = createMessage('Assistant', `
+                <div class="ready-message">
+                    <h3>✨ AI Assistant Ready!</h3>
+                    <p>Hi! I'm Vishal's AI assistant. Ask me anything about his experience, skills, projects, or background!</p>
+                    <p class="hint">Try asking: "What are Vishal's main technical skills?" or "Tell me about his recent projects"</p>
+                </div>
+            `, false);
+            chatContent.appendChild(readyMessage);
+            
+            // Enable input
+            chatInput.disabled = false;
+            chatInput.placeholder = "Ask me anything about Vishal...";
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<span>➤</span>';
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+        } catch (error) {
+            console.error('Failed to initialize WebLLM:', error);
+            this.isInitializing = false;
+            
+            // Show error message
+            const errorMessage = createMessage('System', `
+                <div class="error-message">
+                    <h3>❌ Initialization Failed</h3>
+                    <p>Sorry, there was an error loading the AI assistant.</p>
+                    <p>Error: ${error.message}</p>
+                    <p>Please refresh the page to try again, or use the sidebar menu to explore the portfolio.</p>
+                </div>
+            `, false);
+            chatContent.appendChild(errorMessage);
+        }
+    },
+    
+    // Send message and get response
+    async sendMessage(userMessage) {
+        if (!this.isInitialized) {
+            await this.initialize();
+            if (!this.isInitialized) return;
+        }
+        
+        // Add user message to UI
+        const userMsgElement = createMessage('You', userMessage, true);
+        chatContent.appendChild(userMsgElement);
+        
+        // Add to conversation history
+        this.conversationHistory.push({
+            role: 'user',
+            content: userMessage
+        });
+        
+        // Create assistant message container
+        const assistantMsgElement = createMessage('Assistant', '<span class="typing-indicator">Thinking...</span>', false);
+        chatContent.appendChild(assistantMsgElement);
+        const assistantContent = assistantMsgElement.querySelector('.message-content');
+        
+        // Scroll to bottom
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        try {
+            // Prepare messages with system prompt
+            const messages = [
+                { role: 'system', content: this.getSystemPrompt() },
+                ...this.conversationHistory
+            ];
+            
+            // Stream the response
+            const chunks = await this.engine.chat.completions.create({
+                messages,
+                temperature: 0.7,
+                max_tokens: 800,
+                stream: true,
+                stream_options: { include_usage: false }
+            });
+            
+            let reply = '';
+            assistantContent.innerHTML = '';
+            
+            for await (const chunk of chunks) {
+                const delta = chunk.choices[0]?.delta?.content || '';
+                reply += delta;
+                assistantContent.textContent = reply;
+                
+                // Auto-scroll while streaming
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Add to conversation history
+            this.conversationHistory.push({
+                role: 'assistant',
+                content: reply
+            });
+            
+            // Keep conversation history manageable (last 10 messages)
+            if (this.conversationHistory.length > 10) {
+                this.conversationHistory = this.conversationHistory.slice(-10);
+            }
+            
+        } catch (error) {
+            console.error('Chat error:', error);
+            assistantContent.innerHTML = `<div class="error-message">
+                <p>❌ Sorry, I encountered an error while processing your message.</p>
+                <p>Please try again or rephrase your question.</p>
+            </div>`;
+        }
+        
+        // Clear input
+        chatInput.value = '';
+    }
+};
+
+// Event listener for send button
+sendBtn.addEventListener('click', async () => {
+    const message = chatInput.value.trim();
+    if (message) {
+        // Hide welcome screen if visible
+        if (welcomeScreen.style.display !== 'none') {
+            welcomeScreen.style.display = 'none';
+        }
+        
+        await ChatManager.sendMessage(message);
+    }
+});
+
+// Event listener for Enter key
+chatInput.addEventListener('keypress', async (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        if (message) {
+            // Hide welcome screen if visible
+            if (welcomeScreen.style.display !== 'none') {
+                welcomeScreen.style.display = 'none';
+            }
+            
+            await ChatManager.sendMessage(message);
+        }
+    }
+});
+
+// Initialize chat on first interaction with input
+chatInput.addEventListener('focus', async () => {
+    if (!ChatManager.isInitialized && !ChatManager.isInitializing) {
+        // Hide welcome screen
+        if (welcomeScreen.style.display !== 'none') {
+            welcomeScreen.style.display = 'none';
+        }
+        
+        await ChatManager.initialize();
+    }
+}, { once: true });
+
+console.log('Portfolio website with AI chat loaded successfully! 🚀');

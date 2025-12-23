@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vishal Pandey - Portfolio</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="module">
+        // Import WebLLM from CDN
+        import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+        window.webllm = webllm;
+    </script>
 </head>
 <body>
     <!-- Main Container -->
@@ -136,14 +141,13 @@
                         type="text" 
                         class="chat-input" 
                         id="chatInput" 
-                        placeholder="Ask me anything (Coming soon...)" 
-                        disabled
+                        placeholder="Ask me anything about Vishal..." 
                     >
-                    <button class="send-btn" id="sendBtn" disabled>
-                        <span>🎤</span>
+                    <button class="send-btn" id="sendBtn">
+                        <span>➤</span>
                     </button>
                 </div>
-                <p class="disclaimer">Interactive chat feature coming soon!</p>
+                <p class="disclaimer">Powered by AI running locally in your browser</p>
             </div>
         </main>
     </div>

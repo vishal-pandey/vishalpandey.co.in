@@ -312,6 +312,34 @@ body {
     letter-spacing: 0.3px;
 }
 
+/* GitHub Link */
+.github-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.github-link:hover {
+    background-color: var(--bg-hover);
+    color: var(--accent-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.github-link svg {
+    width: 20px;
+    height: 20px;
+}
+
 /* Theme Toggle Button */
 .theme-toggle-btn {
     width: 40px;

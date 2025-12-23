@@ -1063,4 +1063,69 @@ window.addEventListener('load', async () => {
     }, 1000);
 });
 
+// Settings & Help button functionality
+const settingsBtn = document.getElementById('settingsBtn');
+if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+        const helpMessage = `
+### 🛠️ Settings & Help
+
+**AI Chat Features:**
+- Ask me anything about Vishal's experience, skills, or projects
+- The AI runs locally in your browser (no server needed!)
+- First load downloads ~2GB model (cached for future visits)
+
+**Keyboard Shortcuts:**
+- **Enter** - Send message
+- **Shift + Enter** - New line in message
+
+**Troubleshooting:**
+- **AI not loading?** Clear site data: DevTools (F12) → Application → Storage → Clear site data
+- **Storage full?** The AI model needs ~2GB browser storage
+- **Slow responses?** First load caches the model, subsequent visits are faster
+
+**Privacy:**
+- All AI processing happens in your browser
+- No data is sent to any server
+- Your conversations are not stored
+
+**Theme:**
+- Toggle dark/light theme using the 🌙/☀️ button
+
+**Quick Navigation:**
+- Use the sidebar menu to explore different sections
+- Click "Home" to return to the welcome screen
+
+**Contact:**
+- Email: contact@vishalpandey.co.in
+- GitHub: github.com/vishal-pandey
+- LinkedIn: linkedin.com/in/thevishalpandey
+
+**Technology:**
+- AI Model: Llama 3.2 3B Instruct (WebLLM)
+- Browser: Requires WebGPU support (Chrome 113+, Edge 113+, Safari 18+)
+        `.trim();
+
+        // Hide welcome screen
+        welcomeScreen.style.display = 'none';
+        
+        // Clear chat content and show help
+        chatContent.innerHTML = '';
+        const helpMsg = createMessage('System', helpMessage, false, true);
+        chatContent.appendChild(helpMsg);
+        
+        // Scroll to top
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = 0;
+        
+        // Update active state
+        menuItems.forEach(item => item.classList.remove('active'));
+        newChatBtn.classList.remove('active');
+        settingsBtn.classList.add('active');
+        
+        // Close mobile sidebar
+        closeMobileSidebar();
+    });
+}
+
 console.log('Portfolio website with AI chat loaded successfully! 🚀');

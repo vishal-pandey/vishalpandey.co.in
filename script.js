@@ -480,8 +480,8 @@ function createMessage(sender, content, isUser = false, isMarkdown = false) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message';
     
-    const avatar = isUser ? '👤' : '🤖';
-    const senderName = isUser ? 'You' : 'Portfolio';
+    const avatar = isUser ? '👤' : '✨';
+    const senderName = isUser ? 'You' : 'Vishal\'s Assistant';
     
     // Parse markdown if enabled and marked is available
     let processedContent = content;
@@ -751,8 +751,32 @@ When answering questions, draw from this context to provide accurate, specific, 
         chatInput.placeholder = "AI chat not available - WebGPU not supported";
     },
     
+    // Humorous loading messages
+    loadingMessages: [
+        "Waking up the AI... it had a late night 🌙",
+        "Teaching AI about Vishal's achievements... there's a lot 📚",
+        "Downloading brain cells... please wait 🧠",
+        "Convincing AI that it's not a chatbot, it's a 'digital assistant' 🤖",
+        "Loading sarcasm module... almost there 😏",
+        "Bribing the AI with virtual cookies 🍪",
+        "AI is doing its morning yoga... namaste 🧘",
+        "Feeding hamsters that power this AI... 🐹",
+        "AI is reading Vishal's resume for the 1000th time 📄",
+        "Warming up the silicon neurons... 🔥",
+        "AI is having an existential crisis... one moment ✨",
+        "Downloading more RAM... just kidding, that's not how it works 💾",
+        "AI is practicing its typing... hunt and peck style ⌨️",
+        "Loading witty responses... this might take a while 🎭",
+        "AI is brushing up on Vishal's accomplishments... impressive stuff 🏆"
+    ],
+    
+    // Get random loading message
+    getRandomLoadingMessage() {
+        return this.loadingMessages[Math.floor(Math.random() * this.loadingMessages.length)];
+    },
+    
     // Initialize WebLLM engine
-    async initialize() {
+    async initialize(showInChat = false) {
         if (this.isInitializing || this.isInitialized) return;
         
         // Check WebGPU support first
@@ -764,34 +788,43 @@ When answering questions, draw from this context to provide accurate, specific, 
         
         this.isInitializing = true;
         
-        // Show initialization message
-        const initMessage = createMessage('System', `
-            <div class="loading-message">
-                <div class="loading-icon">🤖</div>
-                <h3>Initializing AI Assistant...</h3>
-                <p>Loading Vishal's AI assistant. This may take a few minutes on first load.</p>
-                <div class="progress-container">
-                    <div class="progress-bar" id="loadingProgress"></div>
-                </div>
-                <p class="progress-text" id="progressText">Preparing...</p>
-            </div>
-        `, false);
-        chatContent.appendChild(initMessage);
+        // Get loading indicator elements
+        const loadingIndicator = document.getElementById('aiLoadingIndicator');
+        const loadingText = document.getElementById('aiLoadingText');
+        const loadingBar = document.getElementById('aiLoadingBar');
+        const disclaimerText = document.getElementById('disclaimerText');
         
-        // Scroll to show loading message
-        const chatMessages = document.getElementById('chatMessages');
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        // Show compact loading indicator below input
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'block';
+            loadingText.textContent = this.getRandomLoadingMessage();
+        }
+        
+        // Hide disclaimer while loading
+        if (disclaimerText) {
+            disclaimerText.style.display = 'none';
+        }
+        
+        // Rotate humorous messages every 3 seconds
+        const messageInterval = setInterval(() => {
+            if (loadingText && this.isInitializing) {
+                loadingText.textContent = this.getRandomLoadingMessage();
+            }
+        }, 3000);
+        
+        // Get progress percentage element
+        const loadingPercent = document.getElementById('aiLoadingPercent');
         
         try {
-            const progressBar = document.getElementById('loadingProgress');
-            const progressText = document.getElementById('progressText');
             
             // Create engine with progress callback
             const initProgressCallback = (progress) => {
-                if (progressBar && progressText) {
-                    const percent = Math.round(progress.progress * 100);
-                    progressBar.style.width = percent + '%';
-                    progressText.textContent = progress.text || `Loading... ${percent}%`;
+                const percent = Math.round(progress.progress * 100);
+                if (loadingBar) {
+                    loadingBar.style.width = percent + '%';
+                }
+                if (loadingPercent) {
+                    loadingPercent.textContent = percent + '%';
                 }
             };
             
@@ -809,18 +842,26 @@ When answering questions, draw from this context to provide accurate, specific, 
             this.isInitialized = true;
             this.isInitializing = false;
             
-            // Remove loading message
-            initMessage.remove();
+            // Stop rotating messages
+            clearInterval(messageInterval);
             
-            // Show ready message
-            const readyMessage = createMessage('Assistant', `
-                <div class="ready-message">
-                    <h3>✨ AI Assistant Ready!</h3>
-                    <p>Hi! I'm Vishal's AI assistant. Ask me anything about his experience, skills, projects, or background!</p>
-                    <p class="hint">Try asking: "What are Vishal's main technical skills?" or "Tell me about his recent projects"</p>
-                </div>
-            `, false);
-            chatContent.appendChild(readyMessage);
+            // Hide loading indicator
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
+            // Show success message in disclaimer area briefly
+            if (disclaimerText) {
+                disclaimerText.style.display = 'block';
+                disclaimerText.innerHTML = '✨ <strong>AI Ready!</strong> Ask me anything about Vishal\'s experience, skills, or projects!';
+                disclaimerText.style.color = 'var(--accent-blue)';
+                
+                // Reset after 5 seconds
+                setTimeout(() => {
+                    disclaimerText.innerHTML = 'I don\'t have budget to run LLM on my server, so I\'m using your computer instead 😅';
+                    disclaimerText.style.color = '';
+                }, 5000);
+            }
             
             // Enable input
             chatInput.disabled = false;
@@ -828,23 +869,35 @@ When answering questions, draw from this context to provide accurate, specific, 
             sendBtn.disabled = false;
             sendBtn.innerHTML = '<span>➤</span>';
             
-            // Scroll to bottom
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
         } catch (error) {
             console.error('Failed to initialize WebLLM:', error);
             this.isInitializing = false;
             
-            // Show error message
-            const errorMessage = createMessage('System', `
-                <div class="error-message">
-                    <h3>❌ Initialization Failed</h3>
-                    <p>Sorry, there was an error loading the AI assistant.</p>
-                    <p>Error: ${error.message}</p>
-                    <p>Please refresh the page to try again, or use the sidebar menu to explore the portfolio.</p>
-                </div>
-            `, false);
-            chatContent.appendChild(errorMessage);
+            // Stop rotating messages
+            clearInterval(messageInterval);
+            
+            // Hide loading indicator
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
+            // Determine error message based on error type
+            let errorMsg = '😅 AI couldn\'t wake up today. Use the sidebar menu to explore!';
+            
+            if (error.name === 'QuotaExceededError' || error.message?.includes('Quota')) {
+                errorMsg = '💾 Browser storage full! Clear site data in DevTools → Application → Storage';
+            } else if (error.message?.includes('WebGPU')) {
+                errorMsg = '🖥️ WebGPU not available. Try Chrome 113+ or Edge 113+';
+            }
+            
+            // Show error in disclaimer area
+            if (disclaimerText) {
+                disclaimerText.style.display = 'block';
+                disclaimerText.innerHTML = errorMsg;
+                disclaimerText.style.color = 'var(--accent-purple)';
+            }
+            
+            chatInput.placeholder = "AI unavailable - use sidebar menu";
         }
     },
     
@@ -854,6 +907,9 @@ When answering questions, draw from this context to provide accurate, specific, 
             await this.initialize();
             if (!this.isInitialized) return;
         }
+        
+        // Clear input immediately
+        chatInput.value = '';
         
         // Add user message to UI
         const userMsgElement = createMessage('You', userMessage, true);
@@ -945,9 +1001,6 @@ When answering questions, draw from this context to provide accurate, specific, 
                 <p>Please try again or rephrase your question.</p>
             </div>`;
         }
-        
-        // Clear input
-        chatInput.value = '';
     }
 };
 
@@ -980,16 +1033,14 @@ chatInput.addEventListener('keypress', async (e) => {
     }
 });
 
-// Initialize chat on first interaction with input
-chatInput.addEventListener('focus', async () => {
-    if (!ChatManager.isInitialized && !ChatManager.isInitializing) {
-        // Hide welcome screen
-        if (welcomeScreen.style.display !== 'none') {
-            welcomeScreen.style.display = 'none';
+// Auto-initialize AI in background when page loads
+window.addEventListener('load', async () => {
+    // Small delay to let the page render first
+    setTimeout(async () => {
+        if (!ChatManager.isInitialized && !ChatManager.isInitializing) {
+            await ChatManager.initialize();
         }
-        
-        await ChatManager.initialize();
-    }
-}, { once: true });
+    }, 1000);
+});
 
 console.log('Portfolio website with AI chat loaded successfully! 🚀');

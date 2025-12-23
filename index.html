@@ -153,7 +153,29 @@
                         <span>➤</span>
                     </button>
                 </div>
-                <p class="disclaimer">I don't have budget to run LLM on my server, so I'm using your computer instead 😅</p>
+                <!-- Compact AI Loading Indicator -->
+                <div class="ai-loading-indicator" id="aiLoadingIndicator" style="display: none;">
+                    <div class="ai-loading-content">
+                        <div class="ai-loading-orb">
+                            <div class="orb-core"></div>
+                            <div class="orb-ring"></div>
+                            <div class="orb-ring orb-ring-2"></div>
+                            <div class="orb-particles">
+                                <span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="ai-loading-info">
+                            <span class="ai-loading-text" id="aiLoadingText">Waking up the AI...</span>
+                            <div class="ai-loading-progress-row">
+                                <div class="ai-loading-progress">
+                                    <div class="ai-loading-bar" id="aiLoadingBar"></div>
+                                </div>
+                                <span class="ai-loading-percent" id="aiLoadingPercent">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="disclaimer" id="disclaimerText">I don't have budget to run LLM on my server, so I'm using your computer instead 😅</p>
             </div>
         </main>
     </div>

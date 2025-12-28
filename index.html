@@ -104,39 +104,73 @@
             <div class="chat-messages" id="chatMessages">
                 <!-- Welcome Screen (shown by default) -->
                 <div class="welcome-screen" id="welcomeScreen">
-                    <h1 class="welcome-title">Hello, I'm <span class="highlight">Vishal</span></h1>
-                    <p class="welcome-subtitle">Welcome to my interactive portfolio</p>
-                    
-                    <!-- Witty Quote -->
-                    <div class="witty-quote">
-                        <p class="quote-text">
-                            💡 Instead of you asking me "Why should we hire you"<br>
-                            <span class="quote-highlight">Ask my AI assistant and find out 😉</span>
-                        </p>
+                    <div class="hero-intro">
+                        <div class="status-badge">
+                            <span class="status-dot"></span>
+                            <span>Probably debugging something rn</span>
+                        </div>
+                        <h1 class="welcome-title">Hey, I'm <span class="highlight">Vishal</span> <span class="wave-emoji">👋</span></h1>
+                        <p class="welcome-subtitle">I build things that sometimes work</p>
+                        <p class="tagline">Software Engineer • Mass builder • Professional mass refactorer</p>
                     </div>
                     
-                    <!-- Quick Action Buttons -->
-                    <div class="quick-actions">
-                        <button class="action-btn" data-section="about">
-                            <span class="emoji">👨‍💻</span>
-                            <span>About</span>
-                        </button>
-                        <button class="action-btn" data-section="skills">
-                            <span class="emoji">🚀</span>
-                            <span>Skills</span>
-                        </button>
-                        <button class="action-btn" data-section="projects">
-                            <span class="emoji">💼</span>
-                            <span>Projects</span>
-                        </button>
-                        <button class="action-btn" data-section="contact">
-                            <span class="emoji">📧</span>
-                            <span>Contact</span>
-                        </button>
+                    <!-- Fun Facts Carousel -->
+                    <div class="fun-facts-section">
+                        <div class="fun-fact-card" id="funFactCard">
+                            <span class="fact-emoji" id="factEmoji">🤔</span>
+                            <p class="fact-text" id="factText">This AI is running on a MacBook hiding in my closet. Yes, that's my "homelab".</p>
+                        </div>
                     </div>
-
-                    <div class="learn-section">
-                        <p class="learn-text">Type a question below or explore the sidebar menu</p>
+                    
+                    <!-- Interactive Prompt -->
+                    <div class="ai-prompt-section">
+                        <p class="prompt-intro">Ask my AI anything • It knows too much about me tbh</p>
+                        <div class="sample-questions">
+                            <button class="sample-q" data-question="What weird projects has Vishal built?">
+                                <span>🛠️</span> Weird projects
+                            </button>
+                            <button class="sample-q" data-question="Tell me something surprising or fun about Vishal">
+                                <span>🎲</span> Surprise me
+                            </button>
+                            <button class="sample-q" data-question="What tech stack does Vishal work with?">
+                                <span>💻</span> Tech stack
+                            </button>
+                            <button class="sample-q" data-question="Roast Vishal's career choices">
+                                <span>🔥</span> Roast him
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Fourth Wall Break -->
+                    <div class="fourth-wall-section">
+                        <p class="fourth-wall-text">Still scrolling? Fine, here are some buttons ↓</p>
+                    </div>
+                    
+                    <!-- Quick Navigation -->
+                    <div class="quick-nav-section">
+                        <div class="quick-actions">
+                            <button class="action-btn" data-section="about">
+                                <span class="emoji">👨‍💻</span>
+                                <span>About</span>
+                            </button>
+                            <button class="action-btn" data-section="skills">
+                                <span class="emoji">🚀</span>
+                                <span>Skills</span>
+                            </button>
+                            <button class="action-btn" data-section="projects">
+                                <span class="emoji">💼</span>
+                                <span>Projects</span>
+                            </button>
+                            <button class="action-btn" data-section="contact">
+                                <span class="emoji">📧</span>
+                                <span>Contact</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Easter Egg Footer -->
+                    <div class="easter-egg-footer">
+                        <p>upar buttons click kar dia? nice. ab kya padh rahe ho, khatam hogya 👋</p>
                     </div>
                 </div>
 

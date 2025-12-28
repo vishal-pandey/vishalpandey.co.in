@@ -1447,4 +1447,72 @@ if (settingsBtn) {
     });
 }
 
+// ===== Fun Facts Carousel =====
+const FunFactsManager = {
+    facts: [
+        { emoji: '🤔', text: "This AI is running on a MacBook hiding in my closet. Yes, that's my 'homelab'." },
+        { emoji: '😅', text: "I mass produce more projects than I can count. Most work. Some don't. We don't talk about those." },
+        { emoji: '🔥', text: "I've mass refactored codebases at 3am. No regrets. Okay, some regrets." },
+        { emoji: '🎮', text: "Built Tetris, Snake, and a Brick Game. Yes, I mass produce nostalgia." },
+        { emoji: '🧠', text: "Made a neural network in pure JavaScript. Why? Kuch bhi." },
+        { emoji: '💸', text: "Looking for help with: Money. Paise chahiye bhai dedo." },
+        { emoji: '🐘', text: "Fun fact: 1 baar 1 hathi ne chiti se kaha... actually nvm" },
+        { emoji: '🤷', text: "Ask me about: Kuch bhi pooch lo par bataunga nahi" },
+        { emoji: '😴', text: "Currently working on: Kuch Bhi Nahi (and mass learning everything)" },
+        { emoji: '🚀', text: "Started a startup from my college room. Mass chaos, mass fun." },
+        { emoji: '🤖', text: "This portfolio has AI. The AI knows everything. I'm mass scared." },
+        { emoji: '👋', text: "Ye last fact hai. Bye. Full stop. Khatam. Why are you still here?" },
+    ],
+    currentIndex: 0,
+    interval: null,
+    
+    init() {
+        const card = document.getElementById('funFactCard');
+        if (!card) return;
+        
+        // Click to show next fact
+        card.addEventListener('click', () => this.showNext());
+        
+        // Auto-rotate every 5 seconds
+        this.interval = setInterval(() => this.showNext(), 5000);
+    },
+    
+    showNext() {
+        this.currentIndex = (this.currentIndex + 1) % this.facts.length;
+        const fact = this.facts[this.currentIndex];
+        
+        const emojiEl = document.getElementById('factEmoji');
+        const textEl = document.getElementById('factText');
+        
+        if (emojiEl && textEl) {
+            // Fade out
+            emojiEl.style.opacity = '0';
+            textEl.style.opacity = '0';
+            
+            setTimeout(() => {
+                emojiEl.textContent = fact.emoji;
+                textEl.textContent = fact.text;
+                // Fade in
+                emojiEl.style.opacity = '1';
+                textEl.style.opacity = '1';
+            }, 200);
+        }
+    }
+};
+
+// Initialize fun facts
+FunFactsManager.init();
+
+// ===== Sample Questions Handler =====
+document.querySelectorAll('.sample-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const question = btn.dataset.question;
+        if (question) {
+            chatInput.value = question;
+            // Trigger the send button click
+            sendBtn.click();
+        }
+    });
+});
+
 console.log('🚀 Portfolio loaded! Cloud AI ready, Local AI available on demand.');

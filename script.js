@@ -712,11 +712,8 @@ const AIModeManager = {
         const localLabel = document.getElementById('localModeLabel');
         const description = document.getElementById('modeDescription');
         
-        // On mobile, always show server mode status
+        // On mobile, just update placeholder (status is handled by HTML)
         if (this.isMobile()) {
-            if (description) {
-                description.innerHTML = '<span class="ai-status-dot online"></span>M1 Mac • Fast & ready ⚡';
-            }
             chatInput.placeholder = "Ask me anything about Vishal...";
             return;
         }

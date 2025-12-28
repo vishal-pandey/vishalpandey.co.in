@@ -652,13 +652,24 @@ newChatBtn.classList.add('active');
 const AIModeManager = {
     currentMode: 'server', // 'server' or 'local'
     
+    isMobile() {
+        return window.innerWidth <= 768;
+    },
+    
     init() {
         const toggle = document.getElementById('aiModeSwitch');
         const serverLabel = document.getElementById('serverModeLabel');
         const localLabel = document.getElementById('localModeLabel');
         const description = document.getElementById('modeDescription');
         
-        // Load saved preference
+        // On mobile, always use server mode
+        if (this.isMobile()) {
+            this.currentMode = 'server';
+            this.updateUI();
+            return;
+        }
+        
+        // Load saved preference (desktop only)
         const savedMode = localStorage.getItem('ai-mode') || 'server';
         this.currentMode = savedMode;
         
@@ -701,6 +712,15 @@ const AIModeManager = {
         const localLabel = document.getElementById('localModeLabel');
         const description = document.getElementById('modeDescription');
         
+        // On mobile, always show server mode status
+        if (this.isMobile()) {
+            if (description) {
+                description.innerHTML = '<span class="ai-status-dot online"></span>M1 Mac • Fast & ready ⚡';
+            }
+            chatInput.placeholder = "Ask me anything about Vishal...";
+            return;
+        }
+        
         if (this.currentMode === 'server') {
             serverLabel?.classList.add('active');
             localLabel?.classList.remove('active');
@@ -728,12 +748,18 @@ const AIModeManager = {
     
     onModeChange() {
         if (this.currentMode === 'local' && !LocalChatManager.isInitialized && !LocalChatManager.isInitializing) {
-            // Start initializing WebLLM when switching to local mode
-            LocalChatManager.initialize();
+            // Start initializing WebLLM when switching to local mode (desktop only)
+            if (!this.isMobile()) {
+                LocalChatManager.initialize();
+            }
         }
     },
     
     getActiveManager() {
+        // Always use server on mobile
+        if (this.isMobile()) {
+            return ServerChatManager;
+        }
         return this.currentMode === 'server' ? ServerChatManager : LocalChatManager;
     }
 };

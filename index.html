@@ -186,6 +186,10 @@
                         class="chat-input" 
                         id="chatInput" 
                         placeholder="Ask me anything about Vishal..." 
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
                     >
                     <button class="send-btn" id="sendBtn">
                         <span>➤</span>
@@ -215,13 +219,19 @@
                 </div>
                 <!-- AI Mode Toggle -->
                 <div class="ai-mode-toggle" id="aiModeToggle">
-                    <div class="mode-toggle-container">
+                    <!-- Desktop: Full toggle -->
+                    <div class="mode-toggle-container desktop-only">
                         <span class="mode-label mode-label-server" id="serverModeLabel">🖥️ Homelab</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="aiModeSwitch">
                             <span class="toggle-slider"></span>
                         </label>
                         <span class="mode-label mode-label-local" id="localModeLabel">🔒 Your Device</span>
+                    </div>
+                    <!-- Mobile: Simple status -->
+                    <div class="mobile-ai-status mobile-only">
+                        <span class="mobile-ai-icon">🖥️</span>
+                        <span class="mobile-ai-text">Powered by Vishal's Homelab</span>
                     </div>
                     <p class="mode-description" id="modeDescription">Running on Vishal's M1 Mac homelab ⚡</p>
                 </div>

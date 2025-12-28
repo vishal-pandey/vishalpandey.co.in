@@ -1376,15 +1376,113 @@ body {
     .message-content {
         margin-left: 0;
     }
+    
+    /* Mobile touch optimizations */
+    .sample-q {
+        padding: 12px 16px;
+        font-size: 14px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .action-btn {
+        padding: 14px 10px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .menu-item {
+        padding: 14px 16px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Better input on mobile */
+    .chat-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .send-btn {
+        min-width: 44px;
+        min-height: 44px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Fourth wall text smaller on mobile */
+    .fourth-wall-text {
+        font-size: 13px;
+    }
+    
+    .easter-egg-footer p {
+        font-size: 12px;
+    }
+    
+    /* Welcome screen adjustments */
+    .welcome-screen {
+        padding-top: 4vh;
+    }
+    
+    .hero-intro {
+        margin-bottom: 24px;
+    }
+    
+    .fun-facts-section {
+        margin: 24px auto;
+    }
+    
+    .ai-prompt-section {
+        margin: 28px auto;
+    }
+    
+    .prompt-intro {
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 480px) {
     .quick-actions {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
 
     .welcome-title {
         font-size: 28px;
+    }
+    
+    .welcome-subtitle {
+        font-size: 16px;
+    }
+    
+    .tagline {
+        font-size: 13px;
+    }
+    
+    .sample-questions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .sample-q {
+        justify-content: center;
+    }
+    
+    .fun-fact-card {
+        padding: 14px 16px;
+        gap: 12px;
+    }
+    
+    .fact-emoji {
+        font-size: 24px;
+    }
+    
+    .fact-text {
+        font-size: 13px;
+    }
+    
+    .action-btn {
+        padding: 12px 8px;
+        gap: 6px;
+    }
+    
+    .action-btn .emoji {
+        font-size: 20px;
     }
 }
 
@@ -2079,22 +2177,45 @@ body {
         padding: 10px 12px;
     }
     
-    .mode-label {
-        font-size: 12px;
+    /* Hide desktop toggle on mobile */
+    .desktop-only {
+        display: none !important;
     }
     
-    .toggle-switch {
-        width: 48px;
-        height: 26px;
+    /* Show mobile status */
+    .mobile-only {
+        display: flex !important;
     }
     
-    .toggle-slider::before {
-        height: 20px;
-        width: 20px;
+    .mobile-ai-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+    }
+    
+    .mobile-ai-icon {
+        font-size: 18px;
+    }
+    
+    .mobile-ai-text {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--accent-blue);
+    }
+    
+    .mode-description {
         font-size: 11px;
     }
+}
+
+/* Hide mobile-only on desktop */
+@media (min-width: 769px) {
+    .mobile-only {
+        display: none !important;
+    }
     
-    .toggle-switch input:checked + .toggle-slider::before {
-        transform: translateX(22px);
+    .desktop-only {
+        display: flex !important;
     }
 }

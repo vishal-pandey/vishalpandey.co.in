@@ -110,8 +110,8 @@
                     <!-- Witty Quote -->
                     <div class="witty-quote">
                         <p class="quote-text">
-                            💡 Instead of you asking me "Why we should we hire you"<br>
-                            <span class="quote-highlight">Ask and find it here 😉</span>
+                            💡 Instead of you asking me "Why should we hire you"<br>
+                            <span class="quote-highlight">Ask my AI assistant and find out 😉</span>
                         </p>
                     </div>
                     
@@ -136,7 +136,7 @@
                     </div>
 
                     <div class="learn-section">
-                        <p class="learn-text">Explore the menu to learn more about my work and experience</p>
+                        <p class="learn-text">Type a question below or explore the sidebar menu</p>
                     </div>
                 </div>
 
@@ -179,7 +179,18 @@
                         </div>
                     </div>
                 </div>
-                <p class="disclaimer" id="disclaimerText">I don't have budget to run LLM on my server, so I'm using your computer instead 😅</p>
+                <!-- AI Mode Toggle -->
+                <div class="ai-mode-toggle" id="aiModeToggle">
+                    <div class="mode-toggle-container">
+                        <span class="mode-label mode-label-server" id="serverModeLabel">🖥️ Homelab</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="aiModeSwitch">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="mode-label mode-label-local" id="localModeLabel">🔒 Your Device</span>
+                    </div>
+                    <p class="mode-description" id="modeDescription">Running on Vishal's M1 Mac homelab ⚡</p>
+                </div>
             </div>
         </main>
     </div>

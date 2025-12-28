@@ -646,15 +646,385 @@ newChatBtn.classList.add('active');
 // Uncomment the line below if you want to show "About" section on load instead of welcome screen
 // displaySection('about');
 
-// ===== WebLLM Chat Integration =====
+// ===== AI Chat Integration =====
 
-// WebLLM Chat Manager
-const ChatManager = {
+// AI Mode Manager - Controls which AI backend is active
+const AIModeManager = {
+    currentMode: 'server', // 'server' or 'local'
+    
+    init() {
+        const toggle = document.getElementById('aiModeSwitch');
+        const serverLabel = document.getElementById('serverModeLabel');
+        const localLabel = document.getElementById('localModeLabel');
+        const description = document.getElementById('modeDescription');
+        
+        // Load saved preference
+        const savedMode = localStorage.getItem('ai-mode') || 'server';
+        this.currentMode = savedMode;
+        
+        if (toggle) {
+            toggle.checked = savedMode === 'local';
+            this.updateUI();
+            
+            toggle.addEventListener('change', () => {
+                this.currentMode = toggle.checked ? 'local' : 'server';
+                localStorage.setItem('ai-mode', this.currentMode);
+                this.updateUI();
+                this.onModeChange();
+            });
+        }
+        
+        // Make labels clickable
+        if (serverLabel) {
+            serverLabel.addEventListener('click', () => {
+                if (toggle) toggle.checked = false;
+                this.currentMode = 'server';
+                localStorage.setItem('ai-mode', 'server');
+                this.updateUI();
+                this.onModeChange();
+            });
+        }
+        
+        if (localLabel) {
+            localLabel.addEventListener('click', () => {
+                if (toggle) toggle.checked = true;
+                this.currentMode = 'local';
+                localStorage.setItem('ai-mode', 'local');
+                this.updateUI();
+                this.onModeChange();
+            });
+        }
+    },
+    
+    updateUI() {
+        const serverLabel = document.getElementById('serverModeLabel');
+        const localLabel = document.getElementById('localModeLabel');
+        const description = document.getElementById('modeDescription');
+        
+        if (this.currentMode === 'server') {
+            serverLabel?.classList.add('active');
+            localLabel?.classList.remove('active');
+            description?.classList.remove('local-mode');
+            if (description) {
+                description.innerHTML = '<span class="ai-status-dot online"></span>Running on Vishal\'s M1 Mac homelab ⚡';
+            }
+            chatInput.placeholder = "Ask me anything about Vishal...";
+        } else {
+            serverLabel?.classList.remove('active');
+            localLabel?.classList.add('active');
+            description?.classList.add('local-mode');
+            if (description) {
+                if (LocalChatManager.isInitialized) {
+                    description.innerHTML = '<span class="ai-status-dot online"></span>Running on YOUR device • 100% private 🔒';
+                } else if (LocalChatManager.isInitializing) {
+                    description.innerHTML = '<span class="ai-status-dot loading"></span>Downloading AI to your device...';
+                } else {
+                    description.innerHTML = '🔒 Don\'t trust Vishal\'s server? Run AI on your own device!';
+                }
+            }
+            chatInput.placeholder = "Ask me anything (runs on your device)...";
+        }
+    },
+    
+    onModeChange() {
+        if (this.currentMode === 'local' && !LocalChatManager.isInitialized && !LocalChatManager.isInitializing) {
+            // Start initializing WebLLM when switching to local mode
+            LocalChatManager.initialize();
+        }
+    },
+    
+    getActiveManager() {
+        return this.currentMode === 'server' ? ServerChatManager : LocalChatManager;
+    }
+};
+
+// ===== Server-based Chat Manager (Default) =====
+const ServerChatManager = {
+    API_BASE: 'https://vishal-agent.codeshare.co.in',
+    APP_NAME: 'vishal_assistant',
+    sessionId: null,
+    userId: null,
+    conversationHistory: [],
+    isReady: false,
+    currentXHR: null,
+    loadingInterval: null,
+    isFirstMessage: true,
+    
+    // Fun homelab cold start messages
+    homelabLoadingMessages: [
+        "Waking up the M1 Mac... ☕",
+        "Poking Vishal's MacBook... 👆",
+        "Warming up the neural networks... 🧠",
+        "Mac was taking a nap, hold on... 😴",
+        "Spinning up Ollama... 🦙",
+        "Cold start detected, brewing AI... ☕",
+        "The M1 chip is stretching... 🏋️",
+        "Homelab is waking up... 🏠",
+        "Dusting off the GPU cores... ✨",
+        "Loading Vishal's digital brain... 🧠",
+        "M1 Mac says 'just 5 more minutes'... ⏰",
+        "Initializing homebrew AI... 🍺",
+        "The hamsters are running faster... 🐹",
+        "Consulting the silicon oracle... 🔮",
+    ],
+    
+    startLoadingAnimation(element) {
+        let messageIndex = 0;
+        const messages = this.homelabLoadingMessages;
+        const self = this;
+        
+        // Show first message immediately
+        element.innerHTML = `<span class="homelab-loading">
+            <span class="loading-emoji">🖥️</span>
+            <span class="loading-text">${messages[messageIndex]}</span>
+        </span>`;
+        
+        // Rotate messages every 2.5 seconds
+        this.loadingInterval = setInterval(() => {
+            messageIndex = (messageIndex + 1) % messages.length;
+            const loadingText = element.querySelector('.loading-text');
+            if (loadingText) {
+                loadingText.style.opacity = '0';
+                setTimeout(() => {
+                    loadingText.textContent = messages[messageIndex];
+                    loadingText.style.opacity = '1';
+                }, 200);
+            }
+        }, 2500);
+    },
+    
+    stopLoadingAnimation() {
+        if (this.loadingInterval) {
+            clearInterval(this.loadingInterval);
+            this.loadingInterval = null;
+        }
+    },
+    
+    // Generate unique user ID
+    generateUserId() {
+        const stored = localStorage.getItem('portfolio-user-id');
+        if (stored) return stored;
+        
+        const newId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('portfolio-user-id', newId);
+        return newId;
+    },
+    
+    // Generate session ID
+    generateSessionId() {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    },
+    
+    // Initialize session
+    async initialize() {
+        this.userId = this.generateUserId();
+        this.sessionId = this.generateSessionId();
+        
+        try {
+            const response = await fetch(`${this.API_BASE}/sessions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    app_name: this.APP_NAME,
+                    user_id: this.userId,
+                    session_id: this.sessionId
+                })
+            });
+            
+            if (response.ok) {
+                this.isReady = true;
+                console.log('✅ Server AI session created:', this.sessionId);
+                return true;
+            } else {
+                console.error('Failed to create session:', response.status);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error creating session:', error);
+            return false;
+        }
+    },
+    
+    // Send message with SSE streaming
+    async sendMessage(userMessage) {
+        // Abort any pending request
+        if (this.currentXHR) {
+            this.currentXHR.abort();
+            this.currentXHR = null;
+        }
+        
+        // Ensure session exists
+        if (!this.sessionId) {
+            await this.initialize();
+        }
+        
+        // Clear input immediately
+        chatInput.value = '';
+        
+        // Add user message to UI
+        const userMsgElement = createMessage('You', userMessage, true);
+        chatContent.appendChild(userMsgElement);
+        
+        // Add to conversation history
+        this.conversationHistory.push({ role: 'user', content: userMessage });
+        
+        // Create assistant message container
+        const isFirstMsg = this.isFirstMessage;
+        const loadingContent = isFirstMsg 
+            ? '<span class="homelab-loading"><span class="loading-emoji">🖥️</span><span class="loading-text">Waking up the M1 Mac... ☕</span></span>'
+            : '<span class="typing-indicator">Thinking...</span>';
+        
+        const assistantMsgElement = createMessage('Assistant', loadingContent, false);
+        chatContent.appendChild(assistantMsgElement);
+        const assistantContent = assistantMsgElement.querySelector('.message-content');
+        
+        // Start rotating messages for first message (cold start likely)
+        if (isFirstMsg) {
+            this.startLoadingAnimation(assistantContent);
+        }
+        
+        // Scroll to bottom
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        const self = this;
+        
+        try {
+            // Use XMLHttpRequest for better SSE streaming support in browsers
+            const fullReply = await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                self.currentXHR = xhr;
+                
+                xhr.open('POST', `${self.API_BASE}/run_sse`, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.setRequestHeader('Accept', 'text/event-stream');
+                xhr.setRequestHeader('Cache-Control', 'no-cache');
+                
+                let reply = '';
+                let lastIndex = 0;
+                let contentCleared = false;
+                
+                // Initialize streaming markdown renderer (will be set up on first data)
+                let renderer = null;
+                let parser = null;
+                
+                xhr.onprogress = function() {
+                    // Clear loading and set up renderer on first data received
+                    if (!contentCleared) {
+                        self.stopLoadingAnimation();
+                        self.isFirstMessage = false;
+                        assistantContent.innerHTML = '';
+                        contentCleared = true;
+                        
+                        // Initialize streaming markdown renderer
+                        if (typeof smd !== 'undefined') {
+                            renderer = smd.default_renderer(assistantContent);
+                            parser = smd.parser(renderer);
+                        }
+                    }
+                    
+                    // Get only the new part of the response
+                    const newData = xhr.responseText.substring(lastIndex);
+                    lastIndex = xhr.responseText.length;
+                    
+                    const lines = newData.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6).trim();
+                            
+                            if (data === '[DONE]') {
+                                continue;
+                            }
+                            
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (parsed.text && !parsed.is_final) {
+                                    reply += parsed.text;
+                                    
+                                    if (parser) {
+                                        smd.parser_write(parser, parsed.text);
+                                    } else {
+                                        assistantContent.textContent = reply;
+                                    }
+                                    
+                                    // Auto-scroll while streaming
+                                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                                }
+                            } catch (e) {
+                                // Skip invalid JSON
+                            }
+                        }
+                    }
+                };
+                
+                xhr.onload = function() {
+                    self.currentXHR = null;
+                    if (xhr.status === 200) {
+                        if (parser) {
+                            try { smd.parser_end(parser); } catch(e) {}
+                        }
+                        resolve(reply);
+                    } else {
+                        reject(new Error(`HTTP error! status: ${xhr.status}`));
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    self.currentXHR = null;
+                    self.stopLoadingAnimation();
+                    // Try to recreate session on next request
+                    self.sessionId = null;
+                    reject(new Error('Network error'));
+                };
+                
+                xhr.onabort = function() {
+                    self.currentXHR = null;
+                    self.stopLoadingAnimation();
+                };
+                
+                xhr.send(JSON.stringify({
+                    app_name: self.APP_NAME,
+                    user_id: self.userId,
+                    session_id: self.sessionId,
+                    new_message: {
+                        role: 'user',
+                        parts: [{ text: userMessage }]
+                    },
+                    streaming: true
+                }));
+            });
+            
+            // Final scroll
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Add to conversation history
+            this.conversationHistory.push({ role: 'assistant', content: fullReply });
+            
+            // Keep conversation history manageable
+            if (this.conversationHistory.length > 20) {
+                this.conversationHistory = this.conversationHistory.slice(-20);
+            }
+            
+        } catch (error) {
+            console.error('Server chat error:', error);
+            assistantContent.innerHTML = `<div class="error-message">
+                <p>❌ Couldn't reach Vishal's server. It might be sleeping! 😴</p>
+                <p>Try switching to <strong>Local AI</strong> mode, or use the sidebar to explore.</p>
+            </div>`;
+        }
+    }
+};
+
+// ===== Local WebLLM Chat Manager (Privacy Mode) =====
+const LocalChatManager = {
     engine: null,
     isInitializing: false,
     isInitialized: false,
     conversationHistory: [],
-    currentStreamingMessage: null,
     webGPUSupported: false,
     
     // Generate system prompt with portfolio context
@@ -756,48 +1126,45 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
     
     // Show compatibility warning
     showCompatibilityWarning() {
+        const description = document.getElementById('modeDescription');
+        if (description) {
+            description.innerHTML = '<span class="ai-status-dot offline"></span>WebGPU not supported • Use Cloud AI instead';
+        }
+        
         const warningMessage = createMessage('System', `
             <div class="warning-box">
-                <h3>⚠️ WebGPU Not Supported</h3>
-                <p>Your browser doesn't support WebGPU, which is required for AI chat functionality.</p>
-                <p><strong>To enable AI chat, please use:</strong></p>
+                <h3>⚠️ Local AI Not Available</h3>
+                <p>Your browser doesn't support WebGPU, which is required for local AI.</p>
+                <p><strong>Options:</strong></p>
                 <ul>
-                    <li>Google Chrome 113+ or Microsoft Edge 113+</li>
-                    <li>Safari 18+ (with WebGPU enabled in settings)</li>
+                    <li>Use <strong>Cloud AI</strong> mode (toggle above) - works everywhere!</li>
+                    <li>Or try Chrome 113+, Edge 113+, or Safari 18+</li>
                 </ul>
-                <p>You can still browse all sections of the portfolio using the sidebar menu!</p>
             </div>
         `, false);
         chatContent.appendChild(warningMessage);
-        chatInput.placeholder = "AI chat not available - WebGPU not supported";
     },
     
     // Humorous loading messages
     loadingMessages: [
-        "Waking up the AI... it had a late night 🌙",
-        "Teaching AI about Vishal's achievements... there's a lot 📚",
-        "Downloading brain cells... please wait 🧠",
-        "Convincing AI that it's not a chatbot, it's a 'digital assistant' 🤖",
-        "Loading sarcasm module... almost there 😏",
-        "Bribing the AI with virtual cookies 🍪",
-        "AI is doing its morning yoga... namaste 🧘",
-        "Feeding hamsters that power this AI... 🐹",
-        "AI is reading Vishal's resume for the 1000th time 📄",
-        "Warming up the silicon neurons... 🔥",
-        "AI is having an existential crisis... one moment ✨",
-        "Downloading more RAM... just kidding, that's not how it works 💾",
-        "AI is practicing its typing... hunt and peck style ⌨️",
-        "Loading witty responses... this might take a while 🎭",
-        "AI is brushing up on Vishal's accomplishments... impressive stuff 🏆"
+        "Downloading AI to your device... 🚀",
+        "Teaching AI about Vishal locally... 📚",
+        "Securing your privacy fortress... 🏰",
+        "No servers involved, promise! 🤫",
+        "Your GPU is getting a workout... 💪",
+        "100% offline AI coming up... 🔒",
+        "NSA-proof chat loading... 🕵️",
+        "Building your personal AI bunker... 🛡️",
+        "Downloading digital brain cells... 🧠",
+        "Your secrets are safe here... 🤐"
     ],
     
-    // Get random loading message
     getRandomLoadingMessage() {
         return this.loadingMessages[Math.floor(Math.random() * this.loadingMessages.length)];
     },
     
     // Initialize WebLLM engine
-    async initialize(showInChat = false) {
+    async initialize() {
         if (this.isInitializing || this.isInitialized) return;
         
         // Check WebGPU support first
@@ -808,22 +1175,18 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
         }
         
         this.isInitializing = true;
+        AIModeManager.updateUI();
         
         // Get loading indicator elements
         const loadingIndicator = document.getElementById('aiLoadingIndicator');
         const loadingText = document.getElementById('aiLoadingText');
         const loadingBar = document.getElementById('aiLoadingBar');
-        const disclaimerText = document.getElementById('disclaimerText');
+        const description = document.getElementById('modeDescription');
         
-        // Show compact loading indicator below input
+        // Show compact loading indicator
         if (loadingIndicator) {
             loadingIndicator.style.display = 'block';
             loadingText.textContent = this.getRandomLoadingMessage();
-        }
-        
-        // Hide disclaimer while loading
-        if (disclaimerText) {
-            disclaimerText.style.display = 'none';
         }
         
         // Rotate humorous messages every 3 seconds
@@ -833,91 +1196,49 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
             }
         }, 3000);
         
-        // Get progress percentage element
         const loadingPercent = document.getElementById('aiLoadingPercent');
         
         try {
-            
-            // Create engine with progress callback
             const initProgressCallback = (progress) => {
                 const percent = Math.round(progress.progress * 100);
-                if (loadingBar) {
-                    loadingBar.style.width = percent + '%';
-                }
-                if (loadingPercent) {
-                    loadingPercent.textContent = percent + '%';
-                }
+                if (loadingBar) loadingBar.style.width = percent + '%';
+                if (loadingPercent) loadingPercent.textContent = percent + '%';
             };
             
-            // Llama-3.2-3B-Instruct - better at following instructions
             const selectedModel = "Llama-3.2-3B-Instruct-q4f16_1-MLC";
             
             this.engine = await window.webllm.CreateMLCEngine(
                 selectedModel,
-                { 
-                    initProgressCallback
-                }
+                { initProgressCallback }
             );
             
             this.isInitialized = true;
             this.isInitializing = false;
             
-            // Stop rotating messages
             clearInterval(messageInterval);
             
-            // Hide loading indicator
             if (loadingIndicator) {
                 loadingIndicator.style.display = 'none';
             }
             
-            // Show success message in disclaimer area briefly
-            if (disclaimerText) {
-                disclaimerText.style.display = 'block';
-                disclaimerText.innerHTML = '✨ <strong>AI Ready!</strong> Ask me anything about Vishal\'s experience, skills, or projects!';
-                disclaimerText.style.color = 'var(--accent-blue)';
-                
-                // Reset after 5 seconds
-                setTimeout(() => {
-                    disclaimerText.innerHTML = 'I don\'t have budget to run LLM on my server, so I\'m using your computer instead 😅';
-                    disclaimerText.style.color = '';
-                }, 5000);
-            }
+            // Update UI
+            AIModeManager.updateUI();
             
-            // Enable input
-            chatInput.disabled = false;
-            chatInput.placeholder = "Ask me anything about Vishal...";
-            sendBtn.disabled = false;
-            sendBtn.innerHTML = '<span>➤</span>';
+            console.log('✅ Local AI (WebLLM) initialized successfully!');
             
         } catch (error) {
             console.error('Failed to initialize WebLLM:', error);
             this.isInitializing = false;
             
-            // Stop rotating messages
             clearInterval(messageInterval);
             
-            // Hide loading indicator
             if (loadingIndicator) {
                 loadingIndicator.style.display = 'none';
             }
             
-            // Determine error message based on error type
-            let errorMsg = '😅 AI couldn\'t wake up today. Use the sidebar menu to explore!';
-            
-            if (error.name === 'QuotaExceededError' || error.message?.includes('Quota')) {
-                errorMsg = '💾 Browser storage full! Clear site data in DevTools → Application → Storage';
-            } else if (error.message?.includes('WebGPU')) {
-                errorMsg = '🖥️ WebGPU not available. Try Chrome 113+ or Edge 113+';
+            if (description) {
+                description.innerHTML = '<span class="ai-status-dot offline"></span>Local AI failed • Switch to Cloud AI';
             }
-            
-            // Show error in disclaimer area
-            if (disclaimerText) {
-                disclaimerText.style.display = 'block';
-                disclaimerText.innerHTML = errorMsg;
-                disclaimerText.style.color = 'var(--accent-purple)';
-            }
-            
-            chatInput.placeholder = "AI unavailable - use sidebar menu";
         }
     },
     
@@ -936,28 +1257,22 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
         chatContent.appendChild(userMsgElement);
         
         // Add to conversation history
-        this.conversationHistory.push({
-            role: 'user',
-            content: userMessage
-        });
+        this.conversationHistory.push({ role: 'user', content: userMessage });
         
         // Create assistant message container
-        const assistantMsgElement = createMessage('Assistant', '<span class="typing-indicator">Thinking...</span>', false);
+        const assistantMsgElement = createMessage('Assistant', '<span class="typing-indicator">Thinking locally...</span>', false);
         chatContent.appendChild(assistantMsgElement);
         const assistantContent = assistantMsgElement.querySelector('.message-content');
         
-        // Scroll to bottom
         const chatMessages = document.getElementById('chatMessages');
         chatMessages.scrollTop = chatMessages.scrollHeight;
         
         try {
-            // Prepare messages with system prompt
             const messages = [
                 { role: 'system', content: this.getSystemPrompt() },
                 ...this.conversationHistory
             ];
             
-            // Stream the response
             const chunks = await this.engine.chat.completions.create({
                 messages,
                 temperature: 0.7,
@@ -969,56 +1284,43 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
             let reply = '';
             assistantContent.innerHTML = '';
             
-            // Use streaming-markdown for incremental rendering (no flickering)
             let renderer = null;
+            let parser = null;
             if (typeof smd !== 'undefined') {
-                // Initialize streaming markdown parser
                 renderer = smd.default_renderer(assistantContent);
-                smd.parser_write(smd.parser(renderer), '');
+                parser = smd.parser(renderer);
             }
-            
-            const parser = typeof smd !== 'undefined' ? smd.parser(renderer) : null;
             
             for await (const chunk of chunks) {
                 const delta = chunk.choices[0]?.delta?.content || '';
                 reply += delta;
                 
                 if (parser) {
-                    // Streaming markdown - incremental update, no re-render
                     smd.parser_write(parser, delta);
                 } else {
-                    // Fallback to plain text
                     assistantContent.textContent = reply;
                 }
                 
-                // Auto-scroll while streaming
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
             
-            // End the parser stream
             if (parser) {
                 smd.parser_end(parser);
             }
             
-            // Final scroll
             chatMessages.scrollTop = chatMessages.scrollHeight;
             
-            // Add to conversation history
-            this.conversationHistory.push({
-                role: 'assistant',
-                content: reply
-            });
+            this.conversationHistory.push({ role: 'assistant', content: reply });
             
-            // Keep conversation history manageable (last 10 messages)
             if (this.conversationHistory.length > 10) {
                 this.conversationHistory = this.conversationHistory.slice(-10);
             }
             
         } catch (error) {
-            console.error('Chat error:', error);
+            console.error('Local chat error:', error);
             assistantContent.innerHTML = `<div class="error-message">
-                <p>❌ Sorry, I encountered an error while processing your message.</p>
-                <p>Please try again or rephrase your question.</p>
+                <p>❌ Local AI encountered an error.</p>
+                <p>Try refreshing or switch to <strong>Cloud AI</strong> mode.</p>
             </div>`;
         }
     }
@@ -1033,7 +1335,9 @@ sendBtn.addEventListener('click', async () => {
             welcomeScreen.style.display = 'none';
         }
         
-        await ChatManager.sendMessage(message);
+        // Use the active chat manager based on mode
+        const activeManager = AIModeManager.getActiveManager();
+        await activeManager.sendMessage(message);
     }
 });
 
@@ -1048,62 +1352,77 @@ chatInput.addEventListener('keypress', async (e) => {
                 welcomeScreen.style.display = 'none';
             }
             
-            await ChatManager.sendMessage(message);
+            // Use the active chat manager based on mode
+            const activeManager = AIModeManager.getActiveManager();
+            await activeManager.sendMessage(message);
         }
     }
 });
 
-// Auto-initialize AI in background when page loads
+// Initialize on page load
 window.addEventListener('load', async () => {
-    // Small delay to let the page render first
+    // Initialize the AI mode manager
+    AIModeManager.init();
+    
+    // Initialize server chat session (default mode)
     setTimeout(async () => {
-        if (!ChatManager.isInitialized && !ChatManager.isInitializing) {
-            await ChatManager.initialize();
-        }
-    }, 1000);
+        await ServerChatManager.initialize();
+    }, 500);
 });
 
 // Settings & Help button functionality
 const settingsBtn = document.getElementById('settingsBtn');
 if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
+        const currentMode = AIModeManager.currentMode;
+        const modeInfo = currentMode === 'server' 
+            ? '🖥️ **Homelab AI** (Default) - Running on Vishal\'s M1 Mac'
+            : '🔒 **Your Device** - Runs entirely on your machine using WebGPU';
+        
         const helpMessage = `
 ### 🛠️ Settings & Help
 
-**AI Chat Features:**
-- Ask me anything about Vishal's experience, skills, or projects
-- The AI runs locally in your browser (no server needed!)
-- First load downloads ~2GB model (cached for future visits)
+**Current Mode:** ${modeInfo}
 
-**Keyboard Shortcuts:**
+---
+
+### AI Chat Modes
+
+**🖥️ Homelab AI (Recommended)**
+- Instant responses from Vishal's personal M1 MacBook
+- Powered by Ollama running in his homelab cluster
+- Fast & always ready (unless the Mac is sleeping 😴)
+- Works on all devices and browsers
+
+**🔒 Your Device (Privacy Mode)**
+- Don't trust Vishal's server? Run it yourself!
+- 100% private - nothing leaves your device
+- Requires ~2GB download (cached after first use)
+- Needs WebGPU support (Chrome 113+, Edge 113+, Safari 18+)
+
+---
+
+### Keyboard Shortcuts
 - **Enter** - Send message
-- **Shift + Enter** - New line in message
+- **Shift + Enter** - New line
 
-**Troubleshooting:**
-- **AI not loading?** Clear site data: DevTools (F12) → Application → Storage → Clear site data
-- **Storage full?** The AI model needs ~2GB browser storage
-- **Slow responses?** First load caches the model, subsequent visits are faster
+### Troubleshooting
+- **Cloud AI not responding?** The server might be sleeping - try again in a moment
+- **Local AI not loading?** Clear site data: DevTools → Application → Storage
+- **Mode not switching?** Refresh the page and try again
 
-**Privacy:**
-- All AI processing happens in your browser
-- No data is sent to any server
-- Your conversations are not stored
-
-**Theme:**
-- Toggle dark/light theme using the 🌙/☀️ button
-
-**Quick Navigation:**
+### Quick Navigation
 - Use the sidebar menu to explore different sections
 - Click "Home" to return to the welcome screen
 
-**Contact:**
-- Email: contact@vishalpandey.co.in
-- GitHub: github.com/vishal-pandey
-- LinkedIn: linkedin.com/in/thevishalpandey
+### Contact
+- 📧 contact@vishalpandey.co.in
+- 💻 github.com/vishal-pandey
+- 💼 linkedin.com/in/thevishalpandey
 
-**Technology:**
-- AI Model: Llama 3.2 3B Instruct (WebLLM)
-- Browser: Requires WebGPU support (Chrome 113+, Edge 113+, Safari 18+)
+---
+
+*Built with ❤️ by Vishal Pandey*
         `.trim();
 
         // Hide welcome screen
@@ -1128,4 +1447,4 @@ if (settingsBtn) {
     });
 }
 
-console.log('Portfolio website with AI chat loaded successfully! 🚀');
+console.log('🚀 Portfolio loaded! Cloud AI ready, Local AI available on demand.');

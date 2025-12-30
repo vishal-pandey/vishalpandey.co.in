@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vishal Pandey - Portfolio</title>
+    <title>Vishal Pandey - AI Assistant</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <!-- Rough.js for hand-drawn graphics -->
+    <script src="https://cdn.jsdelivr.net/npm/roughjs@4.5.2/bundled/rough.js"></script>
     <!-- Marked.js for Markdown Parsing (used for non-streaming content) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module">
@@ -18,6 +24,9 @@
     </script>
 </head>
 <body>
+    <!-- Decorative Background Canvas -->
+    <canvas id="decorativeCanvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; opacity: 0.3; overflow: hidden;"></canvas>
+    
     <!-- Main Container -->
     <div class="container">
         <!-- Mobile Backdrop -->
@@ -87,9 +96,12 @@
             <!-- Chat Header -->
             <header class="chat-header">
                 <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-                <h2 class="chat-title">Vishal Pandey</h2>
+                <div class="header-profile">
+                    <div class="profile-avatar">VP</div>
+                    <h2 class="chat-title">Vishal Pandey</h2>
+                </div>
                 <div class="header-actions">
-                    <button class="theme-toggle-btn" id="themeToggle" title="Toggle theme">
+                    <button class="theme-toggle-btn" id="themeToggle" title="Toggle theme" style="display: none;">
                         <span id="themeIcon">🌙</span>
                     </button>
                     <a href="https://github.com/vishal-pandey" target="_blank" class="github-link" title="Visit GitHub">
@@ -117,8 +129,8 @@
                     <!-- Fun Facts Carousel -->
                     <div class="fun-facts-section">
                         <div class="fun-fact-card" id="funFactCard">
-                            <span class="fact-emoji" id="factEmoji">🤔</span>
-                            <p class="fact-text" id="factText">This AI is running on a MacBook hiding in my closet. Yes, that's my "homelab".</p>
+                            <span class="fact-emoji" id="factEmoji">👋</span>
+                            <p class="fact-text" id="factText">I mass produce more projects than I can count. Mast work. Some don't. We don't talk about those.</p>
                         </div>
                     </div>
                     

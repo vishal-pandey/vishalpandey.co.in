@@ -1473,17 +1473,17 @@ if (settingsBtn) {
 // ===== Fun Facts Carousel =====
 const FunFactsManager = {
     facts: [
-        { emoji: '🤔', text: "This AI is running on a MacBook hiding in my closet. Yes, that's my 'homelab'." },
-        { emoji: '😅', text: "I mass produce more projects than I can count. Most work. Some don't. We don't talk about those." },
-        { emoji: '🔥', text: "I've mass refactored codebases at 3am. No regrets. Okay, some regrets." },
-        { emoji: '🎮', text: "Built Tetris, Snake, and a Brick Game. Yes, I mass produce nostalgia." },
-        { emoji: '🧠', text: "Made a neural network in pure JavaScript. Why? Kuch bhi." },
-        { emoji: '💸', text: "Looking for help with: Money. Paise chahiye bhai dedo." },
-        { emoji: '🐘', text: "Fun fact: 1 baar 1 hathi ne chiti se kaha... actually nvm" },
-        { emoji: '🤷', text: "Ask me about: Kuch bhi pooch lo par bataunga nahi" },
-        { emoji: '😴', text: "Currently working on: Kuch Bhi Nahi (and mass learning everything)" },
-        { emoji: '🚀', text: "Started a startup from my college room. Mass chaos, mass fun." },
-        { emoji: '🤖', text: "This portfolio has AI. The AI knows everything. I'm mass scared." },
+        { emoji: '👋', text: "I mass produce more projects than I can count. Mast work. Some don't. We don't talk about those." },
+        { emoji: '👋', text: "I've mass refactored codebases at 3am. No regrets. Okay, some regrets." },
+        { emoji: '👋', text: "This AI is running on a MacBook hiding in my closet. Yes, that's my 'homelab'." },
+        { emoji: '👋', text: "Built Tetris, Snake, and a Brick Game. Yes, I mass produce nostalgia." },
+        { emoji: '👋', text: "Made a neural network in pure JavaScript. Why? Kuch bhi." },
+        { emoji: '👋', text: "Looking for help with: Money. Paise chahiye bhai dedo." },
+        { emoji: '👋', text: "Fun fact: 1 baar 1 hathi ne chiti se kaha... actually nvm" },
+        { emoji: '👋', text: "Ask me about: Kuch bhi pooch lo par bataunga nahi" },
+        { emoji: '👋', text: "Currently working on: Kuch Bhi Nahi (and mass learning everything)" },
+        { emoji: '👋', text: "Started a startup from my college room. Mass chaos, mass fun." },
+        { emoji: '👋', text: "This portfolio has AI. The AI knows everything. I'm mass scared." },
         { emoji: '👋', text: "Ye last fact hai. Bye. Full stop. Khatam. Why are you still here?" },
     ],
     currentIndex: 0,
@@ -1518,6 +1518,20 @@ const FunFactsManager = {
                 // Fade in
                 emojiEl.style.opacity = '1';
                 textEl.style.opacity = '1';
+                
+                // Redraw hand-drawn border after content changes
+                setTimeout(() => {
+                    const funFactCard = document.getElementById('funFactCard');
+                    if (funFactCard && typeof HandDrawnShapes !== 'undefined') {
+                        HandDrawnShapes.redrawElement(funFactCard, {
+                            strokeColor: '#3a3830',
+                            strokeWidth: 3,
+                            roughness: 1.8,
+                            shape: 'rounded-rect',
+                            radius: 20
+                        });
+                    }
+                }, 50);
             }, 200);
         }
     }
@@ -1539,3 +1553,235 @@ document.querySelectorAll('.sample-q').forEach(btn => {
 });
 
 console.log('🚀 Portfolio loaded! Cloud AI ready, Local AI available on demand.');
+
+// ===== Hand-Drawn Shapes with Rough.js =====
+const HandDrawnShapes = {
+    init() {
+        if (typeof rough === 'undefined') {
+            console.log('Rough.js not loaded, using CSS fallback');
+            return;
+        }
+        
+        // Wait a bit for DOM to be fully ready
+        setTimeout(() => {
+            this.drawBackgroundShapes();
+            this.applyHandDrawnBorders();
+        }, 100);
+        
+        // Redraw on resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.drawBackgroundShapes();
+                this.applyHandDrawnBorders();
+            }, 300);
+        });
+    },
+    
+    // Background decorative shapes
+    drawBackgroundShapes() {
+        const canvas = document.getElementById('decorativeCanvas');
+        if (!canvas) return;
+        
+        // Get the actual scrollable height
+        const chatMessages = document.getElementById('chatMessages');
+        const actualHeight = chatMessages ? chatMessages.scrollHeight : window.innerHeight;
+        
+        canvas.width = window.innerWidth;
+        canvas.height = Math.max(actualHeight, window.innerHeight);
+        
+        const rc = rough.canvas(canvas);
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Organic curvy lines - top right
+        rc.curve([
+            [canvas.width - 180, 80],
+            [canvas.width - 140, 180],
+            [canvas.width - 100, 280],
+            [canvas.width - 120, 380]
+        ], { stroke: '#c4b5a0', strokeWidth: 2, roughness: 2, bowing: 3 });
+        
+        // Small decorative curves
+        rc.curve([
+            [canvas.width - 100, 200],
+            [canvas.width - 60, 220],
+            [canvas.width - 40, 260]
+        ], { stroke: '#d4c4b0', strokeWidth: 1.5, roughness: 1.5, bowing: 2 });
+        
+        // Bottom left curves
+        rc.curve([
+            [40, canvas.height - 150],
+            [80, canvas.height - 200],
+            [60, canvas.height - 280],
+            [100, canvas.height - 350]
+        ], { stroke: '#c4b5a0', strokeWidth: 2, roughness: 2, bowing: 3 });
+        
+        // Small circle decorations
+        rc.circle(canvas.width - 80, 320, 30, {
+            stroke: '#d4c4b0', strokeWidth: 1.5, roughness: 2, fill: 'transparent'
+        });
+        
+        rc.circle(80, canvas.height - 120, 40, {
+            stroke: '#d4c4b0', strokeWidth: 1.5, roughness: 2, fill: 'transparent'
+        });
+    },
+    
+    applyHandDrawnBorders() {
+        // Status badge - green border
+        const statusBadge = document.querySelector('.status-badge');
+        if (statusBadge) {
+            this.createHandDrawnElement(statusBadge, {
+                strokeColor: '#3d9d5f',
+                strokeWidth: 2,
+                roughness: 1.5,
+                shape: 'pill'
+            });
+        }
+        
+        // Fun fact card - thick dark border
+        const funFactCard = document.getElementById('funFactCard');
+        if (funFactCard) {
+            this.createHandDrawnElement(funFactCard, {
+                strokeColor: '#3a3830',
+                strokeWidth: 3,
+                roughness: 1.8,
+                shape: 'rounded-rect',
+                radius: 20
+            });
+        }
+        
+        // Sample question buttons
+        const sampleButtons = document.querySelectorAll('.sample-q');
+        const sampleColors = ['#c05a50', '#8a7960', '#3d8a7a', '#4a6a9f'];
+        sampleButtons.forEach((btn, i) => {
+            this.createHandDrawnElement(btn, {
+                strokeColor: sampleColors[i % sampleColors.length],
+                strokeWidth: 2.5,
+                roughness: 1.5,
+                shape: 'pill'
+            });
+        });
+        
+        // Action buttons - colorful borders
+        const actionButtons = document.querySelectorAll('.action-btn');
+        const actionColors = ['#c05a50', '#b89030', '#3d8a7a', '#4a6a9f'];
+        actionButtons.forEach((btn, i) => {
+            this.createHandDrawnElement(btn, {
+                strokeColor: actionColors[i % actionColors.length],
+                strokeWidth: 2.5,
+                roughness: 1.5,
+                shape: 'rounded-square',
+                radius: 20
+            });
+        });
+        
+        // Input container
+        const inputContainer = document.querySelector('.input-container');
+        if (inputContainer) {
+            this.createHandDrawnElement(inputContainer, {
+                strokeColor: '#8b7355',
+                strokeWidth: 3,
+                roughness: 1.5,
+                shape: 'pill'
+            });
+        }
+    },
+    
+    redrawElement(element, options) {
+        // This is specifically for redrawing after content changes
+        if (!element || typeof rough === 'undefined') return;
+        this.createHandDrawnElement(element, options);
+    },
+    
+    createHandDrawnElement(element, options) {
+        // Remove existing
+        const existing = element.querySelector('.rough-border-svg');
+        if (existing) existing.remove();
+        
+        const width = element.offsetWidth;
+        const height = element.offsetHeight;
+        
+        if (width === 0 || height === 0) return;
+        
+        // Create SVG container
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.classList.add('rough-border-svg');
+        svg.setAttribute('width', width + 8);
+        svg.setAttribute('height', height + 8);
+        svg.style.cssText = `
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            pointer-events: none;
+            z-index: 10;
+            overflow: visible;
+        `;
+        
+        // Ensure parent is positioned
+        if (getComputedStyle(element).position === 'static') {
+            element.style.position = 'relative';
+        }
+        
+        const rc = rough.svg(svg);
+        let shape;
+        
+        const padding = 4;
+        const w = width;
+        const h = height;
+        
+        if (options.shape === 'pill') {
+            const r = h / 2;
+            // Create wobbly pill path
+            shape = rc.path(
+                `M ${r + padding} ${padding}
+                 C ${r + padding + 10} ${padding - 2}, ${w - r + padding - 10} ${padding + 2}, ${w - r + padding} ${padding}
+                 C ${w + padding + 2} ${padding + 5}, ${w + padding} ${h/2 + padding}, ${w + padding} ${h/2 + padding}
+                 C ${w + padding + 2} ${h - 5 + padding}, ${w - r + padding + 5} ${h + padding}, ${w - r + padding} ${h + padding}
+                 C ${w - r + padding - 10} ${h + padding + 2}, ${r + padding + 10} ${h + padding - 2}, ${r + padding} ${h + padding}
+                 C ${padding - 2} ${h + padding - 5}, ${padding} ${h/2 + padding}, ${padding} ${h/2 + padding}
+                 C ${padding - 2} ${padding + 5}, ${r + padding - 5} ${padding}, ${r + padding} ${padding}
+                 Z`,
+                {
+                    stroke: options.strokeColor,
+                    strokeWidth: options.strokeWidth,
+                    roughness: options.roughness,
+                    bowing: 2,
+                    fill: 'transparent'
+                }
+            );
+        } else if (options.shape === 'rounded-square' || options.shape === 'rounded-rect') {
+            const r = options.radius || 20;
+            shape = rc.path(
+                `M ${r + padding} ${padding}
+                 L ${w - r + padding} ${padding}
+                 Q ${w + padding} ${padding} ${w + padding} ${r + padding}
+                 L ${w + padding} ${h - r + padding}
+                 Q ${w + padding} ${h + padding} ${w - r + padding} ${h + padding}
+                 L ${r + padding} ${h + padding}
+                 Q ${padding} ${h + padding} ${padding} ${h - r + padding}
+                 L ${padding} ${r + padding}
+                 Q ${padding} ${padding} ${r + padding} ${padding}
+                 Z`,
+                {
+                    stroke: options.strokeColor,
+                    strokeWidth: options.strokeWidth,
+                    roughness: options.roughness,
+                    bowing: 1.5,
+                    fill: 'transparent'
+                }
+            );
+        }
+        
+        if (shape) {
+            svg.appendChild(shape);
+            element.appendChild(svg);
+        }
+    }
+};
+
+// Initialize when DOM is loaded
+window.addEventListener('load', () => {
+    HandDrawnShapes.init();
+});

@@ -76,6 +76,7 @@
 html {
     height: 100%;
     height: -webkit-fill-available;
+    overflow-x: hidden;
 }
 
 body {
@@ -83,7 +84,8 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -91,6 +93,8 @@ body {
     background-image: url('./assets/bg.png');
     min-height: 100%;
     min-height: -webkit-fill-available;
+    width: 100%;
+    max-width: 100vw;
 }
 
 /* Decorative background shapes */
@@ -138,7 +142,9 @@ body::after {
     display: flex;
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile */
-    width: 100vw;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 /* ===== Sidebar Styles ===== */
@@ -1467,21 +1473,37 @@ body::after {
         height: 100dvh;
         display: flex;
         flex-direction: column;
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
     }
     
     .chat-messages {
         flex: 1;
         overflow-y: auto;
+        overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
+        padding: 16px 12px;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .chat-input-area {
         position: sticky;
         bottom: 0;
-        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+        padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0));
         background: var(--bg-primary);
         background-image: url('./assets/bg.png');
         z-index: 100;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .input-container {
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 4px 4px 4px 14px;
     }
 
     .welcome-title {
@@ -1542,11 +1564,14 @@ body::after {
         max-width: 100%;
         overflow-wrap: break-word;
         word-wrap: break-word;
+        word-break: break-word;
     }
     
     .chat-content {
-        padding: 0 4px;
+        padding: 0;
         max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .project-card {
@@ -1554,6 +1579,11 @@ body::after {
         margin: 12px 0;
         max-width: 100%;
         box-sizing: border-box;
+    }
+    
+    .message {
+        max-width: 100%;
+        overflow-x: hidden;
     }
     
     /* Mobile touch optimizations */

@@ -824,6 +824,8 @@ body::after {
 .chat-content {
     max-width: 900px;
     margin: 0 auto;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .message {
@@ -955,6 +957,8 @@ body::after {
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 0 var(--border-dark);
+    box-sizing: border-box;
+    max-width: 100%;
 }
 
 .project-card:hover {
@@ -1535,6 +1539,21 @@ body::after {
 
     .message-content {
         margin-left: 0;
+        max-width: 100%;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
+    
+    .chat-content {
+        padding: 0 4px;
+        max-width: 100%;
+    }
+    
+    .project-card {
+        padding: 16px;
+        margin: 12px 0;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     /* Mobile touch optimizations */

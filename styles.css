@@ -1092,19 +1092,30 @@ body::after {
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6b9eff 0%, #7b8fff 100%);
+    background: transparent;
     border: none;
-    color: #ffffff;
+    color: #6b7d8f;
     font-size: 18px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.send-btn svg {
+    transition: all 0.2s ease;
+    stroke: #6b7d8f;
 }
 
 .send-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #5a8fee 0%, #6a7fee 100%);
-    transform: scale(1.05);
+    transform: scale(1.1);
+}
+
+.send-btn:hover:not(:disabled) svg {
+    stroke: #5a6d7f;
 }
 
 .send-btn:disabled {
@@ -1805,36 +1816,6 @@ body::after {
 }
 
 /* Enhanced Send Button */
-.send-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--gradient-secondary);
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.send-btn:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(107, 158, 255, 0.3);
-}
-
-.send-btn:active:not(:disabled) {
-    transform: scale(0.95);
-}
-
-.send-btn:disabled {
-    background: var(--bg-tertiary);
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
 /* Chat Input Enhanced */
 .chat-input:not(:disabled):focus {
     outline: none;

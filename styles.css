@@ -1421,7 +1421,29 @@ body::after {
     opacity: 1;
 }
 
-/* ===== Responsive Design ===== */
+/* ===== Tablet Responsive Design (iPad) ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .chat-messages {
+        background-image: 
+            linear-gradient(rgba(249, 243, 229, 0.85), rgba(249, 243, 229, 0.85)),
+            url('./assets/body-bg-left.png'), 
+            url('./assets/body-bg-right.png');
+        background-position: 0 0, 0 0, 100% 0;
+        background-size: 100% 100%, auto 100%, auto 100%;
+        background-repeat: no-repeat, no-repeat, no-repeat;
+    }
+
+    .nav-menu {
+        background-image: 
+            linear-gradient(rgba(249, 243, 229, 0.9), rgba(249, 243, 229, 0.9)),
+            url('./assets/sidebar.png');
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+}
+
+/* ===== Mobile Responsive Design ===== */
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
@@ -1557,6 +1579,15 @@ body::after {
         background-position: 0 0, 0 0, 100% 0;
         background-size: 100% 100%, auto 100%, auto 100%;
         background-repeat: no-repeat, no-repeat, no-repeat;
+    }
+
+    .nav-menu {
+        background-image: 
+            linear-gradient(rgba(249, 243, 229, 0.9), rgba(249, 243, 229, 0.9)),
+            url('./assets/sidebar.png');
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
     }
 
     .message-content {

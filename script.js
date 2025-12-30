@@ -403,67 +403,15 @@ const newChatBtn = document.getElementById('newChatBtn');
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 const mobileBackdrop = document.getElementById('mobileBackdrop');
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
-// Theme Management
-const ThemeManager = {
-    // Get system preference
-    getSystemPreference: () => {
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    },
-    
-    // Get saved theme or use system preference
-    getSavedTheme: () => {
-        const savedTheme = localStorage.getItem('portfolio-theme');
-        return savedTheme || ThemeManager.getSystemPreference();
-    },
-    
-    // Apply theme
-    applyTheme: (theme) => {
-        const root = document.documentElement;
-        
-        if (theme === 'dark') {
-            root.removeAttribute('data-theme');
-            themeIcon.textContent = '🌙';
-            themeToggle.setAttribute('title', 'Switch to light mode');
-        } else {
-            root.setAttribute('data-theme', 'light');
-            themeIcon.textContent = '☀️';
-            themeToggle.setAttribute('title', 'Switch to dark mode');
-        }
-        
-        // Save preference
-        localStorage.setItem('portfolio-theme', theme);
-    },
-    
-    // Toggle theme
-    toggle: () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        ThemeManager.applyTheme(newTheme);
-    },
-    
-    // Initialize theme
-    init: () => {
-        const savedTheme = ThemeManager.getSavedTheme();
-        ThemeManager.applyTheme(savedTheme);
-        
-        // Listen for system preference changes
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                // Only auto-switch if user hasn't manually set a preference
-                if (!localStorage.getItem('portfolio-theme')) {
-                    ThemeManager.applyTheme(e.matches ? 'dark' : 'light');
-                }
-            });
-        }
-    }
-};
-
-// Initialize theme on page load
-ThemeManager.init();
+// Theme Management - Disabled (keeping current theme only)
+// const ThemeManager = {
+//     init: () => {
+//         // Theme is now fixed, no toggling needed
+//     }
+// };
+// ThemeManager.init();
 
 // Configure marked.js for better rendering
 if (typeof marked !== 'undefined') {
@@ -614,11 +562,6 @@ if (mobileMenuBtn) {
         }
     });
 }
-
-// Event listener for theme toggle
-themeToggle.addEventListener('click', () => {
-    ThemeManager.toggle();
-});
 
 // Event listener for mobile backdrop click
 mobileBackdrop.addEventListener('click', () => {
@@ -1687,12 +1630,67 @@ const HandDrawnShapes = {
                 shape: 'pill'
             });
         }
+        
+        // Send button
+        const sendBtn = document.getElementById('sendBtn');
+        if (sendBtn) {
+            this.createHandDrawnCircle(sendBtn);
+        }
     },
     
     redrawElement(element, options) {
         // This is specifically for redrawing after content changes
         if (!element || typeof rough === 'undefined') return;
         this.createHandDrawnElement(element, options);
+    },
+    
+    createHandDrawnCircle(element) {
+        if (!element || typeof rough === 'undefined') return;
+        
+        // Remove existing
+        const existing = element.querySelector('.rough-border-svg');
+        if (existing) existing.remove();
+        
+        const width = element.offsetWidth;
+        const height = element.offsetHeight;
+        
+        if (width === 0 || height === 0) return;
+        
+        // Create SVG container
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.classList.add('rough-border-svg');
+        svg.setAttribute('width', width + 8);
+        svg.setAttribute('height', height + 8);
+        svg.style.cssText = `
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            pointer-events: none;
+            z-index: 10;
+            overflow: visible;
+        `;
+        
+        // Ensure parent is positioned
+        if (getComputedStyle(element).position === 'static') {
+            element.style.position = 'relative';
+        }
+        
+        const rc = rough.svg(svg);
+        const centerX = (width + 8) / 2;
+        const centerY = (height + 8) / 2;
+        const radius = Math.min(width, height) / 2 + 1;
+        
+        // Draw hand-drawn circle
+        const circle = rc.circle(centerX, centerY, radius * 2, {
+            stroke: '#6b7d8f',
+            strokeWidth: 2.5,
+            roughness: 1.2,
+            fill: 'transparent',
+            bowing: 1
+        });
+        
+        svg.appendChild(circle);
+        element.appendChild(svg);
     },
     
     createHandDrawnElement(element, options) {

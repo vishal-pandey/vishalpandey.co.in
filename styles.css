@@ -413,27 +413,6 @@ body::after {
     height: 20px;
 }
 
-/* Theme Toggle Button */
-.theme-toggle-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--bg-secondary);
-    border: 2px solid var(--border-dark);
-    color: var(--text-primary);
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.theme-toggle-btn:hover {
-    background-color: var(--bg-hover);
-    transform: scale(1.05);
-}
-
 /* Chat Messages Area */
 .chat-messages {
     flex: 1;
@@ -1093,24 +1072,28 @@ body::after {
 }
 
 .send-btn {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: none;
+    background: linear-gradient(135deg, #6b9eff 0%, #7b8fff 100%);
     border: none;
-    color: var(--text-secondary);
+    color: #ffffff;
     font-size: 18px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: visible;
 }
 
 .send-btn:hover:not(:disabled) {
-    background-color: var(--bg-hover);
+    background: linear-gradient(135deg, #5a8fee 0%, #6a7fee 100%);
+    transform: scale(1.05);
 }
 
 .send-btn:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+    filter: grayscale(50%);
 }
 
 .disclaimer {
@@ -2290,8 +2273,10 @@ body::after {
 /* Mobile adjustments for toggle */
 @media (max-width: 768px) {
     .ai-mode-toggle {
-        margin: 8px 16px 0;
-        padding: 10px 12px;
+        margin: 6px auto 0;
+        padding: 6px 12px;
+        max-width: calc(100% - 32px);
+        background: transparent;
     }
     
     /* Hide desktop toggle on mobile */
@@ -2308,20 +2293,24 @@ body::after {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        padding: 6px 0 2px 0;
+        gap: 5px;
+        padding: 4px 10px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
     }
     
     .mobile-ai-status .ai-status-dot {
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
     }
     
     .mobile-ai-text {
-        font-size: 11px;
-        font-weight: 400;
-        color: var(--text-secondary);
-        opacity: 0.7;
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--text-muted);
+        opacity: 0.8;
+        letter-spacing: 0.2px;
     }
     
     .mode-description.desktop-only {

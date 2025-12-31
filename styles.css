@@ -1,7 +1,7 @@
 /* ===== Font Face Declarations ===== */
 @font-face {
     font-family: 'Comic Sans MS';
-    src: url('./assets/Comic Sans MS.ttf') format('truetype');
+    src: url('./assets/Comic Sans MS.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -9,7 +9,7 @@
 
 @font-face {
     font-family: 'Comic Sans MS';
-    src: url('./assets/Comic Sans MS Bold.ttf') format('truetype');
+    src: url('./assets/Comic Sans MS Bold.woff2') format('woff2');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -90,7 +90,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     position: relative;
-    background-image: url('./assets/bg.png');
+    background-image: url('./assets/bg.webp');
     min-height: 100%;
     min-height: -webkit-fill-available;
     width: 100%;
@@ -151,7 +151,7 @@ body::after {
 .sidebar {
     width: var(--sidebar-width);
     background: var(--bg-secondary);
-    background-image: url('/assets/bg.png');
+    background-image: url('/assets/bg.webp');
     display: flex;
     flex-direction: column;
     border-right: 2px solid var(--border-color);
@@ -251,7 +251,7 @@ body::after {
     flex: 1;
     overflow-y: auto;
     padding: 8px;
-    background-image: url('./assets/sidebar.png');
+    background-image: url('./assets/sidebar.webp');
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -263,11 +263,12 @@ body::after {
 
 .section-title {
     font-size: 11px;
-    font-weight: 500;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: var(--text-tertiary, #9ca3af);
     padding: 8px 16px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin: 0;
 }
 
 .menu-list {
@@ -461,6 +462,7 @@ body::after {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.2s;
+    font-family: "Comic Sans MS", cursive;
 }
 
 .settings-btn:hover {
@@ -484,7 +486,7 @@ body::after {
     border-bottom: 2px solid var(--border-color);
     position: relative;
     background: var(--bg-secondary);
-    background-image: url('./assets/bg.png');
+    background-image: url('./assets/bg.webp');
 }
 
 .header-profile {
@@ -595,7 +597,7 @@ body::after {
     flex: 1;
     overflow-y: auto;
     padding: 24px;
-    background-image: url('./assets/body-bg-left.png'), url('./assets/body-bg-right.png');
+    background-image: url('./assets/body-bg-left.webp'), url('./assets/body-bg-right.webp');
     background-position: 0 0, 100% 0;
     background-size: auto 100%, auto 100%;
     background-repeat: no-repeat, no-repeat;
@@ -1218,7 +1220,7 @@ body::after {
 .chat-input-area {
     padding: 12px 20px 16px;
     border-top: 1px solid var(--border-color);
-    background-image: url('./assets/bg.png');
+    background-image: url('./assets/bg.webp');
 }
 
 .input-container {
@@ -1242,6 +1244,7 @@ body::after {
     font-size: 14px;
     padding: 10px 0;
     outline: none;
+    font-family: "Comic Sans MS", cursive;
 }
 
 .chat-input::placeholder {
@@ -1527,7 +1530,7 @@ body::after {
     color: var(--accent-blue);
     min-width: 36px;
     text-align: right;
-    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-family: "Comic Sans MS", cursive;
 }
 
 /* ===== Scrollbar Styles ===== */
@@ -1572,8 +1575,8 @@ body::after {
     .chat-messages {
         background-image: 
             linear-gradient(rgba(249, 243, 229, 0.85), rgba(249, 243, 229, 0.85)),
-            url('./assets/body-bg-left.png'), 
-            url('./assets/body-bg-right.png');
+            url('./assets/body-bg-left.webp'), 
+            url('./assets/body-bg-right.webp');
         background-position: 0 0, 0 0, 100% 0;
         background-size: 100% 100%, auto 100%, auto 100%;
         background-repeat: no-repeat, no-repeat, no-repeat;
@@ -1582,7 +1585,7 @@ body::after {
     .nav-menu {
         background-image: 
             linear-gradient(rgba(249, 243, 229, 0.9), rgba(249, 243, 229, 0.9)),
-            url('./assets/sidebar.png');
+            url('./assets/sidebar.webp');
         background-position: center center;
         background-size: cover;
         background-repeat: no-repeat;
@@ -1661,7 +1664,7 @@ body::after {
         bottom: 0;
         padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0));
         background: var(--bg-primary);
-        background-image: url('./assets/bg.png');
+        background-image: url('./assets/bg.webp');
         z-index: 100;
         width: 100%;
         box-sizing: border-box;
@@ -1726,8 +1729,8 @@ body::after {
         padding: 16px;
         background-image: 
             linear-gradient(rgba(249, 243, 229, 0.85), rgba(249, 243, 229, 0.85)),
-            url('./assets/body-bg-left.png'), 
-            url('./assets/body-bg-right.png');
+            url('./assets/body-bg-left.webp'), 
+            url('./assets/body-bg-right.webp');
         background-position: 0 0, 0 0, 100% 0;
         background-size: 100% 100%, auto 100%, auto 100%;
         background-repeat: no-repeat, no-repeat, no-repeat;
@@ -1736,7 +1739,7 @@ body::after {
     .nav-menu {
         background-image: 
             linear-gradient(rgba(249, 243, 229, 0.9), rgba(249, 243, 229, 0.9)),
-            url('./assets/sidebar.png');
+            url('./assets/sidebar.webp');
         background-position: center center;
         background-size: cover;
         background-repeat: no-repeat;
@@ -2417,7 +2420,7 @@ body::after {
 .mode-label {
     font-size: 11px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: #5c5650;
     transition: all 0.3s ease;
     cursor: pointer;
     user-select: none;
@@ -2429,12 +2432,12 @@ body::after {
 }
 
 .mode-label-server.active {
-    color: var(--accent-blue);
+    color: #3d6499;
     font-weight: 700;
 }
 
 .mode-label-local.active {
-    color: var(--accent-purple);
+    color: #7c5fc4;
     font-weight: 700;
 }
 
@@ -2501,12 +2504,12 @@ body::after {
 
 .mode-description {
     font-size: 10px;
-    color: var(--text-muted);
+    color: var(--text-tertiary, #9ca3af);
     text-align: center;
     margin: 0;
     transition: all 0.3s ease;
-    opacity: 0.7;
-    font-weight: 400;
+    opacity: 0.9;
+    font-weight: 500;
     letter-spacing: 0.2px;
 }
 

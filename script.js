@@ -449,7 +449,7 @@ function createMessage(sender, content, isUser = false, isMarkdown = false) {
 }
 
 // Function to display section content
-function displaySection(section) {
+function displaySection(section, pushState = true) {
     // Hide welcome screen
     welcomeScreen.style.display = 'none';
     
@@ -458,6 +458,11 @@ function displaySection(section) {
     
     // Get content for the section
     const content = portfolioContent[section];
+    
+    // Update browser history (unless triggered by popstate)
+    if (pushState && content) {
+        history.pushState({ section: section }, '', '#' + section);
+    }
     
     if (content) {
         // Add user message
@@ -492,7 +497,7 @@ function displaySection(section) {
 }
 
 // Function to show welcome screen
-function showWelcomeScreen() {
+function showWelcomeScreen(pushState = true) {
     welcomeScreen.style.display = 'block';
     chatContent.innerHTML = '';
     
@@ -504,6 +509,11 @@ function showWelcomeScreen() {
     
     // Close mobile sidebar
     closeMobileSidebar();
+    
+    // Update browser history (unless triggered by popstate)
+    if (pushState) {
+        history.pushState({ section: 'home' }, '', '#');
+    }
 }
 
 // Function to open mobile sidebar
@@ -604,9 +614,40 @@ document.getElementById('chatMessages').style.scrollBehavior = 'smooth';
 // Set home button as active on initial load (since welcome screen is shown)
 newChatBtn.classList.add('active');
 
-// Initialize with about section by default (optional)
-// Uncomment the line below if you want to show "About" section on load instead of welcome screen
-// displaySection('about');
+// Handle browser back/forward navigation
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.section) {
+        if (event.state.section === 'home') {
+            showWelcomeScreen(false); // Don't push state again
+        } else {
+            displaySection(event.state.section, false); // Don't push state again
+        }
+    } else {
+        // No state, check hash or show home
+        const hash = window.location.hash.substring(1);
+        if (hash && portfolioContent[hash]) {
+            displaySection(hash, false);
+        } else {
+            showWelcomeScreen(false);
+        }
+    }
+});
+
+// Handle initial page load with hash in URL
+function handleInitialNavigation() {
+    const hash = window.location.hash.substring(1);
+    if (hash && portfolioContent[hash]) {
+        displaySection(hash, false);
+        // Replace current history state with proper state object
+        history.replaceState({ section: hash }, '', '#' + hash);
+    } else {
+        // Replace current history state for home
+        history.replaceState({ section: 'home' }, '', window.location.pathname);
+    }
+}
+
+// Initialize navigation on page load
+handleInitialNavigation();
 
 // ===== AI Chat Integration =====
 
@@ -734,6 +775,19 @@ const ServerChatManager = {
     currentXHR: null,
     loadingInterval: null,
     isFirstMessage: true,
+    smdLoaded: false,
+    
+    // Lazy load streaming-markdown library
+    async loadStreamingMarkdown() {
+        if (this.smdLoaded && window.smd) return window.smd;
+        
+        console.log('🔄 Lazy loading streaming-markdown...');
+        const smd = await import("https://esm.run/streaming-markdown");
+        window.smd = smd;
+        this.smdLoaded = true;
+        console.log('✅ streaming-markdown loaded');
+        return smd;
+    },
     
     // Fun homelab cold start messages
     homelabLoadingMessages: [
@@ -845,6 +899,9 @@ const ServerChatManager = {
         if (!this.sessionId) {
             await this.initialize();
         }
+        
+        // Lazy load streaming-markdown library for streaming responses
+        await this.loadStreamingMarkdown();
         
         // Clear input immediately
         chatInput.value = '';
@@ -1011,6 +1068,32 @@ const LocalChatManager = {
     isInitialized: false,
     conversationHistory: [],
     webGPUSupported: false,
+    webllmLoaded: false,
+    smdLoaded: false,
+    
+    // Lazy load WebLLM library
+    async loadWebLLM() {
+        if (this.webllmLoaded && window.webllm) return window.webllm;
+        
+        console.log('🔄 Lazy loading WebLLM...');
+        const webllm = await import("https://esm.run/@mlc-ai/web-llm");
+        window.webllm = webllm;
+        this.webllmLoaded = true;
+        console.log('✅ WebLLM loaded');
+        return webllm;
+    },
+    
+    // Lazy load streaming-markdown library
+    async loadStreamingMarkdown() {
+        if (this.smdLoaded && window.smd) return window.smd;
+        
+        console.log('🔄 Lazy loading streaming-markdown...');
+        const smd = await import("https://esm.run/streaming-markdown");
+        window.smd = smd;
+        this.smdLoaded = true;
+        console.log('✅ streaming-markdown loaded');
+        return smd;
+    },
     
     // Generate system prompt with portfolio context
     getSystemPrompt() {
@@ -1184,6 +1267,12 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
         const loadingPercent = document.getElementById('aiLoadingPercent');
         
         try {
+            // Lazy load WebLLM and streaming-markdown libraries
+            await Promise.all([
+                this.loadWebLLM(),
+                this.loadStreamingMarkdown()
+            ]);
+            
             const initProgressCallback = (progress) => {
                 const percent = Math.round(progress.progress * 100);
                 if (loadingBar) loadingBar.style.width = percent + '%';

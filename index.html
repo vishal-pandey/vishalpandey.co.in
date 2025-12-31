@@ -2,26 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="description" content="Vishal Pandey - Software Engineer who builds things that sometimes work. Mass builder, professional refactorer. Ask my AI anything, it knows too much about me tbh.">
     <title>Vishal Pandey - AI Assistant</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Comic+Neue:wght@300;400;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <!-- Fonts loaded from local .ttf files in styles.css -->
     <link rel="stylesheet" href="styles.css">
-    <!-- Rough.js for hand-drawn graphics -->
-    <script src="https://cdn.jsdelivr.net/npm/roughjs@4.5.2/bundled/rough.js"></script>
-    <!-- Marked.js for Markdown Parsing (used for non-streaming content) -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script type="module">
-        // Import WebLLM from CDN
-        import * as webllm from "https://esm.run/@mlc-ai/web-llm";
-        window.webllm = webllm;
-        
-        // Import streaming-markdown for real-time LLM rendering
-        import * as smd from "https://esm.run/streaming-markdown";
-        window.smd = smd;
-    </script>
+    <!-- Rough.js for hand-drawn graphics (deferred - not render blocking) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/roughjs@4.5.2/bundled/rough.js"></script>
+    <!-- Marked.js for Markdown Parsing (deferred - not render blocking) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- WebLLM and streaming-markdown are lazy loaded in script.js when needed -->
 </head>
 <body>
     <!-- Decorative Background Canvas -->
@@ -35,8 +25,8 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <button class="menu-toggle" id="menuToggle">
-                    <span class="menu-icon">☰</span>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar menu">
+                    <span class="menu-icon" aria-hidden="true">☰</span>
                 </button>
                 <a href="#" class="logo-link" id="logoLink"><h1 class="logo">~/vishal</h1></a>
             </div>
@@ -50,9 +40,9 @@
             </div>
 
             <!-- Navigation Menu (styled as chat history) -->
-            <nav class="nav-menu">
+            <nav class="nav-menu" aria-label="Main navigation">
                 <div class="menu-section">
-                    <h3 class="section-title">Recent</h3>
+                    <h2 class="section-title">Recent</h2>
                     <ul class="menu-list">
                         <li class="menu-item" data-section="about">
                             <img src="assets/icons/about-me.svg" alt="" class="menu-icon svg-icon">
@@ -95,11 +85,11 @@
         <main class="chat-container">
             <!-- Chat Header -->
             <header class="chat-header">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation menu">☰</button>
                 <a href="#" class="header-profile-link" id="headerProfileLink">
                     <div class="header-profile">
                         <div class="profile-avatar">
-                            <img src="assets/profile.svg" alt="Vishal Pandey" class="profile-img">
+                            <img src="assets/profile.svg" alt="" class="profile-img" aria-hidden="true">
                         </div>
                         <h2 class="chat-title">Vishal Pandey</h2>
                     </div>
@@ -204,8 +194,8 @@
                         autocapitalize="off"
                         spellcheck="false"
                     >
-                    <button class="send-btn" id="sendBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="send-btn" id="sendBtn" aria-label="Send message">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
                             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                         </svg>
@@ -238,9 +228,9 @@
                     <!-- Desktop: Full toggle -->
                     <div class="mode-toggle-container desktop-only">
                         <span class="mode-label mode-label-server" id="serverModeLabel">🖥️ Homelab</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="aiModeSwitch">
-                            <span class="toggle-slider"></span>
+                        <label class="toggle-switch" for="aiModeSwitch">
+                            <input type="checkbox" id="aiModeSwitch" aria-label="Toggle between Homelab and Your Device AI mode" role="switch">
+                            <span class="toggle-slider" aria-hidden="true"></span>
                         </label>
                         <span class="mode-label mode-label-local" id="localModeLabel">🔒 Your Device</span>
                     </div>

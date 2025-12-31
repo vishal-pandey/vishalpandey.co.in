@@ -541,6 +541,25 @@ newChatBtn.addEventListener('click', () => {
     showWelcomeScreen();
 });
 
+// Event listener for logo link (sidebar ~/vishal)
+const logoLink = document.getElementById('logoLink');
+if (logoLink) {
+    logoLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showWelcomeScreen();
+        closeMobileSidebar();
+    });
+}
+
+// Event listener for header profile link
+const headerProfileLink = document.getElementById('headerProfileLink');
+if (headerProfileLink) {
+    headerProfileLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showWelcomeScreen();
+    });
+}
+
 // Event listener for menu toggle (mobile)
 menuToggle.addEventListener('click', () => {
     if (sidebar.classList.contains('active')) {

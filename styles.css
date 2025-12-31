@@ -296,6 +296,120 @@ body::after {
     font-size: 18px;
 }
 
+/* SVG Icon Styling */
+.svg-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.menu-icon.svg-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.new-chat-btn .svg-icon {
+    width: 18px;
+    height: 18px;
+    /* Coral/Orange - energetic home icon */
+    filter: invert(45%) sepia(98%) saturate(1500%) hue-rotate(340deg) brightness(100%) contrast(95%);
+}
+
+.sample-q .svg-icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.action-btn .svg-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* Colorful Icon Filters - Hand-drawn vibe colors */
+/* About Me - Teal/Cyan */
+.menu-item[data-section="about"] .svg-icon {
+    filter: invert(55%) sepia(75%) saturate(600%) hue-rotate(140deg) brightness(95%) contrast(90%);
+}
+
+/* Skills - Purple/Violet */
+.menu-item[data-section="skills"] .svg-icon {
+    filter: invert(40%) sepia(90%) saturate(800%) hue-rotate(240deg) brightness(90%) contrast(95%);
+}
+
+/* Work Experience - Blue */
+.menu-item[data-section="experience"] .svg-icon {
+    filter: invert(45%) sepia(80%) saturate(700%) hue-rotate(190deg) brightness(95%) contrast(90%);
+}
+
+/* Projects - Orange/Amber */
+.menu-item[data-section="projects"] .svg-icon {
+    filter: invert(55%) sepia(95%) saturate(1200%) hue-rotate(10deg) brightness(100%) contrast(95%);
+}
+
+/* Education - Green */
+.menu-item[data-section="education"] .svg-icon {
+    filter: invert(55%) sepia(70%) saturate(600%) hue-rotate(80deg) brightness(95%) contrast(90%);
+}
+
+/* Contact - Pink/Magenta */
+.menu-item[data-section="contact"] .svg-icon {
+    filter: invert(50%) sepia(85%) saturate(800%) hue-rotate(300deg) brightness(95%) contrast(95%);
+}
+
+/* Sample Question Button Icons - Match text colors (dark shades) */
+/* Weird Projects - Dark coral/burgundy */
+.sample-q[data-question*="weird"] .svg-icon {
+    filter: invert(20%) sepia(40%) saturate(1500%) hue-rotate(340deg) brightness(70%) contrast(100%);
+}
+
+/* Surprise Me - Dark olive/brown */
+.sample-q[data-question*="surprising"] .svg-icon {
+    filter: invert(25%) sepia(30%) saturate(800%) hue-rotate(20deg) brightness(60%) contrast(100%);
+}
+
+/* Tech Stack - Dark teal */
+.sample-q[data-question*="tech stack"] .svg-icon {
+    filter: invert(25%) sepia(50%) saturate(600%) hue-rotate(130deg) brightness(70%) contrast(100%);
+}
+
+/* Roast Him - Dark blue/indigo */
+.sample-q[data-question*="Roast"] .svg-icon {
+    filter: invert(20%) sepia(60%) saturate(800%) hue-rotate(220deg) brightness(60%) contrast(100%);
+}
+
+/* Quick Action Button Icons - Match text colors (dark shades) */
+/* About - Dark coral */
+.action-btn[data-section="about"] .svg-icon {
+    filter: invert(20%) sepia(40%) saturate(1500%) hue-rotate(340deg) brightness(70%) contrast(100%);
+}
+
+/* Skills - Dark golden/brown */
+.action-btn[data-section="skills"] .svg-icon {
+    filter: invert(25%) sepia(50%) saturate(800%) hue-rotate(30deg) brightness(60%) contrast(100%);
+}
+
+/* Projects - Dark teal */
+.action-btn[data-section="projects"] .svg-icon {
+    filter: invert(25%) sepia(50%) saturate(600%) hue-rotate(130deg) brightness(70%) contrast(100%);
+}
+
+/* Contact - Dark blue */
+.action-btn[data-section="contact"] .svg-icon {
+    filter: invert(20%) sepia(60%) saturate(800%) hue-rotate(200deg) brightness(60%) contrast(100%);
+}
+
+/* Hover effects - brighten and slight scale */
+.menu-item:hover .svg-icon,
+.new-chat-btn:hover .svg-icon,
+.sample-q:hover .svg-icon,
+.action-btn:hover .svg-icon {
+    transform: scale(1.1);
+}
+
 .menu-text {
     font-size: 14px;
     color: var(--text-primary);

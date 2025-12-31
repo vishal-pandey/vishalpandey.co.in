@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <meta name="description" content="Vishal Pandey - Software Engineer who builds things that sometimes work. Mass builder, professional refactorer. Ask my AI anything, it knows too much about me tbh.">
     <title>Vishal Pandey - AI Assistant</title>
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vishal">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/profile.svg">
     <!-- Fonts loaded from local .ttf files in styles.css -->
     <link rel="stylesheet" href="styles.css">
     <!-- Rough.js for hand-drawn graphics (deferred - not render blocking) -->
@@ -246,5 +253,19 @@
     </div>
 
     <script src="script.js"></script>
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('SW registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

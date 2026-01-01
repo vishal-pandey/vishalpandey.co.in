@@ -5,7 +5,7 @@
   "description": "Vishal Pandey - Software Engineer portfolio with AI assistant",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
+  "background_color": "#faf3e3",
   "theme_color": "#faf3e3",
   "orientation": "portrait-primary",
   "icons": [

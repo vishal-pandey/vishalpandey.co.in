@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vishal-portfolio-v3';
+const CACHE_NAME = 'vishal-portfolio-v4';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -19,12 +19,14 @@ const STATIC_ASSETS = [
   // Icons
   '/assets/icons/home.svg',
   '/assets/icons/about-me.svg',
+  '/assets/icons/ai.svg',
   '/assets/icons/ask-ai.svg',
   '/assets/icons/contact.svg',
   '/assets/icons/education.svg',
   '/assets/icons/mailbox.svg',
   '/assets/icons/project.svg',
   '/assets/icons/roast-him.svg',
+  '/assets/icons/setting.svg',
   '/assets/icons/skill.svg',
   '/assets/icons/surprise-me.svg',
   '/assets/icons/tech-stack.svg',

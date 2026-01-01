@@ -428,7 +428,7 @@ function createMessage(sender, content, isUser = false, isMarkdown = false) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message';
     
-    const avatar = isUser ? '👤' : '✨';
+    const avatar = isUser ? '<img src="assets/icons/about-me.svg" alt="User" class="avatar-icon">' : '<img src="assets/icons/ai.svg" alt="Assistant" class="avatar-icon">';
     const senderName = isUser ? 'You' : 'Vishal\'s Assistant';
     
     // Parse markdown if enabled and marked is available

@@ -1,11 +1,12 @@
 {
   "name": "Vishal Pandey - Portfolio",
   "short_name": "Vishal",
+  "version": "1.0.1",
   "description": "Vishal Pandey - Software Engineer portfolio with AI assistant",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
+  "theme_color": "#faf3e3",
   "orientation": "portrait-primary",
   "icons": [
     {

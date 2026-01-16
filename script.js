@@ -776,6 +776,22 @@ const ServerChatManager = {
     loadingInterval: null,
     isFirstMessage: true,
     smdLoaded: false,
+    isWaitingForResponse: false,
+    
+    // Helper to enable/disable chat input
+    setInputEnabled(enabled) {
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        if (chatInput) {
+            chatInput.disabled = !enabled;
+            if (enabled) {
+                chatInput.focus();
+            }
+        }
+        if (sendBtn) {
+            sendBtn.disabled = !enabled;
+        }
+    },
     
     // Lazy load streaming-markdown library
     async loadStreamingMarkdown() {
@@ -889,11 +905,21 @@ const ServerChatManager = {
     
     // Send message with SSE streaming
     async sendMessage(userMessage) {
+        // Prevent sending if already waiting for response
+        if (this.isWaitingForResponse) {
+            console.log('Already waiting for response, ignoring...');
+            return;
+        }
+        
         // Abort any pending request
         if (this.currentXHR) {
             this.currentXHR.abort();
             this.currentXHR = null;
         }
+        
+        // Set waiting state and disable input
+        this.isWaitingForResponse = true;
+        this.setInputEnabled(false);
         
         // Ensure session exists
         if (!this.sessionId) {
@@ -961,6 +987,10 @@ const ServerChatManager = {
                         assistantContent.innerHTML = '';
                         contentCleared = true;
                         
+                        // Re-enable input when agent starts responding
+                        self.isWaitingForResponse = false;
+                        self.setInputEnabled(true);
+                        
                         // Initialize streaming markdown renderer
                         if (typeof smd !== 'undefined') {
                             renderer = smd.default_renderer(assistantContent);
@@ -1018,6 +1048,9 @@ const ServerChatManager = {
                 xhr.onerror = function() {
                     self.currentXHR = null;
                     self.stopLoadingAnimation();
+                    // Re-enable input on error
+                    self.isWaitingForResponse = false;
+                    self.setInputEnabled(true);
                     // Try to recreate session on next request
                     self.sessionId = null;
                     reject(new Error('Network error'));
@@ -1026,6 +1059,9 @@ const ServerChatManager = {
                 xhr.onabort = function() {
                     self.currentXHR = null;
                     self.stopLoadingAnimation();
+                    // Re-enable input on abort
+                    self.isWaitingForResponse = false;
+                    self.setInputEnabled(true);
                 };
                 
                 xhr.send(JSON.stringify({
@@ -1053,6 +1089,9 @@ const ServerChatManager = {
             
         } catch (error) {
             console.error('Server chat error:', error);
+            // Re-enable input on error
+            this.isWaitingForResponse = false;
+            this.setInputEnabled(true);
             assistantContent.innerHTML = `<div class="error-message">
                 <p>❌ Couldn't reach Vishal's server. It might be sleeping! 😴</p>
                 <p>Try switching to <strong>Local AI</strong> mode, or use the sidebar to explore.</p>
@@ -1070,6 +1109,22 @@ const LocalChatManager = {
     webGPUSupported: false,
     webllmLoaded: false,
     smdLoaded: false,
+    isWaitingForResponse: false,
+    
+    // Helper to enable/disable chat input
+    setInputEnabled(enabled) {
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        if (chatInput) {
+            chatInput.disabled = !enabled;
+            if (enabled) {
+                chatInput.focus();
+            }
+        }
+        if (sendBtn) {
+            sendBtn.disabled = !enabled;
+        }
+    },
     
     // Lazy load WebLLM library
     async loadWebLLM() {
@@ -1318,10 +1373,17 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
     
     // Send message and get response
     async sendMessage(userMessage) {
+        // Prevent sending while waiting for response
+        if (this.isWaitingForResponse) return;
+        
         if (!this.isInitialized) {
             await this.initialize();
             if (!this.isInitialized) return;
         }
+        
+        // Set waiting state and disable input
+        this.isWaitingForResponse = true;
+        this.setInputEnabled(false);
         
         // Clear input immediately
         chatInput.value = '';
@@ -1357,6 +1419,7 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
             
             let reply = '';
             assistantContent.innerHTML = '';
+            let firstChunk = true;
             
             let renderer = null;
             let parser = null;
@@ -1368,6 +1431,13 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
             for await (const chunk of chunks) {
                 const delta = chunk.choices[0]?.delta?.content || '';
                 reply += delta;
+                
+                // Re-enable input on first chunk (agent started responding)
+                if (firstChunk && delta) {
+                    firstChunk = false;
+                    this.isWaitingForResponse = false;
+                    this.setInputEnabled(true);
+                }
                 
                 if (parser) {
                     smd.parser_write(parser, delta);
@@ -1392,10 +1462,435 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
             
         } catch (error) {
             console.error('Local chat error:', error);
+            // Re-enable input on error
+            this.isWaitingForResponse = false;
+            this.setInputEnabled(true);
             assistantContent.innerHTML = `<div class="error-message">
                 <p>❌ Local AI encountered an error.</p>
                 <p>Try refreshing or switch to <strong>Cloud AI</strong> mode.</p>
             </div>`;
+        }
+    }
+};
+
+// ===== Voice Chat Manager (LiveKit Integration) =====
+const VoiceChatManager = {
+    room: null,
+    isConnected: false,
+    isConnecting: false,
+    isMicEnabled: false,
+    transcriptions: [],
+    lastTranscriptionId: new Map(),
+    
+    // Configuration
+    CONNECTION_API: 'https://vishal-voice-agent.codeshare.co.in/api/connection-details',
+    
+    // DOM Elements
+    elements: {
+        voiceBtn: null,
+        inputContainer: null,
+        voiceStatusText: null,
+        voiceMuteBtn: null,
+        voiceEndBtn: null,
+    },
+    
+    // Initialize voice chat
+    init() {
+        this.elements = {
+            voiceBtn: document.getElementById('voiceBtn'),
+            inputContainer: document.getElementById('inputContainer'),
+            voiceStatusText: document.getElementById('voiceStatusText'),
+            voiceMuteBtn: document.getElementById('voiceMuteBtn'),
+            voiceEndBtn: document.getElementById('voiceEndBtn'),
+        };
+        
+        if (this.elements.voiceBtn) {
+            this.elements.voiceBtn.addEventListener('click', () => this.toggleVoiceChat());
+        }
+        
+        if (this.elements.voiceMuteBtn) {
+            this.elements.voiceMuteBtn.addEventListener('click', () => this.toggleMute());
+        }
+        
+        if (this.elements.voiceEndBtn) {
+            this.elements.voiceEndBtn.addEventListener('click', () => this.endCall());
+        }
+        
+        console.log('🎙️ Voice Chat Manager initialized');
+    },
+    
+    // Toggle voice chat on/off
+    async toggleVoiceChat() {
+        if (this.isConnected || this.isConnecting) {
+            await this.endCall();
+        } else {
+            await this.startCall();
+        }
+    },
+    
+    // Start voice call
+    async startCall() {
+        if (this.isConnecting || this.isConnected) return;
+        
+        this.isConnecting = true;
+        this.updateUI('connecting');
+        
+        try {
+            // Fetch connection details from API
+            console.log('🎙️ Fetching voice connection details...');
+            const response = await fetch(this.CONNECTION_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({}),
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API request failed: ${response.status}`);
+            }
+            
+            const connectionDetails = await response.json();
+            console.log('🎙️ Connection details received:', {
+                serverUrl: connectionDetails.serverUrl,
+                roomName: connectionDetails.roomName,
+            });
+            
+            // Connect to room
+            await this.connectToRoom(
+                connectionDetails.serverUrl,
+                connectionDetails.participantToken,
+                connectionDetails.roomName
+            );
+            
+            // Hide welcome screen and show chat
+            if (welcomeScreen.style.display !== 'none') {
+                welcomeScreen.style.display = 'none';
+            }
+            
+            // Add system message about voice call starting
+            this.addVoiceMessage('system', '🎙️ Voice call started. Speak naturally - your conversation will appear here.', true);
+            
+        } catch (error) {
+            console.error('🎙️ Failed to start voice call:', error);
+            this.isConnecting = false;
+            this.updateUI('disconnected');
+            
+            // Show error message
+            this.addVoiceMessage('system', `❌ Couldn't connect to voice assistant: ${error.message}`, true);
+        }
+    },
+    
+    // Connect to LiveKit room
+    async connectToRoom(serverUrl, token, roomName) {
+        const { Room, RoomEvent, Track, VideoPresets } = LivekitClient;
+        
+        // Create room instance
+        const roomOptions = {
+            adaptiveStream: false,
+            dynacast: false,
+            autoSubscribe: true,
+            rtcConfig: {
+                iceServers: [
+                    {
+                        urls: [
+                            'stun:stun.l.google.com:19302',
+                            'stun:stun1.l.google.com:19302',
+                        ],
+                    },
+                ],
+                iceTransportPolicy: 'all',
+                bundlePolicy: 'max-bundle',
+                rtcpMuxPolicy: 'require',
+            },
+        };
+        
+        this.room = new Room(roomOptions);
+        
+        // Set up event listeners
+        this.setupRoomEventListeners();
+        
+        // Connect to room
+        console.log('🎙️ Connecting to:', serverUrl);
+        await this.room.connect(serverUrl, token, {
+            autoSubscribe: true,
+            peerConnectionTimeout: 60000,
+        });
+        
+        console.log('🎙️ ✅ Connected to room:', this.room.name);
+        
+        this.isConnected = true;
+        this.isConnecting = false;
+        
+        // Enable microphone
+        setTimeout(async () => {
+            try {
+                await this.room.localParticipant.setMicrophoneEnabled(true);
+                this.isMicEnabled = true;
+                this.updateUI('connected');
+                console.log('🎙️ ✅ Microphone enabled');
+            } catch (error) {
+                console.warn('🎙️ ⚠️ Could not enable microphone:', error.message);
+                this.updateUI('connected');
+            }
+        }, 100);
+    },
+    
+    // Setup room event listeners
+    setupRoomEventListeners() {
+        const { RoomEvent, Track } = LivekitClient;
+        
+        this.room
+            .on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+                console.log('🎙️ Track subscribed:', track.kind, participant.identity);
+                if (track.kind === Track.Kind.Audio) {
+                    const element = track.attach();
+                    document.body.appendChild(element);
+                    element.style.display = 'none';
+                }
+            })
+            .on(RoomEvent.TrackUnsubscribed, (track) => {
+                console.log('🎙️ Track unsubscribed:', track.kind);
+                track.detach().forEach(el => el.remove());
+            })
+            .on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
+                const isAgentSpeaking = speakers.some(s => s.identity !== this.room?.localParticipant?.identity);
+                if (isAgentSpeaking) {
+                    this.elements.inputContainer?.classList.add('speaking');
+                    if (this.elements.voiceStatusText) {
+                        this.elements.voiceStatusText.textContent = 'Agent speaking...';
+                    }
+                } else {
+                    this.elements.inputContainer?.classList.remove('speaking');
+                    if (this.elements.voiceStatusText && this.isConnected) {
+                        this.elements.voiceStatusText.textContent = this.isMicEnabled ? 'Listening...' : 'Muted';
+                    }
+                }
+            })
+            .on(RoomEvent.Disconnected, () => {
+                console.log('🎙️ Disconnected from room');
+                this.cleanup();
+            })
+            .on(RoomEvent.Reconnecting, () => {
+                console.log('🎙️ Reconnecting...');
+                this.updateUI('connecting');
+            })
+            .on(RoomEvent.Reconnected, () => {
+                console.log('🎙️ Reconnected');
+                this.updateUI('connected');
+            })
+            .on(RoomEvent.DataReceived, (payload, participant) => {
+                this.handleDataReceived(payload, participant);
+            })
+            .on(RoomEvent.TranscriptionReceived, (transcriptions, participant) => {
+                this.handleTranscriptionReceived(transcriptions, participant);
+            })
+            .on(RoomEvent.AudioPlaybackStatusChanged, () => {
+                if (!this.room.canPlaybackAudio) {
+                    this.room.startAudio();
+                }
+            });
+        
+        console.log('🎙️ Room event listeners set up');
+    },
+    
+    // Handle data received (for transcriptions)
+    handleDataReceived(payload, participant) {
+        console.log('🎙️ Data received from:', participant?.identity);
+        
+        try {
+            const decoder = new TextDecoder();
+            const text = decoder.decode(payload);
+            
+            try {
+                const data = JSON.parse(text);
+                if (data.type === 'transcription' || data.transcript || data.text || data.message) {
+                    const transcriptText = data.transcript || data.text || data.message || '';
+                    const speaker = data.speaker || data.participant || participant?.identity || 'Agent';
+                    const isFinal = data.is_final !== false;
+                    
+                    this.addVoiceMessage(speaker, transcriptText, isFinal, data.id);
+                }
+            } catch (parseError) {
+                // Plain text
+                const speaker = participant?.identity || 'Agent';
+                this.addVoiceMessage(speaker, text, true);
+            }
+        } catch (error) {
+            console.error('🎙️ Error processing data:', error);
+        }
+    },
+    
+    // Handle transcription received
+    handleTranscriptionReceived(transcriptions, participant) {
+        console.log('🎙️ Transcription received:', transcriptions.length, 'segments');
+        
+        transcriptions.forEach(transcription => {
+            const speaker = participant?.identity || 'Agent';
+            const isFinal = transcription.final !== false;
+            
+            if (transcription.text && transcription.text.trim()) {
+                this.addVoiceMessage(speaker, transcription.text, isFinal, transcription.id);
+            }
+        });
+    },
+    
+    // Add voice message to chat (using existing createMessage function)
+    addVoiceMessage(speaker, text, isFinal = true, transcriptionId = null) {
+        if (!text || !text.trim()) return;
+        
+        const isUser = speaker.toLowerCase().includes('user') || 
+                       speaker === this.room?.localParticipant?.identity ||
+                       speaker.toLowerCase().includes('participant');
+        const isSystem = speaker === 'system';
+        
+        // For interim transcripts, update existing message
+        if (!isFinal && transcriptionId) {
+            const existingMsg = document.querySelector(`[data-transcription-id="${transcriptionId}"]`);
+            if (existingMsg) {
+                const content = existingMsg.querySelector('.message-content');
+                if (content) content.textContent = text;
+                return;
+            }
+        }
+        
+        // For final transcripts, remove interim version
+        if (isFinal && transcriptionId) {
+            const interimMsg = document.querySelector(`[data-transcription-id="${transcriptionId}"]`);
+            if (interimMsg && interimMsg.classList.contains('interim')) {
+                interimMsg.remove();
+            }
+        }
+        
+        // Create message element
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message voice-message ${isFinal ? 'final' : 'interim'}`;
+        if (transcriptionId) {
+            messageDiv.dataset.transcriptionId = transcriptionId;
+        }
+        
+        let avatar, senderName;
+        if (isSystem) {
+            avatar = '<img src="assets/icons/ai.svg" alt="System" class="avatar-icon">';
+            senderName = 'System';
+        } else if (isUser) {
+            avatar = '<img src="assets/icons/about-me.svg" alt="You" class="avatar-icon">';
+            senderName = 'You';
+        } else {
+            avatar = '<img src="assets/icons/ai.svg" alt="Assistant" class="avatar-icon">';
+            senderName = "Vishal's Assistant";
+        }
+        
+        messageDiv.innerHTML = `
+            <div class="message-header">
+                <div class="avatar">${avatar}</div>
+                <span class="sender-name">${senderName}</span>
+            </div>
+            <div class="message-content">${text}</div>
+        `;
+        
+        chatContent.appendChild(messageDiv);
+        
+        // Scroll to bottom
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Store final transcriptions
+        if (isFinal && !isSystem) {
+            this.transcriptions.push({ speaker: senderName, text, timestamp: new Date() });
+        }
+    },
+    
+    // Toggle mute
+    async toggleMute() {
+        if (!this.room) return;
+        
+        try {
+            this.isMicEnabled = !this.isMicEnabled;
+            await this.room.localParticipant.setMicrophoneEnabled(this.isMicEnabled);
+            this.updateMuteButton();
+            
+            if (this.elements.voiceStatusText) {
+                this.elements.voiceStatusText.textContent = this.isMicEnabled ? 'Listening...' : 'Muted';
+            }
+            
+            if (this.isMicEnabled) {
+                this.elements.inputContainer?.classList.remove('muted');
+            } else {
+                this.elements.inputContainer?.classList.add('muted');
+            }
+        } catch (error) {
+            console.error('🎙️ Failed to toggle mute:', error);
+            this.isMicEnabled = !this.isMicEnabled;
+        }
+    },
+    
+    // End call
+    async endCall() {
+        if (this.room) {
+            await this.room.disconnect();
+        }
+        this.cleanup();
+        this.addVoiceMessage('system', '📞 Voice call ended.', true);
+    },
+    
+    // Cleanup
+    cleanup() {
+        if (this.room) {
+            this.room.disconnect();
+            this.room = null;
+        }
+        
+        this.isConnected = false;
+        this.isConnecting = false;
+        this.isMicEnabled = false;
+        this.updateUI('disconnected');
+    },
+    
+    // Update UI state
+    updateUI(state) {
+        const { voiceBtn, inputContainer, voiceStatusText, voiceMuteBtn } = this.elements;
+        
+        switch (state) {
+            case 'connecting':
+                voiceBtn?.classList.add('connecting');
+                voiceBtn?.classList.remove('active');
+                inputContainer?.classList.add('voice-active');
+                inputContainer?.classList.remove('speaking', 'muted');
+                if (voiceStatusText) voiceStatusText.textContent = 'Connecting...';
+                break;
+                
+            case 'connected':
+                voiceBtn?.classList.remove('connecting');
+                voiceBtn?.classList.add('active');
+                inputContainer?.classList.add('voice-active');
+                inputContainer?.classList.remove('speaking');
+                if (this.isMicEnabled) {
+                    inputContainer?.classList.remove('muted');
+                    if (voiceStatusText) voiceStatusText.textContent = 'Listening...';
+                } else {
+                    inputContainer?.classList.add('muted');
+                    if (voiceStatusText) voiceStatusText.textContent = 'Muted';
+                }
+                this.updateMuteButton();
+                break;
+                
+            case 'disconnected':
+                voiceBtn?.classList.remove('connecting', 'active');
+                inputContainer?.classList.remove('voice-active', 'speaking', 'muted');
+                break;
+        }
+    },
+    
+    // Update mute button state
+    updateMuteButton() {
+        const { voiceMuteBtn } = this.elements;
+        if (voiceMuteBtn) {
+            if (this.isMicEnabled) {
+                voiceMuteBtn.classList.remove('muted');
+                voiceMuteBtn.title = 'Mute microphone';
+            } else {
+                voiceMuteBtn.classList.add('muted');
+                voiceMuteBtn.title = 'Unmute microphone';
+            }
         }
     }
 };
@@ -1438,6 +1933,9 @@ window.addEventListener('load', async () => {
     // Initialize the AI mode manager
     AIModeManager.init();
     
+    // Initialize Voice Chat Manager
+    VoiceChatManager.init();
+    
     // Initialize server chat session (default mode)
     setTimeout(async () => {
         await ServerChatManager.initialize();
@@ -1453,10 +1951,26 @@ if (settingsBtn) {
             ? '🖥️ **Homelab AI** (Default) - Running on Vishal\'s M1 Mac'
             : '🔒 **Your Device** - Runs entirely on your machine using WebGPU';
         
+        const voiceStatus = VoiceChatManager.isConnected 
+            ? '🟢 Voice call active' 
+            : '⚪ Voice call inactive';
+        
         const helpMessage = `
 ### 🛠️ Settings & Help
 
 **Current Mode:** ${modeInfo}
+**Voice Status:** ${voiceStatus}
+
+---
+
+### 🎙️ Voice Chat (NEW!)
+
+Click the **microphone button** next to the text input to start a voice conversation with Vishal's AI assistant!
+
+- **Real-time transcription** - Your conversation appears as text
+- **Natural conversation** - Just speak naturally
+- **Powered by LiveKit** - Low-latency voice streaming
+- **Works alongside text** - Switch between voice and text anytime
 
 ---
 
@@ -1484,6 +1998,7 @@ if (settingsBtn) {
 - **Cloud AI not responding?** The server might be sleeping - try again in a moment
 - **Local AI not loading?** Clear site data: DevTools → Application → Storage
 - **Mode not switching?** Refresh the page and try again
+- **Voice not working?** Make sure you've allowed microphone access
 
 ### Quick Navigation
 - Use the sidebar menu to explore different sections

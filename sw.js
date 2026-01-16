@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vishal-portfolio-v4';
+const CACHE_NAME = 'vishal-portfolio-v5';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -37,7 +37,8 @@ const STATIC_ASSETS = [
 // CDN resources to cache
 const CDN_ASSETS = [
   'https://cdn.jsdelivr.net/npm/roughjs@4.5.2/bundled/rough.js',
-  'https://cdn.jsdelivr.net/npm/marked/marked.min.js'
+  'https://cdn.jsdelivr.net/npm/marked/marked.min.js',
+  'https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js'
 ];
 
 // Install event - cache static assets

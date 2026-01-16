@@ -1725,7 +1725,10 @@ const VoiceChatManager = {
         
         transcriptions.forEach(transcription => {
             const speaker = participant?.identity || 'Agent';
-            const isFinal = transcription.final !== false;
+            // Only treat as final if explicitly true (interim if false or undefined)
+            const isFinal = transcription.final === true;
+            
+            console.log('📝 Transcription:', { speaker, isFinal, id: transcription.id, text: transcription.text?.substring(0, 50) });
             
             if (transcription.text && transcription.text.trim()) {
                 this.addVoiceMessage(speaker, transcription.text, isFinal, transcription.id);
@@ -1747,15 +1750,55 @@ const VoiceChatManager = {
             const existingMsg = document.querySelector(`[data-transcription-id="${transcriptionId}"]`);
             if (existingMsg) {
                 const content = existingMsg.querySelector('.message-content');
-                if (content) content.textContent = text;
+                if (content) {
+                    // Check if this is an agent message (not user)
+                    const isAgentMsg = !existingMsg.querySelector('.sender-name')?.textContent?.includes('You');
+                    
+                    // Use streaming markdown if available, or create one for agent messages
+                    if (existingMsg._smdParser) {
+                        // Calculate new content to add
+                        const oldLen = existingMsg._lastText?.length || 0;
+                        const newContent = text.substring(oldLen);
+                        if (newContent) {
+                            smd.parser_write(existingMsg._smdParser, newContent);
+                        }
+                        existingMsg._lastText = text;
+                    } else if (isAgentMsg && typeof smd !== 'undefined') {
+                        // Create streaming parser if missing (shouldn't happen but fallback)
+                        content.innerHTML = '';
+                        const renderer = smd.default_renderer(content);
+                        const parser = smd.parser(renderer);
+                        smd.parser_write(parser, text);
+                        existingMsg._smdParser = parser;
+                        existingMsg._lastText = text;
+                    } else {
+                        content.textContent = text;
+                    }
+                    
+                    // Auto-scroll on update
+                    const chatMessages = document.getElementById('chatMessages');
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
                 return;
             }
         }
         
-        // For final transcripts, remove interim version
+        // For final transcripts, finalize or remove interim version
         if (isFinal && transcriptionId) {
             const interimMsg = document.querySelector(`[data-transcription-id="${transcriptionId}"]`);
             if (interimMsg && interimMsg.classList.contains('interim')) {
+                // If it has a streaming parser, finalize it instead of removing
+                if (interimMsg._smdParser) {
+                    smd.parser_end(interimMsg._smdParser);
+                    interimMsg.classList.remove('interim');
+                    interimMsg.classList.add('final');
+                    delete interimMsg._smdParser;
+                    delete interimMsg._lastText;
+                    // Auto-scroll after finalization
+                    const chatMessages = document.getElementById('chatMessages');
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    return; // Don't create a new message
+                }
                 interimMsg.remove();
             }
         }
@@ -1784,8 +1827,30 @@ const VoiceChatManager = {
                 <div class="avatar">${avatar}</div>
                 <span class="sender-name">${senderName}</span>
             </div>
-            <div class="message-content">${text}</div>
+            <div class="message-content"></div>
         `;
+        
+        const contentDiv = messageDiv.querySelector('.message-content');
+        
+        // For agent messages, use streaming markdown parser
+        if (!isUser && !isSystem && typeof smd !== 'undefined') {
+            const renderer = smd.default_renderer(contentDiv);
+            const parser = smd.parser(renderer);
+            smd.parser_write(parser, text);
+            
+            if (isFinal) {
+                smd.parser_end(parser);
+            } else {
+                // Store parser for updates
+                messageDiv._smdParser = parser;
+                messageDiv._lastText = text;
+            }
+        } else if (isFinal && typeof marked !== 'undefined') {
+            // For final user messages, use marked for markdown
+            contentDiv.innerHTML = marked.parse(text);
+        } else {
+            contentDiv.textContent = text;
+        }
         
         chatContent.appendChild(messageDiv);
         

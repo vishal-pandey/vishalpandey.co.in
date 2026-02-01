@@ -752,6 +752,9 @@ const AIModeManager = {
             if (!this.isMobile()) {
                 LocalChatManager.initialize();
             }
+        } else if (this.currentMode === 'server' && LocalChatManager.isInitializing) {
+            // Cancel initialization when switching back to server mode
+            LocalChatManager.cancelInitialization();
         }
     },
     
@@ -1110,6 +1113,8 @@ const LocalChatManager = {
     webllmLoaded: false,
     smdLoaded: false,
     isWaitingForResponse: false,
+    messageInterval: null,
+    initCancelled: false,
     
     // Helper to enable/disable chat input
     setInputEnabled(enabled) {
@@ -1286,9 +1291,46 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
         return this.loadingMessages[Math.floor(Math.random() * this.loadingMessages.length)];
     },
     
+    // Cancel ongoing initialization
+    cancelInitialization() {
+        if (!this.isInitializing) return;
+        
+        console.log('🛑 Cancelling local AI initialization...');
+        this.initCancelled = true;
+        this.isInitializing = false;
+        
+        // Clear the message interval
+        if (this.messageInterval) {
+            clearInterval(this.messageInterval);
+            this.messageInterval = null;
+        }
+        
+        // Hide loading indicator
+        const loadingIndicator = document.getElementById('aiLoadingIndicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+        
+        // Reset loading bar
+        const loadingBar = document.getElementById('aiLoadingBar');
+        if (loadingBar) {
+            loadingBar.style.width = '0%';
+        }
+        
+        const loadingPercent = document.getElementById('aiLoadingPercent');
+        if (loadingPercent) {
+            loadingPercent.textContent = '0%';
+        }
+        
+        console.log('✅ Local AI initialization cancelled');
+    },
+
     // Initialize WebLLM engine
     async initialize() {
         if (this.isInitializing || this.isInitialized) return;
+        
+        // Reset cancellation flag
+        this.initCancelled = false;
         
         // Check WebGPU support first
         const hasWebGPU = await this.checkWebGPUSupport();
@@ -1313,7 +1355,7 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
         }
         
         // Rotate humorous messages every 3 seconds
-        const messageInterval = setInterval(() => {
+        this.messageInterval = setInterval(() => {
             if (loadingText && this.isInitializing) {
                 loadingText.textContent = this.getRandomLoadingMessage();
             }
@@ -1341,10 +1383,20 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
                 { initProgressCallback }
             );
             
+            // Check if cancelled during download
+            if (this.initCancelled) {
+                console.log('🛑 Initialization was cancelled, cleaning up...');
+                this.engine = null;
+                return;
+            }
+            
             this.isInitialized = true;
             this.isInitializing = false;
             
-            clearInterval(messageInterval);
+            if (this.messageInterval) {
+                clearInterval(this.messageInterval);
+                this.messageInterval = null;
+            }
             
             if (loadingIndicator) {
                 loadingIndicator.style.display = 'none';
@@ -1356,16 +1408,23 @@ Q: "Email?" → "**contact@vishalpandey.co.in**"`;
             console.log('✅ Local AI (WebLLM) initialized successfully!');
             
         } catch (error) {
-            console.error('Failed to initialize WebLLM:', error);
+            // Don't log error if it was cancelled
+            if (!this.initCancelled) {
+                console.error('Failed to initialize WebLLM:', error);
+            }
             this.isInitializing = false;
             
-            clearInterval(messageInterval);
+            if (this.messageInterval) {
+                clearInterval(this.messageInterval);
+                this.messageInterval = null;
+            }
             
             if (loadingIndicator) {
                 loadingIndicator.style.display = 'none';
             }
             
-            if (description) {
+            // Only show error if not cancelled
+            if (description && !this.initCancelled) {
                 description.innerHTML = '<span class="ai-status-dot offline"></span>Local AI failed • Switch to Cloud AI';
             }
         }

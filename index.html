@@ -23,6 +23,15 @@
                 t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
             document.documentElement.dataset.theme = t;
+            // Dark boots like a terminal: hide the page until the boot log
+            // plays (motion.js). Failsafe uncovers it even if scripts die.
+            if (t === 'dark' && !location.hash &&
+                !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.documentElement.classList.add('booting');
+                setTimeout(function () {
+                    document.documentElement.classList.remove('booting');
+                }, 2200);
+            }
         })();
     </script>
     <!-- Redline fonts self-hosted as .woff2, loaded in styles.css -->

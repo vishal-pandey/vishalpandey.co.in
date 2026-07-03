@@ -39,10 +39,50 @@
             return tl;
         };
 
+        // --- Terminal boot (dark, first paint): the machine wakes up first ---
+        function runBoot(done) {
+            const overlay = document.createElement('div');
+            overlay.className = 'boot-overlay';
+            const log = document.createElement('div');
+            [
+                '➜ boot vishalpandey.ai v2.0',
+                '<span class="ok">[ ok ]</span> mounting ~/vishal',
+                '<span class="ok">[ ok ]</span> homelab link up · 2 nodes',
+                '<span class="ok">[ ok ]</span> loading humor module',
+                '<span class="warn">[warn]</span> modesty module not found — skipping',
+                '<span class="ok">[ ok ]</span> rendering portfolio ▊'
+            ].forEach(html => {
+                const line = document.createElement('div');
+                line.className = 'boot-line';
+                line.innerHTML = html;
+                log.appendChild(line);
+            });
+            overlay.appendChild(log);
+            document.body.appendChild(overlay);
+
+            let finished = false;
+            const finish = () => {
+                if (finished) return;
+                finished = true;
+                bootTl.kill();
+                overlay.remove();
+                document.documentElement.classList.remove('booting');
+                done();
+            };
+
+            const bootTl = gsap.timeline({ onComplete: finish });
+            bootTl.to(overlay.querySelectorAll('.boot-line'),
+                      { opacity: 1, duration: 0.02, stagger: 0.21 })
+                  .to(overlay, { opacity: 0, duration: 0.28, delay: 0.4 });
+
+            overlay.addEventListener('click', finish); // any click skips
+            setTimeout(finish, 2600);                  // belt and suspenders
+        }
+
         // --- Welcome choreography: one orchestrated sequence ---
         const welcome = document.getElementById('welcomeScreen');
         const welcomeVisible = welcome && welcome.style.display !== 'none';
-        if (welcomeVisible) {
+        const startWelcome = () => {
             const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
             tl.from('.status-badge', { y: -12, opacity: 0, duration: 0.35 })
               .from('.welcome-title', { y: 22, opacity: 0, duration: 0.5 }, '-=0.1')
@@ -63,6 +103,20 @@
               // The stamp lands last — the drawing gets approved after review
               // (the easter-egg line is scroll-triggered handwriting, see below)
               .from('.title-block', { opacity: 0, scale: 0.96, duration: 0.4, ease: 'power1.out' }, '-=0.1');
+        };
+
+        if (welcomeVisible) {
+            // Dark theme boots like a terminal before the page composes
+            const bootNeeded = document.documentElement.dataset.theme === 'dark'
+                && document.documentElement.classList.contains('booting');
+            if (bootNeeded) {
+                runBoot(startWelcome);
+            } else {
+                document.documentElement.classList.remove('booting');
+                startWelcome();
+            }
+        } else {
+            document.documentElement.classList.remove('booting');
         }
 
         // --- Easter egg: the pen writes it live when you actually reach it ---

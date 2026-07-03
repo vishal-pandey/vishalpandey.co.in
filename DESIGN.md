@@ -42,6 +42,8 @@
 ### Dark — "CRT terminal"
 - **Bg:** `#0A0D0E`, phosphor grid `rgba(52,211,153,.10)` · **Surface:** `#171B1F`, borders `#262B30` / `#3A4046`
 - **CRT glass:** fixed radial phosphor glow from the top of the viewport + subtle scanline overlay (`body::after`, 3px pitch, ~7% effective darkening). Hacker energy without Matrix-rain cliché; light mode stays the drafting pad.
+- **Phosphor voice (dark):** machine-voice text goes green — bright `#34D399` for status/indices/log headers/AI bold, dim `#7FCDB0` for telemetry/taglines/labels, soft `#8FE3C4` for AI reply body. Blinking `▊` cursor on the status badge (reduced-motion: solid). Input caret phosphor.
+- **Boot sequence (dark, load):** terminal boot log types over a black overlay before the welcome timeline (`runBoot` in motion.js) — "[ok] mounting ~/vishal … [warn] modesty module not found". ~1.6s, click-to-skip, reduced-motion/deep-links/light skip it, 2.2s inline failsafe uncovers content if scripts die.
 - **Text:** `#E8E6E1` · **Muted:** `#8A8F94`
 - **Ultramarine → `#7A8CFF`**, **Red pen → `#FF6B4A`**, **Phosphor → `#34D399`** (desaturate/brighten for dark)
 - **Semantic:** success = Phosphor, error/destructive = Red Pen, info = Ultramarine, warning `#B45309` (light) / `#F59E0B` (dark).

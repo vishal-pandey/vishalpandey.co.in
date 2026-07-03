@@ -4,7 +4,7 @@ const portfolioContent = {
         user: "Tell me about yourself",
         assistant: `
             <h2>About Me</h2>
-            <p>Hello! I'm <strong>Vishal Pandey</strong>, a Technical Lead with 5+ years of experience in building enterprise-grade software solutions. I specialize in real-time data-driven architectures, full-stack development, and leading cross-functional teams to deliver innovative products.</p>
+            <p>Hello! I'm <strong>Vishal Pandey</strong>, a Technical Lead with 10+ years of experience building software — from freelance web projects starting back in 2015 to enterprise-grade solutions today. I specialize in real-time data-driven architectures, full-stack development, and leading cross-functional teams to deliver innovative products.</p>
             
             <p>Currently leading technical initiatives at <strong>Lumiq</strong>, where I've architected and developed multiple products from scratch. I have a proven track record of building scalable platforms, managing diverse engineering teams, and delivering products that solve real-world business problems.</p>
             
@@ -18,13 +18,14 @@ const portfolioContent = {
             </ul>
             
             <h3>My Journey</h3>
-            <p>From founding my own IoT startup <strong>AirTrik</strong> to leading products at <strong>LimeChat</strong> (AI-powered e-commerce support) and <strong>Lumiq</strong> (data reliability platform), I've worn many hats - from hands-on developer to technical leader, team builder to product strategist.</p>
+            <p>I started out freelancing in 2015, building websites and apps for clients while still in college. From there to founding my own IoT startup <strong>AirTrik</strong>, then leading products at <strong>LimeChat</strong> (AI-powered e-commerce support) and <strong>Lumiq</strong> (data reliability platform), I've worn many hats - from hands-on developer to technical leader, team builder to product strategist.</p>
             
             <h3>Philosophy</h3>
             <p>I believe in building products that make a real impact, fostering collaborative team environments, and continuous learning. Whether it's architecting complex systems or mentoring team members, I'm passionate about creating solutions that scale and teams that thrive.</p>
             
             <h3>Beyond Code</h3>
             <p>When I'm not coding, you'll find me exploring photography/videography, creating content on YouTube, or building fun side projects like retro games and web experiments.</p>
+            <p class="redline-note">* also: the AI you're talking to runs on his Mac homelab cluster (a MacBook + a Mac mini) in the living room. the electricity bill is a "we don't discuss it" situation.</p>
         `
     },
     skills: {
@@ -103,7 +104,7 @@ const portfolioContent = {
         user: "Tell me about your experience",
         assistant: `
             <h2>Work Experience</h2>
-            <p>5+ years of professional experience spanning technical leadership, full-stack development, and entrepreneurship.</p>
+            <p>10+ years of experience spanning freelancing (since 2015), entrepreneurship, full-stack development, and technical leadership.</p>
             
             <div class="project-card">
                 <h3 class="project-title">🏢 Full Stack and IoT Developer (Founder)</h3>
@@ -118,6 +119,7 @@ const portfolioContent = {
                     • Built complete tech stack: Python, Django, C, Apache, Mosquitto, Docker, AWS<br>
                     • Designed and implemented secure IoT communication protocols
                 </p>
+                <span class="redline-note">← the college-room startup era</span>
             </div>
             
             <div class="project-card">
@@ -264,6 +266,7 @@ const portfolioContent = {
                     <a href="https://tetris.vishalpandey.co.in/" target="_blank" class="project-link">🧱 Tetris</a>
                     <a href="https://rock-paper-scissor.vishalpandey.co.in/" target="_blank" class="project-link">✊ Rock Paper Scissor</a>
                 </div>
+                <p class="redline-note" style="margin-top: 12px;">← built instead of sleeping. worth it.</p>
             </div>
         `
     },
@@ -335,6 +338,7 @@ const portfolioContent = {
                         <div class="contact-label">Email</div>
                         <div class="contact-value">contact@vishalpandey.co.in</div>
                     </div>
+                    <span class="redline-note">← he actually replies</span>
                 </a>
                 
                 <a href="tel:+919717130893" class="contact-item">
@@ -345,11 +349,11 @@ const portfolioContent = {
                     </div>
                 </a>
                 
-                <a href="https://www.vishalpandey.co.in" target="_blank" class="contact-item">
+                <a href="https://vishalpandey.ai" target="_blank" class="contact-item">
                     <span class="contact-icon">🌐</span>
                     <div class="contact-info">
                         <div class="contact-label">Website</div>
-                        <div class="contact-value">www.vishalpandey.co.in</div>
+                        <div class="contact-value">vishalpandey.ai</div>
                     </div>
                 </a>
                 
@@ -405,13 +409,49 @@ const sidebar = document.getElementById('sidebar');
 const mobileBackdrop = document.getElementById('mobileBackdrop');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
-// Theme Management - Disabled (keeping current theme only)
-// const ThemeManager = {
-//     init: () => {
-//         // Theme is now fixed, no toggling needed
-//     }
-// };
-// ThemeManager.init();
+// ===== Theme Management =====
+// The inline head script resolves the initial theme before first paint
+// (stored choice > system preference). This manages the toggle + live
+// system changes for visitors who haven't chosen.
+const ThemeManager = {
+    init() {
+        const btn = document.getElementById('themeToggle');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('theme', next);
+                this.apply(next);
+            });
+        }
+
+        // Follow the OS live, but only until the visitor explicitly chooses
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            const stored = localStorage.getItem('theme');
+            if (stored !== 'light' && stored !== 'dark') {
+                this.apply(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        this.updateButton();
+    },
+
+    apply(theme) {
+        document.documentElement.dataset.theme = theme;
+        // Keep browser chrome in sync (all theme-color metas, incl. media ones)
+        const color = theme === 'dark' ? '#0F1215' : '#F3F2ED';
+        document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.setAttribute('content', color));
+        this.updateButton();
+    },
+
+    updateButton() {
+        const btn = document.getElementById('themeToggle');
+        if (!btn) return;
+        const dark = document.documentElement.dataset.theme === 'dark';
+        btn.textContent = dark ? '◑' : '◐';
+        btn.title = dark ? 'Switch to light (drafting pad)' : 'Switch to dark (oscilloscope)';
+    }
+};
+ThemeManager.init();
 
 // Configure marked.js for better rendering
 if (typeof marked !== 'undefined') {
@@ -426,7 +466,10 @@ if (typeof marked !== 'undefined') {
 // Function to create message element
 function createMessage(sender, content, isUser = false, isMarkdown = false) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = 'message';
+    // Dual-voice: visitor speaks sans (msg-user), the AI speaks mono (msg-ai),
+    // static portfolio sections read as the document (msg-doc)
+    const voiceClass = isUser ? 'msg-user' : (sender === 'Assistant' ? 'msg-ai' : 'msg-doc');
+    messageDiv.className = `message ${voiceClass}`;
     
     const avatar = isUser ? '<img src="assets/icons/about-me.svg" alt="User" class="avatar-icon">' : '<img src="assets/icons/ai.svg" alt="Assistant" class="avatar-icon">';
     const senderName = isUser ? 'You' : 'Vishal\'s Assistant';
@@ -473,7 +516,10 @@ function displaySection(section, pushState = true) {
         setTimeout(() => {
             const assistantMessage = createMessage('Portfolio', content.assistant, false);
             chatContent.appendChild(assistantMessage);
-            
+
+            // Motion layer staggers the content in; red-pen notes arrive last
+            window.MotionLayer?.sectionIn?.(assistantMessage);
+
             // Scroll to bottom
             const chatMessages = document.getElementById('chatMessages');
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -726,7 +772,7 @@ const AIModeManager = {
             localLabel?.classList.remove('active');
             description?.classList.remove('local-mode');
             if (description) {
-                description.innerHTML = '<span class="ai-status-dot online"></span>Running on Vishal\'s M1 Mac homelab ⚡';
+                description.innerHTML = '<span class="ai-status-dot online"></span>Running on Vishal\'s Mac homelab cluster ⚡';
             }
             chatInput.placeholder = "Ask me anything about Vishal...";
         } else {
@@ -801,7 +847,7 @@ const ServerChatManager = {
         if (this.smdLoaded && window.smd) return window.smd;
         
         console.log('🔄 Lazy loading streaming-markdown...');
-        const smd = await import("https://esm.run/streaming-markdown");
+        const smd = await import("https://esm.run/streaming-markdown@0.2.15");
         window.smd = smd;
         this.smdLoaded = true;
         console.log('✅ streaming-markdown loaded');
@@ -810,17 +856,18 @@ const ServerChatManager = {
     
     // Fun homelab cold start messages
     homelabLoadingMessages: [
-        "Waking up the M1 Mac... ☕",
+        "Waking up the homelab cluster... ☕",
         "Poking Vishal's MacBook... 👆",
         "Warming up the neural networks... 🧠",
         "Mac was taking a nap, hold on... 😴",
         "Spinning up Ollama... 🦙",
         "Cold start detected, brewing AI... ☕",
-        "The M1 chip is stretching... 🏋️",
+        "The Apple Silicon is stretching... 🏋️",
         "Homelab is waking up... 🏠",
         "Dusting off the GPU cores... ✨",
         "Loading Vishal's digital brain... 🧠",
-        "M1 Mac says 'just 5 more minutes'... ⏰",
+        "The Mac mini says 'just 5 more minutes'... ⏰",
+        "Asking the MacBook and Mac mini whose turn it is... 🎲",
         "Initializing homebrew AI... 🍺",
         "The hamsters are running faster... 🐹",
         "Consulting the silicon oracle... 🔮",
@@ -945,7 +992,7 @@ const ServerChatManager = {
         // Create assistant message container
         const isFirstMsg = this.isFirstMessage;
         const loadingContent = isFirstMsg 
-            ? '<span class="homelab-loading"><span class="loading-emoji">🖥️</span><span class="loading-text">Waking up the M1 Mac... ☕</span></span>'
+            ? '<span class="homelab-loading"><span class="loading-emoji">🖥️</span><span class="loading-text">Waking up the homelab cluster... ☕</span></span>'
             : '<span class="typing-indicator">Thinking...</span>';
         
         const assistantMsgElement = createMessage('Assistant', loadingContent, false);
@@ -1095,9 +1142,12 @@ const ServerChatManager = {
             // Re-enable input on error
             this.isWaitingForResponse = false;
             this.setInputEnabled(true);
+            const errorHint = AIModeManager.isMobile()
+                ? '<p>Give it a moment and try again, or use the sidebar to explore.</p>'
+                : '<p>Try switching to <strong>Local AI</strong> mode, or use the sidebar to explore.</p>';
             assistantContent.innerHTML = `<div class="error-message">
                 <p>❌ Couldn't reach Vishal's server. It might be sleeping! 😴</p>
-                <p>Try switching to <strong>Local AI</strong> mode, or use the sidebar to explore.</p>
+                ${errorHint}
             </div>`;
         }
     }
@@ -1136,7 +1186,7 @@ const LocalChatManager = {
         if (this.webllmLoaded && window.webllm) return window.webllm;
         
         console.log('🔄 Lazy loading WebLLM...');
-        const webllm = await import("https://esm.run/@mlc-ai/web-llm");
+        const webllm = await import("https://esm.run/@mlc-ai/web-llm@0.2.84");
         window.webllm = webllm;
         this.webllmLoaded = true;
         console.log('✅ WebLLM loaded');
@@ -1148,7 +1198,7 @@ const LocalChatManager = {
         if (this.smdLoaded && window.smd) return window.smd;
         
         console.log('🔄 Lazy loading streaming-markdown...');
-        const smd = await import("https://esm.run/streaming-markdown");
+        const smd = await import("https://esm.run/streaming-markdown@0.2.15");
         window.smd = smd;
         this.smdLoaded = true;
         console.log('✅ streaming-markdown loaded');
@@ -1170,6 +1220,10 @@ RESPONSE RULES (FOLLOW STRICTLY):
 
 VISHAL'S COMPLETE PROFILE:
 
+Overview:
+- 10+ years of experience in software development (freelancing since 2015)
+- Runs a personal homelab: a Mac cluster (MacBook + Mac mini) that serves this site's AI
+
 Current Role:
 - Technical Lead at Lumiq (Feb 2022 - Present)
 - Leading emPower pryzm - data reliability platform for financial services
@@ -1188,6 +1242,10 @@ Previous Experience:
   - Built PaaS for Industrial IoT applications
   - Published Android App, NPM package, Python package
   - Tech: Python, Django, C, Apache, Mosquitto, Docker, AWS
+
+- Freelance Web Developer (2015 - 2019)
+  - Started freelancing while still in college
+  - Built websites and web apps for clients
 
 Technical Skills:
 - Frontend: HTML5, CSS3, JavaScript (ES6+), Angular, Responsive Design
@@ -1221,7 +1279,7 @@ Leadership:
 Contact:
 - Email: contact@vishalpandey.co.in
 - Phone: +91 97171 30893
-- Website: vishalpandey.co.in
+- Website: vishalpandey.ai
 - LinkedIn: linkedin.com/in/thevishalpandey
 - GitHub: github.com/vishal-pandey
 - YouTube: youtube.com/@pandeyvishal
@@ -1863,8 +1921,9 @@ const VoiceChatManager = {
         }
         
         // Create message element
+        const voiceClass = isUser ? 'msg-user' : (isSystem ? 'msg-doc' : 'msg-ai');
         const messageDiv = document.createElement('div');
-        messageDiv.className = `message voice-message ${isFinal ? 'final' : 'interim'}`;
+        messageDiv.className = `message voice-message ${voiceClass} ${isFinal ? 'final' : 'interim'}`;
         if (transcriptionId) {
             messageDiv.dataset.transcriptionId = transcriptionId;
         }
@@ -2072,7 +2131,7 @@ if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
         const currentMode = AIModeManager.currentMode;
         const modeInfo = currentMode === 'server' 
-            ? '🖥️ **Homelab AI** (Default) - Running on Vishal\'s M1 Mac'
+            ? '🖥️ **Homelab AI** (Default) - Running on Vishal\'s Mac homelab cluster'
             : '🔒 **Your Device** - Runs entirely on your machine using WebGPU';
         
         const voiceStatus = VoiceChatManager.isConnected 
@@ -2101,7 +2160,7 @@ Click the **microphone button** next to the text input to start a voice conversa
 ### AI Chat Modes
 
 **🖥️ Homelab AI (Recommended)**
-- Instant responses from Vishal's personal M1 MacBook
+- Instant responses from Vishal's personal Mac homelab cluster (MacBook + Mac mini)
 - Powered by Ollama running in his homelab cluster
 - Fast & always ready (unless the Mac is sleeping 😴)
 - Works on all devices and browsers
@@ -2165,7 +2224,7 @@ const FunFactsManager = {
     facts: [
         { emoji: '👋', text: "I mass produce more projects than I can count. Mast work. Some don't. We don't talk about those." },
         { emoji: '👋', text: "I've mass refactored codebases at 3am. No regrets. Okay, some regrets." },
-        { emoji: '👋', text: "This AI is running on a MacBook hiding in my closet. Yes, that's my 'homelab'." },
+        { emoji: '👋', text: "This AI runs on a MacBook + Mac mini cluster hiding at my place. Yes, that's my 'homelab'. Yes, it's a 'cluster'." },
         { emoji: '👋', text: "Built Tetris, Snake, and a Brick Game. Yes, I mass produce nostalgia." },
         { emoji: '👋', text: "Made a neural network in pure JavaScript. Why? Kuch bhi." },
         { emoji: '👋', text: "Looking for help with: Money. Paise chahiye bhai dedo." },
@@ -2190,38 +2249,39 @@ const FunFactsManager = {
         this.interval = setInterval(() => this.showNext(), 5000);
     },
     
+    updateCounter() {
+        const counterEl = document.getElementById('factCounter');
+        if (counterEl) {
+            const n = String(this.currentIndex + 1).padStart(2, '0');
+            counterEl.textContent = `${n}/${this.facts.length}`;
+        }
+    },
+
     showNext() {
         this.currentIndex = (this.currentIndex + 1) % this.facts.length;
         const fact = this.facts[this.currentIndex];
-        
+
         const emojiEl = document.getElementById('factEmoji');
         const textEl = document.getElementById('factText');
-        
-        if (emojiEl && textEl) {
-            // Fade out
+        if (!emojiEl || !textEl) return;
+
+        const apply = () => {
+            emojiEl.textContent = fact.emoji;
+            textEl.textContent = fact.text;
+            this.updateCounter();
+        };
+
+        if (window.MotionLayer?.active && window.MotionLayer.factSwap) {
+            // Terminal-log slide via GSAP
+            window.MotionLayer.factSwap(apply);
+        } else {
+            // CSS fallback: simple fade
             emojiEl.style.opacity = '0';
             textEl.style.opacity = '0';
-            
             setTimeout(() => {
-                emojiEl.textContent = fact.emoji;
-                textEl.textContent = fact.text;
-                // Fade in
+                apply();
                 emojiEl.style.opacity = '1';
                 textEl.style.opacity = '1';
-                
-                // Redraw hand-drawn border after content changes
-                setTimeout(() => {
-                    const funFactCard = document.getElementById('funFactCard');
-                    if (funFactCard && typeof HandDrawnShapes !== 'undefined') {
-                        HandDrawnShapes.redrawElement(funFactCard, {
-                            strokeColor: '#3a3830',
-                            strokeWidth: 3,
-                            roughness: 1.8,
-                            shape: 'rounded-rect',
-                            radius: 20
-                        });
-                    }
-                }, 50);
             }, 200);
         }
     }
@@ -2244,289 +2304,140 @@ document.querySelectorAll('.sample-q').forEach(btn => {
 
 console.log('🚀 Portfolio loaded! Cloud AI ready, Local AI available on demand.');
 
-// ===== Hand-Drawn Shapes with Rough.js =====
-const HandDrawnShapes = {
+// ===== The Red Pen (Engineer's Redline) =====
+// Hand-drawn appears ONLY as annotation, never decoration. One mark per
+// viewport: a rough stroke crosses out "sometimes" and writes "usually".
+const RedPen = {
+    drawn: false,
+
+    // Build the SVG stroke without animating it — the motion layer (GSAP)
+    // or the CSS fallback below decides how it gets drawn.
+    build(target) {
+        // Size the viewBox to the word's real width so path length is measurable
+        // (DrawSVG can't measure stretched paths with non-scaling-stroke).
+        const w = Math.max(target.offsetWidth || 100, 40);
+        const sx = w / 100;
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'strike-svg');
+        svg.setAttribute('viewBox', `0 0 ${w} 10`);
+        svg.setAttribute('preserveAspectRatio', 'none');
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        // A hand-wobbled stroke, slightly rising — the pen was moving fast
+        path.setAttribute('d',
+            `M${1 * sx},6 C${18 * sx},3.5 ${34 * sx},7.5 ${52 * sx},5 ` +
+            `S${84 * sx},6.5 ${99 * sx},3.5`);
+        svg.appendChild(path);
+        target.appendChild(svg);
+
+        return { path, correction: document.getElementById('strikeCorrection') };
+    },
+
     init() {
-        if (typeof rough === 'undefined') {
-            console.log('Rough.js not loaded, using CSS fallback');
+        const target = document.getElementById('strikeTarget');
+        if (!target || this.drawn) return;
+
+        // GSAP motion layer owns the strike when active (motion.js)
+        if (window.MotionLayer && window.MotionLayer.active) return;
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // Let the visitor read the line first, then the pen strikes.
+        setTimeout(() => this.strike(target, reduceMotion), reduceMotion ? 0 : 1400);
+    },
+
+    // CSS-transition fallback path (no GSAP)
+    strike(target, instant) {
+        if (this.drawn) return;
+        this.drawn = true;
+
+        const { path, correction } = this.build(target);
+
+        if (instant) {
+            correction?.classList.add('visible');
             return;
         }
-        
-        // Wait a bit for DOM to be fully ready
-        setTimeout(() => {
-            this.drawBackgroundShapes();
-            this.applyHandDrawnBorders();
-        }, 100);
-        
-        // Redraw on resize
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                this.drawBackgroundShapes();
-                this.applyHandDrawnBorders();
-            }, 300);
-        });
+
+        // Animate the stroke being drawn, then the correction appears
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = length;
+        path.style.strokeDashoffset = length;
+        path.getBoundingClientRect(); // flush styles so the transition runs
+        path.style.transition = 'stroke-dashoffset 0.45s ease-in';
+        path.style.strokeDashoffset = '0';
+
+        setTimeout(() => correction?.classList.add('visible'), 500);
+    }
+};
+
+// Exposed for motion.js (deferred scripts run after this file)
+window.RedPen = RedPen;
+
+// ===== Sidebar Telemetry =====
+// Real values only — a ticking session clock and Vishal's actual timezone.
+// The most credible pixels on the page are the ones the machine writes itself.
+const Telemetry = {
+    startTime: Date.now(),
+
+    init() {
+        if (!document.getElementById('telemetryBlock')) return;
+        this.tick();
+        setInterval(() => this.tick(), 1000);
     },
-    
-    // Background decorative shapes
-    drawBackgroundShapes() {
-        const canvas = document.getElementById('decorativeCanvas');
-        if (!canvas) return;
-        
-        // Get the actual scrollable height
-        const chatMessages = document.getElementById('chatMessages');
-        const actualHeight = chatMessages ? chatMessages.scrollHeight : window.innerHeight;
-        
-        canvas.width = window.innerWidth;
-        canvas.height = Math.max(actualHeight, window.innerHeight);
-        
-        const rc = rough.canvas(canvas);
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Organic curvy lines - top right
-        rc.curve([
-            [canvas.width - 180, 80],
-            [canvas.width - 140, 180],
-            [canvas.width - 100, 280],
-            [canvas.width - 120, 380]
-        ], { stroke: '#c4b5a0', strokeWidth: 2, roughness: 2, bowing: 3 });
-        
-        // Small decorative curves
-        rc.curve([
-            [canvas.width - 100, 200],
-            [canvas.width - 60, 220],
-            [canvas.width - 40, 260]
-        ], { stroke: '#d4c4b0', strokeWidth: 1.5, roughness: 1.5, bowing: 2 });
-        
-        // Bottom left curves
-        rc.curve([
-            [40, canvas.height - 150],
-            [80, canvas.height - 200],
-            [60, canvas.height - 280],
-            [100, canvas.height - 350]
-        ], { stroke: '#c4b5a0', strokeWidth: 2, roughness: 2, bowing: 3 });
-        
-        // Small circle decorations
-        rc.circle(canvas.width - 80, 320, 30, {
-            stroke: '#d4c4b0', strokeWidth: 1.5, roughness: 2, fill: 'transparent'
-        });
-        
-        rc.circle(80, canvas.height - 120, 40, {
-            stroke: '#d4c4b0', strokeWidth: 1.5, roughness: 2, fill: 'transparent'
-        });
-    },
-    
-    applyHandDrawnBorders() {
-        // Status badge - green border
-        const statusBadge = document.querySelector('.status-badge');
-        if (statusBadge) {
-            this.createHandDrawnElement(statusBadge, {
-                strokeColor: '#3d9d5f',
-                strokeWidth: 2,
-                roughness: 1.5,
-                shape: 'pill'
+
+    tick() {
+        const sessionEl = document.getElementById('telSession');
+        if (sessionEl) {
+            const s = Math.floor((Date.now() - this.startTime) / 1000);
+            const mm = String(Math.floor(s / 60)).padStart(2, '0');
+            const ss = String(s % 60).padStart(2, '0');
+            sessionEl.textContent = `${mm}:${ss}`;
+        }
+
+        const istEl = document.getElementById('telIst');
+        const awakeEl = document.getElementById('telAwake');
+        if (istEl) {
+            const ist = new Date().toLocaleTimeString('en-IN', {
+                timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false
             });
+            istEl.textContent = ist;
+            if (awakeEl) {
+                const hour = parseInt(ist.split(':')[0], 10);
+                awakeEl.textContent = (hour >= 8 || hour < 2) ? 'probably awake' : 'asleep, allegedly';
+            }
         }
-        
-        // Fun fact card - thick dark border
-        const funFactCard = document.getElementById('funFactCard');
-        if (funFactCard) {
-            this.createHandDrawnElement(funFactCard, {
-                strokeColor: '#3a3830',
-                strokeWidth: 3,
-                roughness: 1.8,
-                shape: 'rounded-rect',
-                radius: 20
-            });
-        }
-        
-        // Sample question buttons
-        const sampleButtons = document.querySelectorAll('.sample-q');
-        const sampleColors = ['#c05a50', '#8a7960', '#3d8a7a', '#4a6a9f'];
-        sampleButtons.forEach((btn, i) => {
-            this.createHandDrawnElement(btn, {
-                strokeColor: sampleColors[i % sampleColors.length],
-                strokeWidth: 2.5,
-                roughness: 1.5,
-                shape: 'pill'
-            });
-        });
-        
-        // Action buttons - colorful borders
-        const actionButtons = document.querySelectorAll('.action-btn');
-        const actionColors = ['#c05a50', '#b89030', '#3d8a7a', '#4a6a9f'];
-        actionButtons.forEach((btn, i) => {
-            this.createHandDrawnElement(btn, {
-                strokeColor: actionColors[i % actionColors.length],
-                strokeWidth: 2.5,
-                roughness: 1.5,
-                shape: 'rounded-square',
-                radius: 20
-            });
-        });
-        
-        // Input container
-        const inputContainer = document.querySelector('.input-container');
-        if (inputContainer) {
-            this.createHandDrawnElement(inputContainer, {
-                strokeColor: '#8b7355',
-                strokeWidth: 3,
-                roughness: 1.5,
-                shape: 'pill'
-            });
-        }
-        
-        // Send button
-        const sendBtn = document.getElementById('sendBtn');
-        if (sendBtn) {
-            this.createHandDrawnCircle(sendBtn);
-        }
-    },
-    
-    redrawElement(element, options) {
-        // This is specifically for redrawing after content changes
-        if (!element || typeof rough === 'undefined') return;
-        this.createHandDrawnElement(element, options);
-    },
-    
-    createHandDrawnCircle(element) {
-        if (!element || typeof rough === 'undefined') return;
-        
-        // Remove existing
-        const existing = element.querySelector('.rough-border-svg');
-        if (existing) existing.remove();
-        
-        const width = element.offsetWidth;
-        const height = element.offsetHeight;
-        
-        if (width === 0 || height === 0) return;
-        
-        // Create SVG container
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.classList.add('rough-border-svg');
-        svg.setAttribute('width', width + 8);
-        svg.setAttribute('height', height + 8);
-        svg.style.cssText = `
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            pointer-events: none;
-            z-index: 10;
-            overflow: visible;
-        `;
-        
-        // Ensure parent is positioned
-        if (getComputedStyle(element).position === 'static') {
-            element.style.position = 'relative';
-        }
-        
-        const rc = rough.svg(svg);
-        const centerX = (width + 8) / 2;
-        const centerY = (height + 8) / 2;
-        const radius = Math.min(width, height) / 2 + 1;
-        
-        // Draw hand-drawn circle
-        const circle = rc.circle(centerX, centerY, radius * 2, {
-            stroke: '#6b7d8f',
-            strokeWidth: 2.5,
-            roughness: 1.2,
-            fill: 'transparent',
-            bowing: 1
-        });
-        
-        svg.appendChild(circle);
-        element.appendChild(svg);
-    },
-    
-    createHandDrawnElement(element, options) {
-        // Remove existing
-        const existing = element.querySelector('.rough-border-svg');
-        if (existing) existing.remove();
-        
-        const width = element.offsetWidth;
-        const height = element.offsetHeight;
-        
-        if (width === 0 || height === 0) return;
-        
-        // Create SVG container
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.classList.add('rough-border-svg');
-        svg.setAttribute('width', width + 8);
-        svg.setAttribute('height', height + 8);
-        svg.style.cssText = `
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            pointer-events: none;
-            z-index: 10;
-            overflow: visible;
-        `;
-        
-        // Ensure parent is positioned
-        if (getComputedStyle(element).position === 'static') {
-            element.style.position = 'relative';
-        }
-        
-        const rc = rough.svg(svg);
-        let shape;
-        
-        const padding = 4;
-        const w = width;
-        const h = height;
-        
-        if (options.shape === 'pill') {
-            const r = h / 2;
-            // Create wobbly pill path
-            shape = rc.path(
-                `M ${r + padding} ${padding}
-                 C ${r + padding + 10} ${padding - 2}, ${w - r + padding - 10} ${padding + 2}, ${w - r + padding} ${padding}
-                 C ${w + padding + 2} ${padding + 5}, ${w + padding} ${h/2 + padding}, ${w + padding} ${h/2 + padding}
-                 C ${w + padding + 2} ${h - 5 + padding}, ${w - r + padding + 5} ${h + padding}, ${w - r + padding} ${h + padding}
-                 C ${w - r + padding - 10} ${h + padding + 2}, ${r + padding + 10} ${h + padding - 2}, ${r + padding} ${h + padding}
-                 C ${padding - 2} ${h + padding - 5}, ${padding} ${h/2 + padding}, ${padding} ${h/2 + padding}
-                 C ${padding - 2} ${padding + 5}, ${r + padding - 5} ${padding}, ${r + padding} ${padding}
-                 Z`,
-                {
-                    stroke: options.strokeColor,
-                    strokeWidth: options.strokeWidth,
-                    roughness: options.roughness,
-                    bowing: 2,
-                    fill: 'transparent'
-                }
-            );
-        } else if (options.shape === 'rounded-square' || options.shape === 'rounded-rect') {
-            const r = options.radius || 20;
-            shape = rc.path(
-                `M ${r + padding} ${padding}
-                 L ${w - r + padding} ${padding}
-                 Q ${w + padding} ${padding} ${w + padding} ${r + padding}
-                 L ${w + padding} ${h - r + padding}
-                 Q ${w + padding} ${h + padding} ${w - r + padding} ${h + padding}
-                 L ${r + padding} ${h + padding}
-                 Q ${padding} ${h + padding} ${padding} ${h - r + padding}
-                 L ${padding} ${r + padding}
-                 Q ${padding} ${padding} ${r + padding} ${padding}
-                 Z`,
-                {
-                    stroke: options.strokeColor,
-                    strokeWidth: options.strokeWidth,
-                    roughness: options.roughness,
-                    bowing: 1.5,
-                    fill: 'transparent'
-                }
-            );
-        }
-        
-        if (shape) {
-            svg.appendChild(shape);
-            element.appendChild(svg);
-        }
+    }
+};
+
+// ===== Status Badge Rotator =====
+const StatusRotator = {
+    statuses: [
+        'Probably debugging something rn',
+        'compiling excuses…',
+        'in a meeting that could\'ve been an email',
+        'waiting for CI like everyone else',
+        'reading docs (lies)',
+        'uptime: suspiciously good',
+    ],
+    index: 0,
+
+    init() {
+        const el = document.getElementById('statusText');
+        if (!el) return;
+        setInterval(() => {
+            this.index = (this.index + 1) % this.statuses.length;
+            el.style.opacity = '0';
+            setTimeout(() => {
+                el.textContent = this.statuses[this.index];
+                el.style.opacity = '1';
+            }, 250);
+        }, 7000);
     }
 };
 
 // Initialize when DOM is loaded
 window.addEventListener('load', () => {
-    HandDrawnShapes.init();
+    RedPen.init();
+    Telemetry.init();
+    StatusRotator.init();
 });

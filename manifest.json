@@ -1,14 +1,32 @@
 {
   "name": "Vishal Pandey - Portfolio",
   "short_name": "Vishal",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Vishal Pandey - Software Engineer portfolio with AI assistant",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf3e3",
-  "theme_color": "#faf3e3",
+  "background_color": "#F3F2ED",
+  "theme_color": "#F3F2ED",
   "orientation": "portrait-primary",
   "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "assets/profile.svg",
       "sizes": "any",
@@ -16,6 +34,9 @@
       "purpose": "any"
     }
   ],
-  "categories": ["portfolio", "personal"],
+  "categories": [
+    "portfolio",
+    "personal"
+  ],
   "lang": "en"
 }

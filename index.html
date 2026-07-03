@@ -6,29 +6,40 @@
     <meta name="description" content="Vishal Pandey - Software Engineer who builds things that sometimes work. Mass builder, professional refactorer. Ask my AI anything, it knows too much about me tbh.">
     <title>Vishal Pandey - AI Assistant</title>
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#faf3e3">
+    <meta name="theme-color" content="#F3F2ED" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0F1215" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F3F2ED">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Vishal">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="assets/profile.svg">
-    <!-- Fonts loaded from local .ttf files in styles.css -->
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <!-- Resolve theme before first paint: stored choice wins, else system -->
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t !== 'light' && t !== 'dark') {
+                t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.dataset.theme = t;
+        })();
+    </script>
+    <!-- Redline fonts self-hosted as .woff2, loaded in styles.css -->
     <link rel="stylesheet" href="styles.css">
     <!-- LogRocket tracking -->
     <script src="https://cdn.logr-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
     <script>window.LogRocket && window.LogRocket.init('vl7yy0/vishalpandey');</script>
-    <!-- Rough.js for hand-drawn graphics (deferred - not render blocking) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/roughjs@4.5.2/bundled/rough.js"></script>
     <!-- Marked.js for Markdown Parsing (deferred - not render blocking) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.min.js" integrity="sha384-MU0bL51BF1u980ujv+Pk0Z0qCjhzfBIEHIFPkUq81289nkiAr+q1jSxEkdlIeHLJ" crossorigin="anonymous"></script>
     <!-- LiveKit SDK for voice chat -->
-    <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.20.0/dist/livekit-client.umd.min.js" integrity="sha384-s/eoT8qpr81c6c9MG5V7GA5xi5IzfEUQLyk3liFfzu9seBzZ3beFVjsD3pXTRmUc" crossorigin="anonymous"></script>
+    <!-- GSAP for orchestrated motion (deferred; site works without it) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/DrawSVGPlugin.min.js" integrity="sha384-pfZbCpJUiv0Y8664JafRbiKcx2uJmjNjVCoPXGwaxvTSbO11M0htzeEeTC6KSaqa" crossorigin="anonymous"></script>
+    <script defer src="motion.js"></script>
     <!-- WebLLM and streaming-markdown are lazy loaded in script.js when needed -->
 </head>
 <body>
-    <!-- Decorative Background Canvas -->
-    <canvas id="decorativeCanvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; opacity: 0.3; overflow: hidden;"></canvas>
-    
     <!-- Main Container -->
     <div class="container">
         <!-- Mobile Backdrop -->
@@ -57,27 +68,27 @@
                     <h2 class="section-title">Recent</h2>
                     <ul class="menu-list">
                         <li class="menu-item" data-section="about">
-                            <img src="assets/icons/about-me.svg" alt="" class="menu-icon svg-icon">
+                            <span class="menu-idx">01</span>
                             <span class="menu-text">About Me</span>
                         </li>
                         <li class="menu-item" data-section="skills">
-                            <img src="assets/icons/skill.svg" alt="" class="menu-icon svg-icon">
+                            <span class="menu-idx">02</span>
                             <span class="menu-text">Skills & Expertise</span>
                         </li>
                         <li class="menu-item" data-section="experience">
-                            <img src="assets/icons/work-experience.svg" alt="" class="menu-icon svg-icon">
+                            <span class="menu-idx">03</span>
                             <span class="menu-text">Work Experience</span>
                         </li>
                         <li class="menu-item" data-section="projects">
-                            <img src="assets/icons/project.svg" alt="" class="menu-icon svg-icon">
+                            <span class="menu-idx">04</span>
                             <span class="menu-text">Projects</span>
                         </li>
                         <li class="menu-item" data-section="education">
-                            <img src="assets/icons/education.svg" alt="" class="menu-icon svg-icon">
+                            <span class="menu-idx">05</span>
                             <span class="menu-text">Education</span>
                         </li>
                         <li class="menu-item" data-section="contact">
-                            <img src="assets/icons/contact.svg" alt="" class="menu-icon svg-icon">
+                            <span class="menu-idx">06</span>
                             <span class="menu-text">Contact Me</span>
                         </li>
                     </ul>
@@ -86,6 +97,12 @@
 
             <!-- Sidebar Footer -->
             <div class="sidebar-footer">
+                <div class="telemetry" id="telemetryBlock" aria-hidden="true">
+                    <div class="tel-line"><span class="tel-dot">●</span> homelab · 2 nodes · online</div>
+                    <div class="tel-line">session <span id="telSession">00:00</span> · sw v8</div>
+                    <div class="tel-line">webllm: on-demand · voice: live</div>
+                    <div class="tel-line">ist <span id="telIst">--:--</span> · vishal: <span id="telAwake">…</span></div>
+                </div>
                 <button class="settings-btn" id="settingsBtn">
                     <img src="assets/icons/setting.svg" alt="Settings" class="settings-icon">
                     <span>Settings & help</span>
@@ -107,6 +124,7 @@
                     </div>
                 </a>
                 <div class="header-actions">
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle color theme" title="Toggle theme">◐</button>
                     <a href="https://github.com/vishal-pandey" target="_blank" class="github-link" title="Visit GitHub">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
@@ -122,18 +140,24 @@
                     <div class="hero-intro">
                         <div class="status-badge">
                             <span class="status-dot"></span>
-                            <span>Probably debugging something rn</span>
+                            <span id="statusText">Probably debugging something rn</span>
                         </div>
                         <h1 class="welcome-title">Hey, I'm <span class="highlight">Vishal</span> <span class="wave-emoji">👋</span></h1>
-                        <p class="welcome-subtitle">I build things that sometimes work</p>
-                        <p class="tagline">Software Engineer • Mass builder • Professional mass refactorer</p>
+                        <p class="welcome-subtitle">I build things that <span class="strike-target" id="strikeTarget">sometimes<span class="strike-correction" id="strikeCorrection">usually</span></span> work</p>
+                        <p class="tagline">software engineer · technical lead · 10+ yrs · builds his own AI stack</p>
                     </div>
                     
-                    <!-- Fun Facts Carousel -->
+                    <!-- Fun Facts Carousel — reads as a log the machine keeps on him -->
                     <div class="fun-facts-section">
                         <div class="fun-fact-card" id="funFactCard">
-                            <span class="fact-emoji" id="factEmoji">👋</span>
-                            <p class="fact-text" id="factText">I mass produce more projects than I can count. Mast work. Some don't. We don't talk about those.</p>
+                            <div class="fact-header">
+                                <span class="fact-prompt">➜</span> ~/vishal/facts
+                                <span class="fact-counter" id="factCounter">01/12</span>
+                            </div>
+                            <div class="fact-body">
+                                <span class="fact-emoji" id="factEmoji">👋</span>
+                                <p class="fact-text" id="factText">I mass produce more projects than I can count. Mast work. Some don't. We don't talk about those.</p>
+                            </div>
                         </div>
                     </div>
                     
@@ -141,17 +165,17 @@
                     <div class="ai-prompt-section">
                         <p class="prompt-intro">Ask my AI anything • It knows too much about me tbh</p>
                         <div class="sample-questions">
-                            <button class="sample-q" data-question="What weird projects has Vishal built?">
-                                <img src="assets/icons/weird-projects.svg" alt="" class="svg-icon"> Weird projects
+                            <button class="sample-q accent-amber" data-question="What weird projects has Vishal built?">
+                                Weird projects
                             </button>
-                            <button class="sample-q" data-question="Tell me something surprising or fun about Vishal">
-                                <img src="assets/icons/surprise-me.svg" alt="" class="svg-icon"> Surprise me
+                            <button class="sample-q accent-phosphor" data-question="Tell me something surprising or fun about Vishal">
+                                Surprise me
                             </button>
-                            <button class="sample-q" data-question="What tech stack does Vishal work with?">
-                                <img src="assets/icons/tech-stack.svg" alt="" class="svg-icon"> Tech stack
+                            <button class="sample-q accent-ultra" data-question="What tech stack does Vishal work with?">
+                                Tech stack
                             </button>
-                            <button class="sample-q" data-question="Roast Vishal's career choices">
-                                <img src="assets/icons/roast-him.svg" alt="" class="svg-icon"> Roast him
+                            <button class="sample-q destructive" data-question="Roast Vishal's career choices">
+                                Roast him
                             </button>
                         </div>
                     </div>
@@ -186,6 +210,14 @@
                     <!-- Easter Egg Footer -->
                     <div class="easter-egg-footer">
                         <p>upar buttons click kar dia? nice. ab kya padh rahe ho, khatam hogya 👋</p>
+                    </div>
+
+                    <!-- Drafting title block — every real drawing has one -->
+                    <div class="title-block" aria-hidden="true">
+                        <div class="tb-row"><span class="tb-label">project</span><span class="tb-value">vishalpandey.ai</span></div>
+                        <div class="tb-row"><span class="tb-label">drawn by</span><span class="tb-value">vishal pandey</span></div>
+                        <div class="tb-row"><span class="tb-label">checked by</span><span class="tb-value">his AI (biased)</span></div>
+                        <div class="tb-row"><span class="tb-label">rev</span><span class="tb-value">2.0</span><span class="tb-label">scale</span><span class="tb-value">1:1</span></div>
                     </div>
                 </div>
 
@@ -284,9 +316,9 @@
                     <!-- Mobile: Compact status -->
                     <div class="mobile-ai-status mobile-only">
                         <span class="ai-status-dot online"></span>
-                        <span class="mobile-ai-text">Running on Vishal's M1 Mac homelab ⚡</span>
+                        <span class="mobile-ai-text">Running on Vishal's Mac homelab cluster ⚡</span>
                     </div>
-                    <p class="mode-description desktop-only" id="modeDescription">Running on Vishal's M1 Mac homelab ⚡</p>
+                    <p class="mode-description desktop-only" id="modeDescription">Running on Vishal's Mac homelab cluster ⚡</p>
                 </div>
             </div>
         </main>

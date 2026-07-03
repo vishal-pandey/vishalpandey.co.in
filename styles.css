@@ -1,69 +1,148 @@
-/* ===== Font Face Declarations ===== */
+/* ===== Font Face Declarations — Engineer's Redline (see DESIGN.md) ===== */
+/* Display: Fraunces (OFL) */
 @font-face {
-    font-family: 'Comic Sans MS';
-    src: url('./assets/Comic Sans MS.woff2') format('woff2');
-    font-weight: normal;
+    font-family: 'Fraunces';
+    src: url('./assets/Fraunces-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Fraunces';
+    src: url('./assets/Fraunces-600.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+/* Body/UI: General Sans (Fontshare) */
+@font-face {
+    font-family: 'General Sans';
+    src: url('./assets/GeneralSans-400.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'General Sans';
+    src: url('./assets/GeneralSans-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'General Sans';
+    src: url('./assets/GeneralSans-600.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+/* Machine voice: JetBrains Mono (OFL) */
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('./assets/JetBrainsMono-400.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('./assets/JetBrainsMono-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('./assets/JetBrainsMono-700.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+/* The red pen: Shantell Sans (OFL) — marginalia ONLY, never body copy */
+@font-face {
+    font-family: 'Shantell Sans';
+    src: url('./assets/ShantellSans-400.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Shantell Sans';
+    src: url('./assets/ShantellSans-500.woff2') format('woff2');
+    font-weight: 500;
     font-style: normal;
     font-display: swap;
 }
 
-@font-face {
-    font-family: 'Comic Sans MS';
-    src: url('./assets/Comic Sans MS Bold.woff2') format('woff2');
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
-}
-
-/* ===== CSS Variables ===== */
+/* ===== CSS Variables — Engineer's Redline tokens ===== */
 :root {
-    /* Warm Beige Theme (Default) */
-    --bg-primary: #f9f3e5;
-    --bg-secondary: #f5ede0;
-    --bg-tertiary: #f0e6d6;
-    --bg-hover: #ebe0d0;
-    --text-primary: #2d2a26;
-    --text-secondary: #5c5650;
-    --text-muted: #7a756e;
-    --accent-blue: #6b8fc7;
-    --accent-purple: #a78bfa;
-    --accent-red: #e07a6d;
-    --accent-yellow: #e8c547;
-    --accent-green: #5eb5a0;
-    --accent-glow: rgba(107, 158, 255, 0.15);
-    --border-color: #c9bba8;
-    --border-dark: #8a7d6d;
-    --message-user-bg: #ffffff;
+    /* Redline tokens (light = drafting pad) */
+    --paper: #F3F2ED;
+    --grid-line: #E0E3E5;
+    --surface: #FFFFFF;
+    --surface-dim: #F9F8F3;
+    --ink: #16130E;
+    --graphite: #6F6A5E;
+    --ultramarine: #2B3FD8;
+    --ultramarine-soft: rgba(43, 63, 216, 0.08);
+    --redpen: #D93A1D;
+    --phosphor: #0F7B5F;
+    --shadow-card: 0 1px 2px rgba(22, 19, 14, 0.05), 0 4px 16px rgba(22, 19, 14, 0.05);
+
+    /* Type voices */
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --font-pen: 'Shantell Sans', 'Comic Sans MS', cursive;
+
+    /* Legacy aliases (existing rules + inline content styles resolve here) */
+    --bg-primary: var(--paper);
+    --bg-secondary: var(--surface);
+    --bg-tertiary: #EFEDE6;
+    --bg-hover: #ECEAE2;
+    --text-primary: var(--ink);
+    --text-secondary: #57534A;
+    --text-muted: var(--graphite);
+    --accent-blue: var(--ultramarine);
+    --accent-purple: var(--ultramarine);
+    --accent-red: var(--redpen);
+    --accent-yellow: #B45309;
+    --accent-green: var(--phosphor);
+    --accent-glow: rgba(43, 63, 216, 0.12);
+    --border-color: #E2E0D8;
+    --border-dark: #C9C6BB;
+    --message-user-bg: var(--surface);
     --message-ai-bg: transparent;
     --sidebar-width: 260px;
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #6b9eff 0%, #a78bfa 100%);
-    --status-green: #4abe80;
-    --card-dark-bg: #4a4a40;
+    --gradient-primary: linear-gradient(135deg, #2B3FD8 0%, #2B3FD8 100%);
+    --gradient-secondary: linear-gradient(135deg, #2B3FD8 0%, #2B3FD8 100%);
+    --status-green: var(--phosphor);
+    --card-dark-bg: #171B1F;
 }
 
-/* Light Theme (keep same as default now) */
-:root[data-theme="light"] {
-    --bg-primary: #f5ede4;
-    --bg-secondary: #faf7f2;
-    --bg-tertiary: #f0e9df;
-    --bg-hover: #ebe3d8;
-    --text-primary: #2d2d2d;
-    --text-secondary: #5a5a5a;
-    --text-muted: #808080;
-    --accent-blue: #6b9eff;
-    --accent-purple: #a78bfa;
-    --accent-red: #ff6b7a;
-    --accent-yellow: #ffd93d;
-    --accent-green: #6bcf9f;
-    --accent-glow: rgba(107, 158, 255, 0.15);
-    --border-color: #d4c4b0;
-    --border-dark: #9d8b73;
-    --message-user-bg: #ffffff;
-    --message-ai-bg: transparent;
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #6b9eff 0%, #a78bfa 100%);
-    --status-green: #10b981;
+/* Dark = oscilloscope: the homelab at night.
+   Applied via data-theme on <html> — an inline head script resolves
+   localStorage choice or system preference before first paint. */
+:root[data-theme="dark"] {
+        --paper: #0F1215;
+        --grid-line: rgba(15, 123, 95, 0.09);
+        --surface: #171B1F;
+        --surface-dim: #14181B;
+        --ink: #E8E6E1;
+        --graphite: #8A8F94;
+        --ultramarine: #7A8CFF;
+        --ultramarine-soft: rgba(122, 140, 255, 0.10);
+        --redpen: #FF6B4A;
+        --phosphor: #34D399;
+        --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+
+        --bg-tertiary: #1F2429;
+        --bg-hover: #232930;
+        --text-secondary: #B9B6AF;
+        --accent-yellow: #F59E0B;
+        --accent-glow: rgba(122, 140, 255, 0.16);
+        --border-color: #262B30;
+        --border-dark: #3A4046;
 }
 
 /* ===== Global Styles ===== */
@@ -80,7 +159,7 @@ html {
 }
 
 body {
-    font-family: 'Comic Sans MS', cursive, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--font-body);
     background-color: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
@@ -90,46 +169,15 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     position: relative;
-    background-image: url('./assets/bg.webp');
+    /* Millimeter graph grid — the drafting pad */
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 24px 24px;
     min-height: 100%;
     min-height: -webkit-fill-available;
     width: 100%;
     max-width: 100vw;
-}
-
-/* Decorative background shapes */
-body::before,
-body::after {
-    content: '';
-    position: fixed;
-    border-radius: 50%;
-    opacity: 0.4;
-    pointer-events: none;
-    z-index: 0;
-}
-
-body::before {
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(255, 219, 61, 0.15) 0%, transparent 70%);
-    top: 5%;
-    right: 10%;
-    animation: floatShape 20s ease-in-out infinite;
-}
-
-body::after {
-    width: 250px;
-    height: 250px;
-    background: radial-gradient(circle, rgba(107, 207, 159, 0.12) 0%, transparent 70%);
-    bottom: 10%;
-    left: 5%;
-    animation: floatShape 25s ease-in-out infinite reverse;
-}
-
-@keyframes floatShape {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(30px, -30px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
 }
 
 .container {
@@ -150,11 +198,10 @@ body::after {
 /* ===== Sidebar Styles ===== */
 .sidebar {
     width: var(--sidebar-width);
-    background: var(--bg-secondary);
-    background-image: url('/assets/bg.webp');
+    background: var(--surface-dim);
     display: flex;
     flex-direction: column;
-    border-right: 2px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
     transition: transform 0.3s ease;
 }
 
@@ -183,10 +230,16 @@ body::after {
 }
 
 .logo {
-    font-size: 20px;
+    font-family: var(--font-mono);
+    font-size: 16px;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.5px;
+}
+
+.logo::before {
+    content: '➜ ';
+    color: var(--phosphor);
 }
 
 .logo-link {
@@ -223,27 +276,28 @@ body::after {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 11px 14px;
     background: transparent;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
+    border: 1px solid var(--border-dark);
+    border-radius: 9px;
     color: var(--text-primary);
+    font-family: var(--font-body);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
 }
 
 .new-chat-btn:hover {
-    background: var(--bg-hover);
-    transform: translateY(-1px);
+    background: var(--ultramarine-soft);
+    border-color: var(--ultramarine);
+    color: var(--ultramarine);
 }
 
 .new-chat-btn.active {
-    background: var(--bg-tertiary);
-    border-color: var(--border-dark);
-    color: var(--text-primary);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: var(--ultramarine-soft);
+    border-color: var(--ultramarine);
+    color: var(--ultramarine);
 }
 
 /* Navigation Menu */
@@ -251,10 +305,6 @@ body::after {
     flex: 1;
     overflow-y: auto;
     padding: 8px;
-    background-image: url('./assets/sidebar.webp');
-    background-position: center center;
-    background-size: cover;
-    background-repeat: no-repeat;
 }
 
 .menu-section {
@@ -262,12 +312,13 @@ body::after {
 }
 
 .section-title {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-tertiary, #9ca3af);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--graphite);
     padding: 8px 16px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.08em;
     margin: 0;
 }
 
@@ -279,42 +330,47 @@ body::after {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 16px;
-    border-radius: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-bottom: 4px;
+    transition: all 0.15s ease;
+    margin-bottom: 2px;
     position: relative;
-}
-
-.menu-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 0;
-    background: var(--gradient-secondary);
-    border-radius: 0 2px 2px 0;
-    transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-secondary);
 }
 
 .menu-item:hover {
-    background-color: var(--bg-hover);
-}
-
-.menu-item:hover::before {
-    height: 60%;
+    background-color: var(--ultramarine-soft);
+    color: var(--ultramarine);
 }
 
 .menu-item.active {
-    background: var(--bg-tertiary);
-    border-left: 3px solid transparent;
+    background: var(--ultramarine-soft);
+    color: var(--ultramarine);
 }
 
-.menu-item.active::before {
-    height: 70%;
+.menu-item:hover .menu-text,
+.menu-item.active .menu-text {
+    color: var(--ultramarine);
+}
+
+.menu-item.active .menu-text {
+    font-weight: 600;
+}
+
+/* Mono index numbers — the machine keeps count */
+.menu-idx {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--graphite);
+    opacity: 0.7;
+    min-width: 18px;
+    flex-shrink: 0;
+}
+
+.menu-item:hover .menu-idx,
+.menu-item.active .menu-idx {
+    color: var(--ultramarine);
 }
 
 .menu-icon {
@@ -338,109 +394,41 @@ body::after {
 .new-chat-btn .svg-icon {
     width: 18px;
     height: 18px;
-    /* Coral/Orange - energetic home icon */
-    filter: invert(45%) sepia(98%) saturate(1500%) hue-rotate(340deg) brightness(100%) contrast(95%);
 }
 
 .sample-q .svg-icon {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     vertical-align: middle;
     margin-right: 4px;
 }
 
 .action-btn .svg-icon {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
 }
 
-/* Colorful Icon Filters - Hand-drawn vibe colors */
-/* About Me - Teal/Cyan */
-.menu-item[data-section="about"] .svg-icon {
-    filter: invert(55%) sepia(75%) saturate(600%) hue-rotate(140deg) brightness(95%) contrast(90%);
+/* One ink, not a crayon box: icons render graphite, sharpen on hover */
+.new-chat-btn .svg-icon,
+.sample-q .svg-icon,
+.action-btn .svg-icon {
+    filter: invert(42%) sepia(8%) saturate(300%) hue-rotate(10deg) brightness(95%) contrast(90%);
+    transition: filter 0.15s ease;
 }
 
-/* Skills - Purple/Violet */
-.menu-item[data-section="skills"] .svg-icon {
-    filter: invert(40%) sepia(90%) saturate(800%) hue-rotate(240deg) brightness(90%) contrast(95%);
-}
-
-/* Work Experience - Blue */
-.menu-item[data-section="experience"] .svg-icon {
-    filter: invert(45%) sepia(80%) saturate(700%) hue-rotate(190deg) brightness(95%) contrast(90%);
-}
-
-/* Projects - Orange/Amber */
-.menu-item[data-section="projects"] .svg-icon {
-    filter: invert(55%) sepia(95%) saturate(1200%) hue-rotate(10deg) brightness(100%) contrast(95%);
-}
-
-/* Education - Green */
-.menu-item[data-section="education"] .svg-icon {
-    filter: invert(55%) sepia(70%) saturate(600%) hue-rotate(80deg) brightness(95%) contrast(90%);
-}
-
-/* Contact - Pink/Magenta */
-.menu-item[data-section="contact"] .svg-icon {
-    filter: invert(50%) sepia(85%) saturate(800%) hue-rotate(300deg) brightness(95%) contrast(95%);
-}
-
-/* Sample Question Button Icons - Match text colors (dark shades) */
-/* Weird Projects - Dark coral/burgundy */
-.sample-q[data-question*="weird"] .svg-icon {
-    filter: invert(20%) sepia(40%) saturate(1500%) hue-rotate(340deg) brightness(70%) contrast(100%);
-}
-
-/* Surprise Me - Dark olive/brown */
-.sample-q[data-question*="surprising"] .svg-icon {
-    filter: invert(25%) sepia(30%) saturate(800%) hue-rotate(20deg) brightness(60%) contrast(100%);
-}
-
-/* Tech Stack - Dark teal */
-.sample-q[data-question*="tech stack"] .svg-icon {
-    filter: invert(25%) sepia(50%) saturate(600%) hue-rotate(130deg) brightness(70%) contrast(100%);
-}
-
-/* Roast Him - Dark blue/indigo */
-.sample-q[data-question*="Roast"] .svg-icon {
-    filter: invert(20%) sepia(60%) saturate(800%) hue-rotate(220deg) brightness(60%) contrast(100%);
-}
-
-/* Quick Action Button Icons - Match text colors (dark shades) */
-/* About - Dark coral */
-.action-btn[data-section="about"] .svg-icon {
-    filter: invert(20%) sepia(40%) saturate(1500%) hue-rotate(340deg) brightness(70%) contrast(100%);
-}
-
-/* Skills - Dark golden/brown */
-.action-btn[data-section="skills"] .svg-icon {
-    filter: invert(25%) sepia(50%) saturate(800%) hue-rotate(30deg) brightness(60%) contrast(100%);
-}
-
-/* Projects - Dark teal */
-.action-btn[data-section="projects"] .svg-icon {
-    filter: invert(25%) sepia(50%) saturate(600%) hue-rotate(130deg) brightness(70%) contrast(100%);
-}
-
-/* Contact - Dark blue */
-.action-btn[data-section="contact"] .svg-icon {
-    filter: invert(20%) sepia(60%) saturate(800%) hue-rotate(200deg) brightness(60%) contrast(100%);
-}
-
-/* Hover effects - brighten and slight scale */
-.menu-item:hover .svg-icon,
-.new-chat-btn:hover .svg-icon,
-.sample-q:hover .svg-icon,
-.action-btn:hover .svg-icon {
-    transform: scale(1.1);
+[data-theme="dark"] .new-chat-btn .svg-icon,
+[data-theme="dark"] .sample-q .svg-icon,
+[data-theme="dark"] .action-btn .svg-icon {
+    filter: invert(65%) sepia(4%) saturate(200%) hue-rotate(180deg) brightness(105%) contrast(90%);
 }
 
 .menu-text {
     font-size: 14px;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: color 0.15s ease;
 }
 
 /* Sidebar Footer */
@@ -462,7 +450,7 @@ body::after {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.2s;
-    font-family: "Comic Sans MS", cursive;
+    font-family: var(--font-body);
 }
 
 .settings-btn:hover {
@@ -480,7 +468,7 @@ body::after {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: var(--bg-primary);
+    background-color: transparent; /* the body's graph grid shows through */
 }
 
 /* Chat Header */
@@ -488,11 +476,10 @@ body::after {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 24px;
-    border-bottom: 2px solid var(--border-color);
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border-color);
     position: relative;
-    background: var(--bg-secondary);
-    background-image: url('./assets/bg.webp');
+    background: var(--surface-dim);
 }
 
 .header-profile {
@@ -502,18 +489,18 @@ body::after {
 }
 
 .profile-avatar {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #b4e8d4 0%, #b4c8ff 100%);
-    border: 3px solid var(--border-dark);
+    background: var(--surface);
+    border: 2px solid var(--border-dark);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 16px;
     color: var(--text-primary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card);
     overflow: hidden;
 }
 
@@ -521,7 +508,7 @@ body::after {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    background-color: #f9f4e4;
+    background-color: #FFFFFF;
 }
 
 .mobile-menu-btn {
@@ -576,11 +563,11 @@ body::after {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--bg-secondary);
-    border: 2px solid var(--border-dark);
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background-color: var(--surface);
+    border: 1px solid var(--border-dark);
     color: var(--text-primary);
     transition: all 0.2s ease;
     text-decoration: none;
@@ -588,9 +575,9 @@ body::after {
 }
 
 .github-link:hover {
-    background-color: var(--bg-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--ultramarine);
+    color: var(--ultramarine);
+    background: var(--ultramarine-soft);
 }
 
 .github-link svg {
@@ -598,15 +585,11 @@ body::after {
     height: 20px;
 }
 
-/* Chat Messages Area */
+/* Chat Messages Area — the grid shows through; annotation is earned, not ambient */
 .chat-messages {
     flex: 1;
     overflow-y: auto;
     padding: 24px;
-    background-image: url('./assets/body-bg-left.webp'), url('./assets/body-bg-right.webp');
-    background-position: 0 0, 100% 0;
-    background-size: auto 100%, auto 100%;
-    background-repeat: no-repeat, no-repeat;
 }
 
 /* Welcome Screen */
@@ -625,13 +608,14 @@ body::after {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    background: #d4f5d9;
-    border: none;
+    padding: 6px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
     border-radius: 50px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #3d9d5f;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--graphite);
     margin-bottom: 24px;
     animation: fadeInDown 0.6s ease-out;
     position: relative;
@@ -639,10 +623,11 @@ body::after {
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
-    background: #3d9d5f;
+    width: 7px;
+    height: 7px;
+    background: var(--phosphor);
     border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(15, 123, 95, 0.15);
     animation: pulse-dot 2s infinite;
 }
 
@@ -657,14 +642,14 @@ body::after {
 }
 
 .welcome-title {
-    font-size: 48px;
+    font-size: 52px;
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     color: var(--text-primary);
     letter-spacing: -0.5px;
-    line-height: 1.15;
+    line-height: 1.1;
     animation: fadeInUp 0.6s ease-out 0.1s both;
-    font-family: 'Comic Sans MS', cursive;
+    font-family: var(--font-display);
     font-style: normal;
 }
 
@@ -694,18 +679,60 @@ body::after {
 
 .welcome-subtitle {
     font-size: 20px;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
     animation: fadeInUp 0.6s ease-out 0.2s both;
     font-weight: 400;
 }
 
 .tagline {
-    font-size: 14px;
-    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--graphite);
     margin-bottom: 0;
     animation: fadeInUp 0.6s ease-out 0.3s both;
     font-weight: 400;
+}
+
+/* ===== The red-pen strikethrough gag (drawn once by script.js) ===== */
+.strike-target {
+    position: relative;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.strike-target .strike-svg {
+    position: absolute;
+    left: -3%;
+    top: 46%;
+    width: 106%;
+    height: 12px;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.strike-target .strike-svg path {
+    stroke: var(--redpen);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    fill: none;
+}
+
+.strike-correction {
+    position: absolute;
+    top: -1.15em;
+    left: 6%;
+    font-family: var(--font-pen);
+    font-size: 0.82em;
+    color: var(--redpen);
+    transform: rotate(-4deg);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.strike-correction.visible {
+    opacity: 1;
 }
 
 /* Fun Facts Section */
@@ -718,21 +745,23 @@ body::after {
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    padding: 22px 26px;
-    background: #4a4a40;
-    border: none;
-    border-radius: 20px;
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     position: relative;
     overflow: visible;
     min-height: 80px;
     width: 100%;
     box-sizing: border-box;
+    text-align: left;
 }
 
 .fun-fact-card:hover {
-    transform: translateY(1px);
+    border-color: var(--ultramarine);
 }
 
 .fact-emoji {
@@ -748,8 +777,8 @@ body::after {
 }
 
 .fact-text {
-    font-size: 14px;
-    color: #f5f0e8;
+    font-size: 14.5px;
+    color: var(--text-secondary);
     margin: 0;
     text-align: left;
     line-height: 1.55;
@@ -761,12 +790,13 @@ body::after {
 }
 
 .fun-fact-card::after {
-    content: 'Click for more →';
+    content: 'click for more →';
     position: absolute;
     bottom: 6px;
     right: 12px;
-    font-size: 11px;
-    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--graphite);
     opacity: 0;
     transition: opacity 0.2s ease;
 }
@@ -787,12 +817,13 @@ body::after {
 }
 
 .prompt-intro {
+    font-family: var(--font-mono);
     font-size: 11px;
-    color: var(--text-muted);
+    color: var(--graphite);
     margin-bottom: 16px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 500;
+    letter-spacing: 0.12em;
+    font-weight: 400;
 }
 
 .sample-questions {
@@ -808,52 +839,37 @@ body::after {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 10px 16px;
-    background: var(--bg-secondary);
-    border: none;
+    padding: 9px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border-dark);
     border-radius: 50px;
     color: var(--text-primary);
-    font-size: 13px;
-    font-weight: 700;
-    font-family: 'Comic Sans MS', cursive;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: var(--font-body);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     white-space: nowrap;
     position: relative;
     overflow: visible;
 }
 
-/* Weird projects - Coral/Salmon */
-.sample-q:nth-child(1) {
-    background: #e07a6d;
-    color: #fff;
-}
-
-/* Surprise me - Cream with dark text */
-.sample-q:nth-child(2) {
-    background: #f5ede0;
-    color: var(--text-primary);
-}
-
-/* Tech stack - Teal */
-.sample-q:nth-child(3) {
-    background: #5eb5a0;
-    color: #fff;
-}
-
-/* Roast him - Blue */
-.sample-q:nth-child(4) {
-    background: #6b8fc7;
-    color: #fff;
-}
-
 .sample-q:hover {
-    transform: translateY(1px);
-    opacity: 0.95;
+    border-color: var(--ultramarine);
+    color: var(--ultramarine);
+    background: var(--ultramarine-soft);
 }
 
-.sample-q span:first-child {
-    font-size: 16px;
+/* Roast him — the site's one destructive action. Red pen, rationed. */
+.sample-q.destructive {
+    color: var(--redpen);
+    border-color: rgba(217, 58, 29, 0.45);
+}
+
+.sample-q.destructive:hover {
+    background: rgba(217, 58, 29, 0.07);
+    border-color: var(--redpen);
+    color: var(--redpen);
 }
 
 /* Quick Navigation Section */
@@ -884,19 +900,22 @@ body::after {
 
 /* Easter Egg Footer */
 .easter-egg-footer {
-    margin-top: 40px;
+    /* A long stretch of empty drafting paper before the punchline —
+       you scroll thinking the page is over, then the pen writes it. */
+    margin-top: 55vh;
     padding-top: 20px;
     border-top: none;
     animation: fadeInUp 0.6s ease-out 0.8s both;
 }
 
 .easter-egg-footer p {
-    font-size: 18px;
-    color: var(--text-secondary);
-    opacity: 0.85;
-    font-family: 'Comic Sans MS', cursive;
+    font-size: 16px;
+    color: var(--redpen);
+    opacity: 0.8;
+    font-family: var(--font-pen);
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
+    transform: rotate(-1.5deg);
     transition: opacity 0.3s ease;
 }
 
@@ -919,47 +938,26 @@ body::after {
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    padding: 20px 16px;
-    background: var(--bg-secondary);
-    border: none;
-    border-radius: 20px;
+    padding: 18px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
     color: var(--text-primary);
+    font-family: var(--font-body);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s ease;
     position: relative;
     overflow: visible;
     min-width: 100px;
 }
 
-/* About - Coral/Red */
-.action-btn:nth-child(1) {
-    background: #e07a6d;
-    color: #fff;
-}
-
-/* Skills - Gold/Yellow */
-.action-btn:nth-child(2) {
-    background: #e8c547;
-    color: #3d3520;
-}
-
-/* Projects - Teal/Green */
-.action-btn:nth-child(3) {
-    background: #5eb5a0;
-    color: #fff;
-}
-
-/* Contact - Blue */
-.action-btn:nth-child(4) {
-    background: #6b8fc7;
-    color: #fff;
-}
-
 .action-btn:hover {
-    transform: translateY(1px);
-    opacity: 0.95;
+    border-color: var(--ultramarine);
+    color: var(--ultramarine);
+    transform: translateY(-1px);
 }
 
 .action-btn span {
@@ -1041,23 +1039,21 @@ body::after {
 }
 
 .message-content h2 {
+    font-family: var(--font-display);
     font-size: 28px;
     margin-bottom: 20px;
-    background: var(--gradient-secondary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 700;
-    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    font-weight: 600;
+    letter-spacing: -0.3px;
 }
 
 .message-content h3 {
-    font-size: 20px;
+    font-size: 19px;
     margin-top: 28px;
     margin-bottom: 14px;
     color: var(--text-primary);
     font-weight: 600;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.2px;
 }
 
 .message-content p {
@@ -1096,40 +1092,38 @@ body::after {
 }
 
 .skill-tag {
-    padding: 8px 16px;
-    background: var(--bg-tertiary);
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
-    transition: all 0.2s ease;
+    padding: 5px 12px;
+    background: var(--ultramarine-soft);
+    border: 1px solid rgba(43, 63, 216, 0.22);
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ultramarine);
+    transition: all 0.15s ease;
 }
 
 .skill-tag:hover {
-    background: var(--bg-hover);
-    border-color: var(--border-dark);
-    transform: translateY(-1px);
+    border-color: var(--ultramarine);
 }
 
 /* Project Cards */
 .project-card {
-    background: var(--bg-secondary);
-    border: 3px solid var(--border-dark);
-    border-radius: 20px;
-    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    padding: 26px;
     margin: 20px 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 0 var(--border-dark);
+    box-shadow: var(--shadow-card);
     box-sizing: border-box;
     max-width: 100%;
 }
 
 .project-card:hover {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 var(--border-dark);
+    border-color: var(--ultramarine);
 }
 
 .project-card > * {
@@ -1156,23 +1150,22 @@ body::after {
 }
 
 .project-link {
-    padding: 10px 18px;
-    background: var(--bg-tertiary);
-    border: 2px solid var(--border-dark);
-    border-radius: 12px;
+    padding: 8px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
     color: var(--text-primary);
     text-decoration: none;
     font-size: 13px;
-    font-weight: 600;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    transition: all 0.15s ease;
     display: inline-block;
-    box-shadow: 0 2px 0 var(--border-dark);
 }
 
 .project-link:hover {
-    background: var(--bg-hover);
-    transform: translateY(1px);
-    box-shadow: 0 1px 0 var(--border-dark);
+    border-color: var(--ultramarine);
+    color: var(--ultramarine);
+    background: var(--ultramarine-soft);
 }
 
 /* Contact Links */
@@ -1187,21 +1180,20 @@ body::after {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 18px 20px;
-    background: var(--bg-secondary);
-    border: 3px solid var(--border-dark);
-    border-radius: 16px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border-dark);
+    border-radius: 10px;
     color: var(--text-primary);
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 3px 0 var(--border-dark);
+    box-shadow: var(--shadow-card);
 }
 
 .contact-item:hover {
-    transform: translateY(2px);
-    box-shadow: 0 1px 0 var(--border-dark);
+    border-color: var(--ultramarine);
 }
 
 .contact-item > * {
@@ -1218,8 +1210,11 @@ body::after {
 }
 
 .contact-label {
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--graphite);
     margin-bottom: 4px;
 }
 
@@ -1230,9 +1225,9 @@ body::after {
 
 /* Chat Input Area */
 .chat-input-area {
-    padding: 12px 20px 16px;
+    padding: 12px 20px 14px;
     border-top: 1px solid var(--border-color);
-    background-image: url('./assets/bg.webp');
+    background: var(--paper);
 }
 
 .input-container {
@@ -1240,12 +1235,14 @@ body::after {
     margin: 0 auto;
     display: flex;
     gap: 10px;
-    background-color: var(--bg-secondary);
-    border: none;
-    border-radius: 24px;
-    padding: 4px 4px 4px 18px;
+    background-color: var(--surface);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    padding: 5px 5px 5px 18px;
     position: relative;
     overflow: visible;
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .chat-input {
@@ -1253,14 +1250,14 @@ body::after {
     background: none;
     border: none;
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 14.5px;
     padding: 10px 0;
     outline: none;
-    font-family: "Comic Sans MS", cursive;
+    font-family: var(--font-body);
 }
 
 .chat-input::placeholder {
-    color: var(--text-secondary);
+    color: var(--graphite);
 }
 
 .chat-input:disabled {
@@ -1270,31 +1267,30 @@ body::after {
 .send-btn {
     width: 38px;
     height: 38px;
-    border-radius: 50%;
-    background: transparent;
+    border-radius: 9px;
+    background: var(--ultramarine);
     border: none;
-    color: #6b7d8f;
+    color: #fff;
     font-size: 18px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s ease;
     position: relative;
     overflow: visible;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .send-btn svg {
-    transition: all 0.2s ease;
-    stroke: #6b7d8f;
+    transition: all 0.15s ease;
+    stroke: #fff;
+    width: 17px;
+    height: 17px;
 }
 
 .send-btn:hover:not(:disabled) {
-    transform: scale(1.1);
-}
-
-.send-btn:hover:not(:disabled) svg {
-    stroke: #5a6d7f;
+    filter: brightness(1.12);
 }
 
 .send-btn:disabled {
@@ -1307,29 +1303,30 @@ body::after {
 .voice-btn {
     width: 38px;
     height: 38px;
-    border-radius: 50%;
+    border-radius: 9px;
     background: transparent;
     border: none;
-    color: #6b7d8f;
+    color: var(--graphite);
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    flex-shrink: 0;
 }
 
 .voice-btn svg {
-    transition: all 0.2s ease;
-    stroke: #6b7d8f;
+    transition: all 0.15s ease;
+    stroke: var(--graphite);
 }
 
 .voice-btn:hover:not(:disabled) {
-    transform: scale(1.1);
+    background: var(--ultramarine-soft);
 }
 
 .voice-btn:hover:not(:disabled) svg {
-    stroke: #5eb5a0;
+    stroke: var(--phosphor);
 }
 
 .voice-btn.active {
@@ -1365,20 +1362,19 @@ body::after {
 
 /* Voice Active Mode - transforms input container */
 .input-container.voice-active {
-    background-color: var(--bg-secondary);
+    background-color: var(--surface);
+    border-color: var(--phosphor);
+    box-shadow: 0 0 0 3px rgba(15, 123, 95, 0.12);
 }
 
-/* Change rough.js hand-drawn border color when voice is active */
-.input-container.voice-active .rough-border-svg {
-    filter: hue-rotate(85deg) saturate(1.5) brightness(0.9);
+.input-container.voice-active.speaking {
+    border-color: var(--ultramarine);
+    box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-.input-container.voice-active.speaking .rough-border-svg {
-    filter: hue-rotate(170deg) saturate(1.5) brightness(0.9);
-}
-
-.input-container.voice-active.muted .rough-border-svg {
-    filter: saturate(0) brightness(0.7);
+.input-container.voice-active.muted {
+    border-color: var(--border-dark);
+    box-shadow: none;
 }
 
 /* Hide text input and send button during voice mode */
@@ -1446,10 +1442,10 @@ body::after {
 }
 
 .voice-status-text {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 400;
     color: var(--text-primary);
-    font-family: 'Comic Sans MS', cursive;
+    font-family: var(--font-mono);
 }
 
 .voice-mode-controls {
@@ -1577,8 +1573,8 @@ body::after {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(107, 158, 255, 0.1),
-        rgba(167, 139, 250, 0.1),
+        rgba(43, 63, 216, 0.08),
+        rgba(43, 63, 216, 0.05),
         transparent
     );
     animation: shimmer 2s infinite;
@@ -1615,8 +1611,8 @@ body::after {
     background: var(--gradient-secondary);
     border-radius: 50%;
     box-shadow: 
-        0 0 20px rgba(107, 158, 255, 0.6),
-        0 0 40px rgba(167, 139, 250, 0.4),
+        0 0 20px rgba(43, 63, 216, 0.45),
+        0 0 40px rgba(43, 63, 216, 0.25),
         inset 0 0 10px rgba(255, 255, 255, 0.3);
     animation: orbPulse 2s ease-in-out infinite;
 }
@@ -1625,15 +1621,15 @@ body::after {
     0%, 100% { 
         transform: translate(-50%, -50%) scale(1);
         box-shadow: 
-            0 0 20px rgba(107, 158, 255, 0.6),
-            0 0 40px rgba(167, 139, 250, 0.4),
+            0 0 20px rgba(43, 63, 216, 0.45),
+            0 0 40px rgba(43, 63, 216, 0.25),
             inset 0 0 10px rgba(255, 255, 255, 0.3);
     }
     50% { 
         transform: translate(-50%, -50%) scale(1.1);
         box-shadow: 
-            0 0 30px rgba(107, 158, 255, 0.8),
-            0 0 60px rgba(167, 139, 250, 0.6),
+            0 0 30px rgba(43, 63, 216, 0.6),
+            0 0 60px rgba(43, 63, 216, 0.35),
             inset 0 0 15px rgba(255, 255, 255, 0.5);
     }
 }
@@ -1783,7 +1779,7 @@ body::after {
     color: var(--accent-blue);
     min-width: 36px;
     text-align: right;
-    font-family: "Comic Sans MS", cursive;
+    font-family: var(--font-mono);
 }
 
 /* ===== Scrollbar Styles ===== */
@@ -1821,28 +1817,6 @@ body::after {
 .mobile-backdrop.active {
     display: block;
     opacity: 1;
-}
-
-/* ===== Tablet Responsive Design (iPad) ===== */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .chat-messages {
-        background-image: 
-            linear-gradient(rgba(249, 243, 229, 0.85), rgba(249, 243, 229, 0.85)),
-            url('./assets/body-bg-left.webp'), 
-            url('./assets/body-bg-right.webp');
-        background-position: 0 0, 0 0, 100% 0;
-        background-size: 100% 100%, auto 100%, auto 100%;
-        background-repeat: no-repeat, no-repeat, no-repeat;
-    }
-
-    .nav-menu {
-        background-image: 
-            linear-gradient(rgba(249, 243, 229, 0.9), rgba(249, 243, 229, 0.9)),
-            url('./assets/sidebar.webp');
-        background-position: center center;
-        background-size: cover;
-        background-repeat: no-repeat;
-    }
 }
 
 /* ===== Mobile Responsive Design ===== */
@@ -1916,8 +1890,7 @@ body::after {
         position: sticky;
         bottom: 0;
         padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0));
-        background: var(--bg-primary);
-        background-image: url('./assets/bg.webp');
+        background: var(--paper);
         z-index: 100;
         width: 100%;
         box-sizing: border-box;
@@ -1980,22 +1953,6 @@ body::after {
 
     .chat-messages {
         padding: 16px;
-        background-image: 
-            linear-gradient(rgba(249, 243, 229, 0.85), rgba(249, 243, 229, 0.85)),
-            url('./assets/body-bg-left.webp'), 
-            url('./assets/body-bg-right.webp');
-        background-position: 0 0, 0 0, 100% 0;
-        background-size: 100% 100%, auto 100%, auto 100%;
-        background-repeat: no-repeat, no-repeat, no-repeat;
-    }
-
-    .nav-menu {
-        background-image: 
-            linear-gradient(rgba(249, 243, 229, 0.9), rgba(249, 243, 229, 0.9)),
-            url('./assets/sidebar.webp');
-        background-position: center center;
-        background-size: cover;
-        background-repeat: no-repeat;
     }
 
     .message-content {
@@ -2329,7 +2286,8 @@ body::after {
 /* Typing Indicator */
 .typing-indicator {
     color: var(--accent-blue);
-    font-style: italic;
+    font-family: var(--font-mono);
+    font-size: 13px;
     animation: blink 1.5s infinite;
 }
 
@@ -2353,7 +2311,8 @@ body::after {
 
 .homelab-loading .loading-text {
     color: var(--accent-blue);
-    font-style: italic;
+    font-family: var(--font-mono);
+    font-size: 13px;
     transition: opacity 0.2s ease;
 }
 
@@ -2477,7 +2436,7 @@ body::after {
     background-color: var(--bg-tertiary);
     padding: 0.2em 0.4em;
     border-radius: 4px;
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.9em;
     color: var(--accent-purple);
     border: 1px solid var(--border-color);
@@ -2605,7 +2564,7 @@ body::after {
     background-color: var(--bg-tertiary);
     padding: 0.2em 0.4em;
     border-radius: 4px;
-    font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace;
+    font-family: var(--font-mono);
     font-size: 0.9em;
 }
 
@@ -2700,7 +2659,7 @@ body::after {
 .mode-label {
     font-size: 11px;
     font-weight: 600;
-    color: #5c5650;
+    color: var(--graphite);
     transition: all 0.3s ease;
     cursor: pointer;
     user-select: none;
@@ -2712,12 +2671,12 @@ body::after {
 }
 
 .mode-label-server.active {
-    color: #3d6499;
+    color: var(--ultramarine);
     font-weight: 700;
 }
 
 .mode-label-local.active {
-    color: #7c5fc4;
+    color: var(--phosphor);
     font-weight: 700;
 }
 
@@ -2741,10 +2700,10 @@ body::after {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #6b9eff 0%, #5eb5a0 100%);
+    background: var(--ultramarine);
     border-radius: 24px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 1px 4px rgba(107, 158, 255, 0.2);
+    box-shadow: none;
 }
 
 .toggle-slider::before {
@@ -2765,8 +2724,8 @@ body::after {
 }
 
 .toggle-switch input:checked + .toggle-slider {
-    background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
-    box-shadow: 0 1px 4px rgba(167, 139, 250, 0.3);
+    background: var(--phosphor);
+    box-shadow: none;
 }
 
 .toggle-switch input:checked + .toggle-slider::before {
@@ -2775,11 +2734,11 @@ body::after {
 }
 
 .toggle-switch:hover .toggle-slider {
-    box-shadow: 0 4px 12px rgba(107, 158, 255, 0.4);
+    filter: brightness(1.1);
 }
 
 .toggle-switch input:checked:hover + .toggle-slider {
-    box-shadow: 0 4px 12px rgba(167, 139, 250, 0.5);
+    filter: brightness(1.1);
 }
 
 .mode-description {
@@ -2884,4 +2843,317 @@ body::after {
     .desktop-only {
         display: flex !important;
     }
+}
+
+/* ===== Engineer's Redline: dual-voice chat ===== */
+/* The visitor speaks sans; the machine he built speaks mono. */
+.message .sender-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--graphite);
+}
+
+.message.msg-user .message-content {
+    background: var(--ultramarine-soft);
+    border: 1px solid rgba(43, 63, 216, 0.20);
+    border-radius: 12px 12px 12px 4px;
+    padding: 12px 16px;
+    font-size: 15px;
+}
+
+.message.msg-ai .message-content,
+.message.msg-ai .markdown-content {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.75;
+    max-width: 65ch;
+}
+
+.message.msg-ai .message-content h2,
+.message.msg-ai .message-content h3 {
+    font-family: var(--font-display);
+}
+
+.message.msg-ai .message-content strong {
+    color: var(--ultramarine);
+}
+
+/* Static section content (About/Projects/…) reads as the document: body voice */
+.message.msg-doc .message-content {
+    font-family: var(--font-body);
+}
+
+/* Red-pen margin note — rationed to one per viewport.
+   Extra selectors outrank .markdown-content p / .message-content p color rules. */
+.redline-note,
+.message-content p.redline-note,
+.markdown-content p.redline-note,
+.message-content .redline-note {
+    font-family: var(--font-pen);
+    color: var(--redpen);
+    font-size: 14px;
+    display: inline-block;
+    transform: rotate(-2deg);
+}
+
+/* Reduced motion: the pen doesn't perform */
+@media (prefers-reduced-motion: reduce) {
+    .strike-target .strike-svg path {
+        transition: none !important;
+        animation: none !important;
+        stroke-dashoffset: 0 !important;
+    }
+    .strike-correction {
+        opacity: 1;
+        transition: none;
+    }
+    .wave-emoji {
+        animation: none;
+    }
+}
+
+/* ===== Personality layer — still Redline, but the pen has opinions ===== */
+
+/* Chips carry one accent each: a colored dot, and they answer to it on hover */
+.sample-q {
+    --chip-accent: var(--graphite);
+}
+
+.sample-q::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--chip-accent);
+    flex-shrink: 0;
+}
+
+.sample-q.accent-amber { --chip-accent: var(--accent-yellow); }
+.sample-q.accent-phosphor { --chip-accent: var(--phosphor); }
+.sample-q.accent-ultra { --chip-accent: var(--ultramarine); }
+.sample-q.destructive { --chip-accent: var(--redpen); }
+
+.sample-q:hover {
+    border-color: var(--chip-accent);
+    color: var(--chip-accent);
+    background: transparent;
+}
+
+/* Quick actions: same four inks, one each */
+.action-btn[data-section="about"] .svg-icon {
+    filter: invert(23%) sepia(78%) saturate(4000%) hue-rotate(235deg) brightness(90%) contrast(95%); /* ultramarine */
+}
+.action-btn[data-section="skills"] .svg-icon {
+    filter: invert(32%) sepia(65%) saturate(700%) hue-rotate(125deg) brightness(90%) contrast(95%); /* phosphor */
+}
+.action-btn[data-section="projects"] .svg-icon {
+    filter: invert(35%) sepia(60%) saturate(1200%) hue-rotate(15deg) brightness(90%) contrast(95%); /* amber */
+}
+.action-btn[data-section="contact"] .svg-icon {
+    filter: invert(30%) sepia(85%) saturate(2500%) hue-rotate(355deg) brightness(90%) contrast(95%); /* red pen — write to him */
+}
+
+/* Hand energy lives in motion now, not in wobbly borders */
+@media (prefers-reduced-motion: no-preference) {
+    .sample-q,
+    .action-btn,
+    .fun-fact-card {
+        transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+    }
+    .sample-q:hover,
+    .action-btn:hover {
+        transform: rotate(-1deg) translateY(-1px);
+    }
+    .sample-q:nth-child(even):hover,
+    .action-btn:nth-child(even):hover {
+        transform: rotate(1deg) translateY(-1px);
+    }
+    .fun-fact-card:hover {
+        transform: rotate(-0.4deg);
+    }
+}
+
+/* Fun-fact card: a log the machine keeps on him */
+.fun-fact-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.fact-header {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--graphite);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 9px;
+    text-align: left;
+}
+
+.fact-prompt {
+    color: var(--phosphor);
+}
+
+.fact-counter {
+    margin-left: auto;
+    opacity: 0.75;
+}
+
+.fact-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+/* Sidebar telemetry — the most credible pixels on the page tick by themselves */
+.telemetry {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    line-height: 1.9;
+    color: var(--graphite);
+    border-top: 1px dashed var(--border-dark);
+    padding: 12px 6px 12px;
+    margin: 0 8px;
+    text-align: left;
+}
+
+.tel-dot {
+    color: var(--phosphor);
+    animation: pulse-dot 2s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Drafting title block — every serious drawing gets stamped */
+.title-block {
+    display: inline-block;
+    margin: 28px auto 8px;
+    border: 1px solid var(--border-dark);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    text-align: left;
+}
+
+.title-block .tb-row {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.title-block .tb-row:last-child {
+    border-bottom: none;
+}
+
+.title-block .tb-label {
+    padding: 4px 10px;
+    border-right: 1px solid var(--border-color);
+    min-width: 74px;
+    opacity: 0.7;
+}
+
+.title-block .tb-value {
+    padding: 4px 12px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.title-block .tb-value + .tb-label {
+    border-left: 1px solid var(--border-color);
+}
+
+/* Status badge text swaps lines; keep the swap gentle */
+#statusText {
+    transition: opacity 0.25s ease;
+}
+
+/* ===== GSAP takeover: when motion.js is active, CSS entrance animations
+   stand down so nothing double-fires. Fallback stays intact without JS. ===== */
+.gsap-on .status-badge,
+.gsap-on .welcome-title,
+.gsap-on .welcome-subtitle,
+.gsap-on .tagline,
+.gsap-on .fun-facts-section,
+.gsap-on .ai-prompt-section,
+.gsap-on .quick-nav-section,
+.gsap-on .fourth-wall-section,
+.gsap-on .easter-egg-footer {
+    animation: none;
+}
+
+.gsap-on .strike-correction {
+    transition: none;
+}
+
+/* ===== Dark mode: ink-drawing icons must flip to chalk ===== */
+/* Chat avatars (You / Vishal's Assistant) and the settings gear are
+   black-stroke SVGs — invert them so they read on dark surfaces */
+[data-theme="dark"] .avatar-icon,
+[data-theme="dark"] .settings-icon {
+    filter: invert(0.88);
+}
+
+[data-theme="dark"] .avatar {
+    border: 1px solid var(--border-dark);
+    background-color: var(--bg-tertiary);
+}
+
+/* Colored quick-action icons get a brightness lift on dark cards */
+[data-theme="dark"] .action-btn[data-section="about"] .svg-icon {
+    filter: invert(23%) sepia(78%) saturate(4000%) hue-rotate(235deg) brightness(160%) contrast(90%);
+}
+[data-theme="dark"] .action-btn[data-section="skills"] .svg-icon {
+    filter: invert(32%) sepia(65%) saturate(700%) hue-rotate(125deg) brightness(150%) contrast(90%);
+}
+[data-theme="dark"] .action-btn[data-section="projects"] .svg-icon {
+    filter: invert(35%) sepia(60%) saturate(1200%) hue-rotate(15deg) brightness(150%) contrast(90%);
+}
+[data-theme="dark"] .action-btn[data-section="contact"] .svg-icon {
+    filter: invert(30%) sepia(85%) saturate(2500%) hue-rotate(355deg) brightness(150%) contrast(90%);
+}
+
+/* Home icon in the sidebar button */
+[data-theme="dark"] .new-chat-btn .svg-icon {
+    filter: invert(0.8);
+}
+
+/* GSAP owns section entrances: the old CSS fade must not run underneath,
+   or gsap.from() captures its transient mid-animation opacity as final. */
+.gsap-on .markdown-content > *,
+.gsap-on .message-content > * {
+    animation: none;
+}
+
+.gsap-on .easter-egg-footer p {
+    transition: none;
+}
+
+/* ===== Theme toggle (header) ===== */
+.theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background-color: var(--surface);
+    border: 1px solid var(--border-dark);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    border-color: var(--ultramarine);
+    color: var(--ultramarine);
+    background: var(--ultramarine-soft);
 }

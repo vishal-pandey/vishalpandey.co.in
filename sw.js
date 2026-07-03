@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vishal-portfolio-v5';
+const CACHE_NAME = 'vishal-portfolio-v8';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -6,16 +6,25 @@ const STATIC_ASSETS = [
   '/index.html',
   '/styles.css',
   '/script.js',
+  '/motion.js',
   '/manifest.json',
-  // Profile and background images
+  // Profile image
   '/assets/profile.svg',
-  '/assets/bg.webp',
-  '/assets/sidebar.webp',
-  '/assets/body-bg-left.webp',
-  '/assets/body-bg-right.webp',
-  // Fonts
-  '/assets/Comic Sans MS.woff2',
-  '/assets/Comic Sans MS Bold.woff2',
+  // PWA icons
+  '/assets/icon-192.png',
+  '/assets/icon-512.png',
+  '/assets/icon-maskable-512.png',
+  // Fonts — Engineer's Redline four voices
+  '/assets/Fraunces-500.woff2',
+  '/assets/Fraunces-600.woff2',
+  '/assets/GeneralSans-400.woff2',
+  '/assets/GeneralSans-500.woff2',
+  '/assets/GeneralSans-600.woff2',
+  '/assets/JetBrainsMono-400.woff2',
+  '/assets/JetBrainsMono-500.woff2',
+  '/assets/JetBrainsMono-700.woff2',
+  '/assets/ShantellSans-400.woff2',
+  '/assets/ShantellSans-500.woff2',
   // Icons
   '/assets/icons/home.svg',
   '/assets/icons/about-me.svg',
@@ -36,9 +45,10 @@ const STATIC_ASSETS = [
 
 // CDN resources to cache
 const CDN_ASSETS = [
-  'https://cdn.jsdelivr.net/npm/roughjs@4.5.2/bundled/rough.js',
-  'https://cdn.jsdelivr.net/npm/marked/marked.min.js',
-  'https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js'
+  'https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.min.js',
+  'https://cdn.jsdelivr.net/npm/livekit-client@2.20.0/dist/livekit-client.umd.min.js',
+  'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js',
+  'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/DrawSVGPlugin.min.js'
 ];
 
 // Install event - cache static assets

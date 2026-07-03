@@ -438,7 +438,7 @@ const ThemeManager = {
     apply(theme) {
         document.documentElement.dataset.theme = theme;
         // Keep browser chrome in sync (all theme-color metas, incl. media ones)
-        const color = theme === 'dark' ? '#0F1215' : '#F3F2ED';
+        const color = theme === 'dark' ? '#0A0D0E' : '#F3F2ED';
         document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.setAttribute('content', color));
         this.updateButton();
     },
@@ -1112,6 +1112,17 @@ const ServerChatManager = {
                     // Re-enable input on abort
                     self.isWaitingForResponse = false;
                     self.setInputEnabled(true);
+                };
+
+                // Safety net: a hung cold start must never brick the input
+                xhr.timeout = 120000;
+                xhr.ontimeout = function() {
+                    self.currentXHR = null;
+                    self.stopLoadingAnimation();
+                    self.isWaitingForResponse = false;
+                    self.setInputEnabled(true);
+                    self.sessionId = null;
+                    reject(new Error('Request timed out'));
                 };
                 
                 xhr.send(JSON.stringify({

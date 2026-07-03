@@ -124,8 +124,8 @@
    Applied via data-theme on <html> — an inline head script resolves
    localStorage choice or system preference before first paint. */
 :root[data-theme="dark"] {
-        --paper: #0F1215;
-        --grid-line: rgba(15, 123, 95, 0.09);
+        --paper: #0A0D0E;
+        --grid-line: rgba(52, 211, 153, 0.10);
         --surface: #171B1F;
         --surface-dim: #14181B;
         --ink: #E8E6E1;
@@ -3145,4 +3145,32 @@ body {
     border-color: var(--ultramarine);
     color: var(--ultramarine);
     background: var(--ultramarine-soft);
+}
+
+/* ===== Dark = CRT terminal: the homelab at night, through the glass ===== */
+/* Phosphor glow bleeding from the top of the tube */
+[data-theme="dark"] body {
+    background-image:
+        radial-gradient(ellipse 90% 55% at 50% -12%, rgba(52, 211, 153, 0.07), transparent 70%),
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 100% 100%, 24px 24px, 24px 24px;
+    background-attachment: fixed, scroll, scroll;
+}
+
+/* Scanlines on the glass — subtle enough to feel, not read */
+[data-theme="dark"] body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10000;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.20) 0px,
+        rgba(0, 0, 0, 0.20) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    opacity: 0.35;
 }

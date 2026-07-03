@@ -39,8 +39,9 @@
 - **Red Pen (annotation):** `#D93A1D` — hand-drawn marks, marginalia, destructive actions ("Roast him"). RATIONED BRUTALLY.
 - **Phosphor (status):** `#0F7B5F` — online dots, uptime, success states.
 
-### Dark — "oscilloscope"
-- **Bg:** `#0F1215`, grid `rgba(15,123,95,.10)` · **Surface:** `#171B1F`, borders `#262B30` / `#3A4046`
+### Dark — "CRT terminal"
+- **Bg:** `#0A0D0E`, phosphor grid `rgba(52,211,153,.10)` · **Surface:** `#171B1F`, borders `#262B30` / `#3A4046`
+- **CRT glass:** fixed radial phosphor glow from the top of the viewport + subtle scanline overlay (`body::after`, 3px pitch, ~7% effective darkening). Hacker energy without Matrix-rain cliché; light mode stays the drafting pad.
 - **Text:** `#E8E6E1` · **Muted:** `#8A8F94`
 - **Ultramarine → `#7A8CFF`**, **Red pen → `#FF6B4A`**, **Phosphor → `#34D399`** (desaturate/brighten for dark)
 - **Semantic:** success = Phosphor, error/destructive = Red Pen, info = Ultramarine, warning `#B45309` (light) / `#F59E0B` (dark).

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vishal-portfolio-v8';
+const CACHE_NAME = 'vishal-portfolio-v9';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -105,6 +105,33 @@ self.addEventListener('fetch', (event) => {
 
   // Skip chrome-extension and other non-http(s) requests
   if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // Network-first for documents and same-origin code: deploys show up on the
+  // FIRST refresh instead of the second. Cache is the offline fallback only.
+  const isDocument = request.mode === 'navigate';
+  const isCode = url.origin === self.location.origin && /\.(css|js)$/.test(url.pathname);
+  if (isDocument || isCode) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse.ok) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() =>
+          caches.match(request).then((cached) => {
+            if (cached) return cached;
+            if (isDocument) return caches.match('/index.html');
+            return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+          })
+        )
+    );
     return;
   }
 

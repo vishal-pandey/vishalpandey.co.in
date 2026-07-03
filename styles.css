@@ -125,7 +125,7 @@
    localStorage choice or system preference before first paint. */
 :root[data-theme="dark"] {
         --paper: #0A0D0E;
-        --grid-line: rgba(52, 211, 153, 0.10);
+        --grid-line: rgba(52, 211, 153, 0.14);
         --surface: #171B1F;
         --surface-dim: #14181B;
         --ink: #E8E6E1;
@@ -154,8 +154,19 @@
 
 html {
     height: 100%;
-    height: -webkit-fill-available;
     overflow-x: hidden;
+    /* Paint the canvas beyond body so no unstyled band can appear */
+    background-color: var(--paper);
+}
+
+/* iOS viewport hack — iOS only; it misbehaves on desktop (bottom gap) */
+@supports (-webkit-touch-callout: none) {
+    html {
+        height: -webkit-fill-available;
+    }
+    body {
+        min-height: -webkit-fill-available;
+    }
 }
 
 body {
@@ -175,7 +186,6 @@ body {
         linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 24px 24px;
     min-height: 100%;
-    min-height: -webkit-fill-available;
     width: 100%;
     max-width: 100vw;
 }
@@ -3151,7 +3161,7 @@ body {
 /* Phosphor glow bleeding from the top of the tube */
 [data-theme="dark"] body {
     background-image:
-        radial-gradient(ellipse 90% 55% at 50% -12%, rgba(52, 211, 153, 0.07), transparent 70%),
+        radial-gradient(ellipse 90% 55% at 50% -12%, rgba(52, 211, 153, 0.10), transparent 70%),
         linear-gradient(var(--grid-line) 1px, transparent 1px),
         linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 100% 100%, 24px 24px, 24px 24px;

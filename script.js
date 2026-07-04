@@ -556,6 +556,16 @@ function showWelcomeScreen(pushState = true) {
     window.MotionLayer?.cancelStream?.();
     welcomeScreen.style.display = 'block';
     chatContent.innerHTML = '';
+
+    // Home always opens at the top — instantly, no smooth glide from wherever
+    // the previous section left the shared scroll container
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        const prev = chatMessages.style.scrollBehavior;
+        chatMessages.style.scrollBehavior = 'auto';
+        chatMessages.scrollTop = 0;
+        chatMessages.style.scrollBehavior = prev || 'smooth';
+    }
     
     // Remove active state from all menu items
     menuItems.forEach(item => item.classList.remove('active'));

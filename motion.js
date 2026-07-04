@@ -236,12 +236,47 @@
             const skip = () => { job.skipped = true; };
             chatMessages?.addEventListener('click', skip);
 
-            const CHARS_PER_TICK = 4;  // ≈440 chars/s: brisk token stream
-            const TICK_MS = 9;
+            // Chat-style follow: stick to the bottom while the machine writes.
+            // Upward intent releases follow SYNCHRONOUSLY (the 11ms ticks would
+            // otherwise yank the reader back down); scrolling back to the
+            // bottom re-sticks it.
+            let follow = true;
+            const gaugeFollow = () => {
+                if (!chatMessages) return;
+                follow = (chatMessages.scrollHeight - chatMessages.scrollTop
+                          - chatMessages.clientHeight) < 80;
+            };
+            const onWheel = (e) => {
+                if (e.deltaY < 0) { follow = false; return; }
+                setTimeout(gaugeFollow, 60);
+            };
+            let lastTouchY = null;
+            const onTouchStart = (e) => { lastTouchY = e.touches[0]?.clientY ?? null; };
+            const onTouchMove = (e) => {
+                const y = e.touches[0]?.clientY;
+                if (y != null && lastTouchY != null && y > lastTouchY + 4) {
+                    follow = false; // finger moving down = scrolling up = release
+                } else {
+                    setTimeout(gaugeFollow, 60);
+                }
+                lastTouchY = y ?? lastTouchY;
+            };
+            chatMessages?.addEventListener('wheel', onWheel, { passive: true });
+            chatMessages?.addEventListener('touchstart', onTouchStart, { passive: true });
+            chatMessages?.addEventListener('touchmove', onTouchMove, { passive: true });
+            const prevScrollBehavior = chatMessages ? chatMessages.style.scrollBehavior : '';
+            if (chatMessages) chatMessages.style.scrollBehavior = 'auto'; // smooth fights per-tick pinning
+
+            const CHARS_PER_TICK = 2;  // ≈180 chars/s: watchable token stream
+            const TICK_MS = 11;
             let i = 0;
 
             function cleanup() {
                 chatMessages?.removeEventListener('click', skip);
+                chatMessages?.removeEventListener('wheel', onWheel);
+                chatMessages?.removeEventListener('touchstart', onTouchStart);
+                chatMessages?.removeEventListener('touchmove', onTouchMove);
+                if (chatMessages) chatMessages.style.scrollBehavior = prevScrollBehavior || 'smooth';
                 caret.remove();
                 if (streamJob === job) streamJob = null;
             }
@@ -285,6 +320,9 @@
                 s.pos = Math.min(s.pos + CHARS_PER_TICK, s.chars.length);
                 s.node.textContent = s.chars.slice(0, s.pos).join('');
                 if (s.pos >= s.chars.length) i++;
+                if (follow && chatMessages) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
                 setTimeout(step, TICK_MS);
             }
 

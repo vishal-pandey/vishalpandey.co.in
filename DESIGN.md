@@ -63,7 +63,7 @@
 - **Approach:** Intentional, GSAP-orchestrated (Polish tier — see docs/superpowers/specs/2026-07-03-gsap-motion-layer-design.md). Crisp 150–250ms micro-transitions stay CSS; sequences are GSAP timelines in `motion.js`.
 - **Engine:** gsap@3.15.0 core + DrawSVGPlugin, pinned + SRI, deferred, SW-cached. Progressive enhancement: `MotionLayer.active` gates everything; no GSAP → CSS fallbacks, content never hidden.
 - **Welcome choreography:** one timeline — badge → headline → subtitle → pen strike (DrawSVG, power1.in) → "usually" back.out pop → tagline → fact card → chips (60ms stagger) → actions → title-block stamp last.
-- **Section entrances:** content children stagger (40ms, 12px rise); `.redline-note` arrives ~0.5s late — the reviewer annotates after reading.
+- **Section entrances:** sections stream like an AI reply — "Thinking…" beat (~550ms), then a DOM-walking typewriter types the content at ≈440 chars/s with a blinking `▊` caret (`MotionLayer.streamIn`). Click anywhere in the chat skips; section switches cancel cleanly; `.redline-note` still arrives after the machine finishes — the reviewer annotates after reading. Reduced-motion/no-GSAP falls back to instant render with the 40ms stagger.
 - **Fact card:** terminal-log slide swaps.
 - **Stays CSS:** hovers/wiggle, status dot, voice bars, chat message entrances.
 - **Easing:** enter ease-out (power2.out) · exit ease-in · overshoot back.out only for pen corrections.

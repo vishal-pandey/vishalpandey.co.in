@@ -3279,3 +3279,21 @@ html.booting .container {
 .boot-overlay .warn {
     color: #F59E0B;
 }
+
+/* Streaming caret — the machine's pen while it writes sections */
+.stream-caret {
+    color: var(--ultramarine);
+    animation: cursor-blink 0.9s steps(1) infinite;
+    display: inline-block;
+    margin-left: 1px;
+}
+
+[data-theme="dark"] .stream-caret {
+    color: var(--phosphor);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stream-caret {
+        animation: none;
+    }
+}

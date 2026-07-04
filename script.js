@@ -495,7 +495,10 @@ function createMessage(sender, content, isUser = false, isMarkdown = false) {
 function displaySection(section, pushState = true) {
     // Hide welcome screen
     welcomeScreen.style.display = 'none';
-    
+
+    // Stop any in-flight section stream before replacing content
+    window.MotionLayer?.cancelStream?.();
+
     // Clear existing content
     chatContent.innerHTML = '';
     
@@ -517,10 +520,16 @@ function displaySection(section, pushState = true) {
             const assistantMessage = createMessage('Portfolio', content.assistant, false);
             chatContent.appendChild(assistantMessage);
 
-            // Motion layer staggers the content in; red-pen notes arrive last
-            window.MotionLayer?.sectionIn?.(assistantMessage);
+            if (window.MotionLayer?.active && window.MotionLayer.streamIn) {
+                // The AI "writes" the section: thinking beat, then typed out.
+                // Click anywhere in the chat to skip; notes arrive last.
+                window.MotionLayer.streamIn(assistantMessage);
+            } else {
+                // Reduced motion / no GSAP: instant, with the stagger fallback
+                window.MotionLayer?.sectionIn?.(assistantMessage);
+            }
 
-            // Scroll to bottom
+            // Scroll to show the question and the reply forming under it
             const chatMessages = document.getElementById('chatMessages');
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }, 300);
@@ -544,6 +553,7 @@ function displaySection(section, pushState = true) {
 
 // Function to show welcome screen
 function showWelcomeScreen(pushState = true) {
+    window.MotionLayer?.cancelStream?.();
     welcomeScreen.style.display = 'block';
     chatContent.innerHTML = '';
     

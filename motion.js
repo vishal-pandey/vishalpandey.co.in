@@ -182,6 +182,121 @@
             }
         };
 
+        // --- Section content streams like the AI is writing it ---
+        // Walks the section's HTML and re-types it text-node by text-node,
+        // structure appearing as the "model" reaches it. Click skips.
+        let streamJob = null;
+
+        MotionLayer.cancelStream = function () {
+            if (streamJob) {
+                streamJob.cancelled = true;
+                streamJob = null;
+            }
+        };
+
+        MotionLayer.streamIn = function (messageEl) {
+            const content = messageEl.querySelector('.message-content');
+            if (!content) return;
+
+            MotionLayer.cancelStream();
+            const job = { cancelled: false, skipped: false };
+            streamJob = job;
+
+            // Lift the real content out; rebuild it live below
+            const source = document.createElement('div');
+            source.innerHTML = content.innerHTML;
+            content.innerHTML = '';
+
+            const steps = [];
+            (function walk(srcParent, dstParent) {
+                Array.from(srcParent.childNodes).forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        steps.push({ dstParent, text: node.textContent });
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        if (node.classList && node.classList.contains('redline-note')) {
+                            // The reviewer annotates AFTER the machine finishes
+                            const whole = node.cloneNode(true);
+                            whole.style.opacity = '0';
+                            steps.push({ dstParent, el: whole, note: true });
+                            return;
+                        }
+                        const shell = node.cloneNode(false);
+                        steps.push({ dstParent, el: shell });
+                        walk(node, shell);
+                    }
+                });
+            })(source, content);
+
+            const caret = document.createElement('span');
+            caret.className = 'stream-caret';
+            caret.textContent = '▊';
+
+            const notes = [];
+            const chatMessages = document.getElementById('chatMessages');
+            const skip = () => { job.skipped = true; };
+            chatMessages?.addEventListener('click', skip);
+
+            const CHARS_PER_TICK = 4;  // ≈440 chars/s: brisk token stream
+            const TICK_MS = 9;
+            let i = 0;
+
+            function cleanup() {
+                chatMessages?.removeEventListener('click', skip);
+                caret.remove();
+                if (streamJob === job) streamJob = null;
+            }
+
+            function finish() {
+                cleanup();
+                if (notes.length && !job.cancelled) {
+                    gsap.fromTo(notes, { opacity: 0 },
+                        { opacity: 1, duration: 0.4, delay: 0.4, ease: 'power1.out' });
+                }
+            }
+
+            function step() {
+                if (job.cancelled) { cleanup(); return; }
+                if (i >= steps.length) { finish(); return; }
+                const s = steps[i];
+
+                if (s.el) {
+                    s.dstParent.appendChild(s.el);
+                    if (s.note) notes.push(s.el);
+                    i++;
+                    job.skipped ? step() : setTimeout(step, 0);
+                    return;
+                }
+
+                if (!s.node) {
+                    s.node = document.createTextNode('');
+                    s.dstParent.appendChild(s.node);
+                    s.chars = Array.from(s.text); // code points — emoji-safe
+                    s.pos = 0;
+                    s.dstParent.appendChild(caret);
+                }
+
+                if (job.skipped || !s.text.trim()) {
+                    s.node.textContent = s.text;
+                    i++;
+                    job.skipped ? step() : setTimeout(step, 0);
+                    return;
+                }
+
+                s.pos = Math.min(s.pos + CHARS_PER_TICK, s.chars.length);
+                s.node.textContent = s.chars.slice(0, s.pos).join('');
+                if (s.pos >= s.chars.length) i++;
+                setTimeout(step, TICK_MS);
+            }
+
+            // The thinking beat, then the machine starts writing
+            content.innerHTML = '<span class="typing-indicator">Thinking...</span>';
+            setTimeout(() => {
+                if (job.cancelled) return;
+                content.innerHTML = '';
+                step();
+            }, 550);
+        };
+
         // --- Fact-card swaps: terminal log lines, not opacity blinks ---
         MotionLayer.factSwap = function (applyFn) {
             const body = document.querySelector('#funFactCard .fact-body');

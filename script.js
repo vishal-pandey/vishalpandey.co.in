@@ -2441,6 +2441,8 @@ const Telemetry = {
 };
 
 // ===== Status Badge Rotator =====
+// Types each status letter by letter, holds it, backspaces it out, types
+// the next — like someone updating their status live at the keyboard.
 const StatusRotator = {
     statuses: [
         'Probably debugging something rn',
@@ -2451,18 +2453,53 @@ const StatusRotator = {
         'uptime: suspiciously good',
     ],
     index: 0,
+    el: null,
 
     init() {
-        const el = document.getElementById('statusText');
-        if (!el) return;
-        setInterval(() => {
-            this.index = (this.index + 1) % this.statuses.length;
-            el.style.opacity = '0';
-            setTimeout(() => {
-                el.textContent = this.statuses[this.index];
-                el.style.opacity = '1';
-            }, 250);
-        }, 7000);
+        this.el = document.getElementById('statusText');
+        if (!this.el) return;
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            // No typing theater — plain swaps
+            setInterval(() => {
+                this.index = (this.index + 1) % this.statuses.length;
+                this.el.textContent = this.statuses[this.index];
+            }, 7000);
+            return;
+        }
+
+        // Let the first status be read, then start the cycle
+        setTimeout(() => this.deletePhase(), 4500);
+    },
+
+    typePhase() {
+        const chars = Array.from(this.statuses[this.index]);
+        let pos = 0;
+        const tick = () => {
+            pos++;
+            this.el.textContent = chars.slice(0, pos).join('');
+            if (pos < chars.length) {
+                setTimeout(tick, 45 + Math.random() * 50); // human-ish rhythm
+            } else {
+                setTimeout(() => this.deletePhase(), 4200); // time to read
+            }
+        };
+        tick();
+    },
+
+    deletePhase() {
+        const chars = Array.from(this.el.textContent);
+        const tick = () => {
+            chars.pop();
+            this.el.textContent = chars.join('');
+            if (chars.length) {
+                setTimeout(tick, 24); // backspace held down
+            } else {
+                this.index = (this.index + 1) % this.statuses.length;
+                setTimeout(() => this.typePhase(), 350);
+            }
+        };
+        tick();
     }
 };
 

@@ -332,11 +332,11 @@ const portfolioContent = {
             <p>I'm always open to discussing new opportunities, collaborations, or just having a chat about technology and innovation. Feel free to reach out through any of these channels!</p>
             
             <div class="contact-links">
-                <a href="mailto:contact@vishalpandey.co.in" class="contact-item">
+                <a href="mailto:contact@vishalpandey.ai" class="contact-item">
                     <span class="contact-icon">📧</span>
                     <div class="contact-info">
                         <div class="contact-label">Email</div>
-                        <div class="contact-value">contact@vishalpandey.co.in</div>
+                        <div class="contact-value">contact@vishalpandey.ai</div>
                     </div>
                     <span class="redline-note">← he actually replies</span>
                 </a>
@@ -1308,7 +1308,7 @@ Leadership:
 - Stakeholder management
 
 Contact:
-- Email: contact@vishalpandey.co.in
+- Email: contact@vishalpandey.ai
 - Phone: +91 97171 30893
 - Website: vishalpandey.ai
 - LinkedIn: linkedin.com/in/thevishalpandey
@@ -1321,7 +1321,7 @@ EXAMPLES OF GOOD RESPONSES:
 Q: "What does Vishal do?" → "Vishal is a **Technical Lead** at Lumiq, building data reliability platforms for financial enterprises. 🚀"
 Q: "What are his skills?" → "He's proficient in **Node.js, Python, Angular, AWS, Docker, Kubernetes**, and Kafka, with strong expertise in real-time architectures."
 Q: "Tell me about LimeChat" → "At LimeChat, Vishal was **Technical Product Lead** where he built their AI help desk from scratch, managed a team of 10, and launched apps on Shopify, Android, and iOS. 💼"
-Q: "Email?" → "**contact@vishalpandey.co.in**"`;
+Q: "Email?" → "**contact@vishalpandey.ai**"`;
     },
     
     // Check WebGPU support
@@ -2219,7 +2219,7 @@ Click the **microphone button** next to the text input to start a voice conversa
 - Click "Home" to return to the welcome screen
 
 ### Contact
-- 📧 contact@vishalpandey.co.in
+- 📧 contact@vishalpandey.ai
 - 💻 github.com/vishal-pandey
 - 💼 linkedin.com/in/thevishalpandey
 

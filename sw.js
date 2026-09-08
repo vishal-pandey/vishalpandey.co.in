@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vishal-portfolio-v9';
+const CACHE_NAME = 'vishal-portfolio-v10';
 
 // Assets to cache on install
 const STATIC_ASSETS = [

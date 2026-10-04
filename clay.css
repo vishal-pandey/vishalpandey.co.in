@@ -1,0 +1,699 @@
+/* ===== Claymorphism layer — loads after styles.css =====
+   Reference: pastel 3D clay icons. Every surface is a thick matte slab:
+   a rolled light rim on the top edge, a darker extruded side wall below
+   (--depth), and a soft contact shadow straight underneath. Fills are muted
+   pastels on a pale pink→lavender backdrop. Buttons sink into the table
+   when pressed (side wall shrinks, slab moves down). */
+
+:root {
+    /* Clay pastels */
+    --c-cream: #FBF6F0;
+    --c-peri: #9DA8E8;
+    --c-peri-deep: #6F7EDC;
+    --c-mint: #95D8C2;
+    --c-pink: #F1A3B0;
+    --c-lav: #C2B2EE;
+    --c-lav-light: #DCD3F7;
+    --c-butter: #F5DA98;
+    --c-ink-on-fill: #352F52;
+
+    /* Redline tokens remapped */
+    --paper: #F4E9EF;
+    --grid-line: transparent;
+    --surface: var(--c-cream);
+    --surface-dim: #EFE6F4;
+    --ink: #352F52;
+    --graphite: #6F6790;
+    --ultramarine: var(--c-peri-deep);
+    --ultramarine-soft: rgba(111, 126, 220, 0.14);
+    --redpen: #E05A62;
+    --phosphor: #2E9C7C;
+    --accent-yellow: #C98A12;
+
+    --bg-tertiary: #ECE3F3;
+    --bg-hover: #F3ECF8;
+    --text-secondary: #4F4870;
+    --border-color: transparent;
+    --border-dark: transparent;
+
+    /* Contact shadow + rim recipe */
+    --rim: rgba(255, 255, 255, 0.75);
+    --roll: rgba(40, 28, 60, 0.09);
+    --contact: rgba(110, 80, 150, 0.24);
+    --contact-near: rgba(110, 80, 150, 0.30);
+    --sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 55%);
+    --well:
+        inset 0 3px 6px rgba(70, 50, 120, 0.16),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+
+    --shadow-card: 0 8px 22px var(--contact);
+
+    /* One rounded voice: mono, serif and handwriting all fold into Nunito */
+    --font-clay: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: var(--font-clay);
+    --font-display: var(--font-clay);
+    --font-mono: var(--font-clay);
+    --font-pen: var(--font-clay);
+}
+
+:root[data-theme="dark"] {
+    /* Same clay after dusk: deeper pastels on plum */
+    --c-cream: #3D3556;
+    --c-peri: #7480D2;
+    --c-peri-deep: #8E9BFF;
+    --c-mint: #57AF93;
+    --c-pink: #CF7887;
+    --c-lav: #8F7BD6;
+    --c-lav-light: #4A4069;
+    --c-butter: #CDAA5C;
+    --c-ink-on-fill: #1D1830;
+
+    --paper: #241E33;
+    --surface: var(--c-cream);
+    --surface-dim: #2E2742;
+    --ink: #F3EEFF;
+    --graphite: #B9AFDA;
+    --ultramarine: var(--c-peri-deep);
+    --ultramarine-soft: rgba(142, 155, 255, 0.16);
+    --redpen: #FF8C8C;
+    --phosphor: #6FE0B9;
+    --accent-yellow: #F2C46A;
+    --phosphor-dim: #B4E8D5;
+
+    --bg-tertiary: #352D4D;
+    --bg-hover: #3A3254;
+    --text-secondary: #DCD4F5;
+
+    --rim: rgba(255, 255, 255, 0.16);
+    --roll: rgba(0, 0, 0, 0.22);
+    --contact: rgba(0, 0, 0, 0.50);
+    --contact-near: rgba(0, 0, 0, 0.45);
+    --sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 55%);
+    --well:
+        inset 0 3px 7px rgba(0, 0, 0, 0.35),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ===== Backdrop: pale pastel wash, no grid, no scanlines ===== */
+body,
+[data-theme="dark"] body {
+    background-color: var(--paper);
+    background-image: linear-gradient(160deg, #FCEFE6 0%, #F6E4EC 45%, #E8E3F6 100%);
+    background-size: 100% 100%;
+    background-attachment: fixed;
+    font-family: var(--font-clay);
+}
+[data-theme="dark"] body {
+    background-image: linear-gradient(160deg, #2C2338 0%, #262036 50%, #1F1C31 100%);
+}
+[data-theme="dark"] body::after {
+    display: none;
+}
+
+/* ===== The slab: one recipe, per-element --fill and --depth ===== */
+.sidebar,
+.new-chat-btn,
+.menu-item.active,
+.profile-avatar,
+.avatar,
+.github-link,
+.theme-toggle-btn,
+.status-badge,
+.fun-fact-card,
+.sample-q,
+.action-btn,
+.title-block,
+.input-container,
+.send-btn,
+.voice-btn,
+.mode-toggle-container,
+.skill-tag,
+.project-card,
+.contact-item,
+.project-link,
+.message.msg-user .message-content,
+.message.msg-ai .message-content:not(:empty),
+.message.msg-doc .message-content {
+    --fill: var(--c-cream);
+    --depth: 5px;
+    /* Side wall = the fill itself, darkened (oklch keeps the hue: cream gets a
+       warm beige wall, lavender a deeper lavender — never a grey band) */
+    --side: oklch(from var(--fill) calc(l - 0.09) calc(c + 0.025) h);
+    --side-low: oklch(from var(--fill) calc(l - 0.16) calc(c + 0.03) h);
+    border: none;
+    background: var(--sheen), var(--fill);
+    box-shadow:
+        inset 0 2px 1px var(--rim),                                   /* light catching the top rim */
+        inset 0 -6px 8px -3px var(--roll),                            /* face rolls over into the wall */
+        0 var(--depth) 0 var(--side),                                 /* the wall */
+        0 calc(var(--depth) + 1px) 1px var(--side-low),               /* wall's darker bottom lip */
+        0 calc(var(--depth) + 6px) 10px -4px var(--contact-near),     /* tight contact, tucked under */
+        0 calc(var(--depth) + 16px) 30px -12px var(--contact);        /* soft ambient on the table */
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Pressable slabs: rise a little on hover, sink into the table on press */
+.new-chat-btn:hover,
+.github-link:hover,
+.theme-toggle-btn:hover,
+.sample-q:hover,
+.sample-q:nth-child(even):hover,
+.action-btn:hover,
+.action-btn:nth-child(even):hover,
+.send-btn:hover:not(:disabled),
+.voice-btn:hover,
+.project-link:hover,
+.contact-item:hover,
+.project-card:hover,
+.fun-fact-card:hover {
+    --depth: 7px;
+    transform: translateY(-2px);
+    background: var(--sheen), var(--fill);
+    filter: none;
+}
+.new-chat-btn:active,
+.github-link:active,
+.theme-toggle-btn:active,
+.sample-q:active,
+.sample-q:nth-child(even):active,
+.action-btn:active,
+.action-btn:nth-child(even):active,
+.send-btn:active:not(:disabled),
+.voice-btn:active,
+.project-link:active,
+.contact-item:active,
+.project-card:active,
+.fun-fact-card:active {
+    --depth: 1px;
+    transform: translateY(4px);
+}
+
+/* ===== Sidebar: a cream slab with a periwinkle title bar, like the window icon ===== */
+.sidebar {
+    --depth: 10px;
+    border-right: none;
+}
+@media (min-width: 769px) {
+    .container {
+        padding: 18px 18px 30px;
+        gap: 24px;
+    }
+    .sidebar {
+        border-radius: 34px;
+        overflow: hidden;
+    }
+    .chat-container {
+        min-width: 0;
+    }
+}
+.sidebar-header {
+    border: none;
+    background: var(--c-peri);
+    box-shadow: inset 0 2px 1px var(--rim), inset 0 -3px 0 oklch(from var(--c-peri) calc(l - 0.09) calc(c + 0.025) h);
+    padding: 18px 20px;
+}
+.sidebar-header .logo,
+.sidebar-header .logo::before {
+    color: #fff;
+}
+.sidebar-footer {
+    border: none;
+}
+.section-title,
+.menu-idx {
+    color: var(--graphite);
+}
+.new-chat-btn {
+    --fill: var(--c-lav-light);
+    border-radius: 18px;
+    margin-top: 10px;
+}
+.new-chat-btn:hover,
+.new-chat-btn.active {
+    color: var(--ink);
+}
+.menu-item {
+    border-radius: 16px;
+    margin-bottom: 6px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.menu-item .menu-text {
+    color: var(--ink);
+    font-weight: 700;
+}
+.menu-item:hover {
+    background: var(--bg-hover);
+    color: var(--ink);
+}
+.menu-item:hover .menu-text {
+    color: var(--ink);
+}
+.menu-item.active {
+    --fill: var(--c-peri);
+    --depth: 4px;
+}
+.menu-item.active .menu-text,
+.menu-item.active .menu-idx {
+    color: #fff;
+}
+.telemetry {
+    border: none;
+    background: var(--bg-tertiary);
+    border-radius: 18px;
+    box-shadow: var(--well);
+    padding: 12px 14px;
+    margin: 0 4px 6px;
+    color: var(--text-secondary);
+}
+.settings-btn {
+    border-radius: 16px;
+    font-weight: 700;
+}
+.settings-btn:hover {
+    background: var(--bg-hover);
+}
+
+/* ===== Header ===== */
+.chat-header {
+    background: transparent;
+    border-bottom: none;
+}
+.profile-avatar {
+    --fill: var(--c-peri);
+    --depth: 4px;
+    width: 46px;
+    height: 46px;
+    padding: 3px;
+}
+.profile-img {
+    border-radius: 50%;
+}
+.github-link,
+.theme-toggle-btn {
+    --depth: 4px;
+    border-radius: 50%;
+    width: 46px;
+    height: 46px;
+    color: var(--ink);
+}
+.github-link:hover,
+.theme-toggle-btn:hover {
+    color: var(--ultramarine);
+}
+
+/* ===== Welcome ===== */
+.welcome-title {
+    font-weight: 900;
+    letter-spacing: -1.5px;
+}
+.welcome-title .highlight {
+    font-weight: 900;
+}
+.status-badge,
+[data-theme="dark"] .status-badge {
+    --fill: var(--c-mint);
+    --depth: 4px;
+    color: var(--c-ink-on-fill);
+    padding: 9px 20px;
+}
+.status-badge::after,
+[data-theme="dark"] .status-badge::after {
+    color: var(--c-ink-on-fill);
+}
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background: #1E7F62;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.fun-fact-card {
+    --depth: 8px;
+    border-radius: 30px;
+    padding: 0 0 22px;
+    overflow: hidden;
+    gap: 14px;
+}
+.fun-fact-card:hover {
+    transform: translateY(-2px);   /* override the old ±0.4° wiggle */
+}
+.fun-fact-card::after {
+    bottom: 10px;
+    right: 18px;
+}
+/* Header as the periwinkle title bar with three clay dots */
+.fact-header {
+    border-bottom: none;
+    background: var(--c-peri);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 0;
+    box-shadow: inset 0 2px 1px var(--rim), inset 0 -3px 0 oklch(from var(--c-peri) calc(l - 0.09) calc(c + 0.025) h);
+}
+[data-theme="dark"] .fact-header {
+    color: #fff;
+}
+.fact-header::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--c-pink);
+    box-shadow: 16px 0 0 var(--c-butter), 32px 0 0 var(--c-mint);
+    margin-right: 40px;
+    flex-shrink: 0;
+}
+.fact-prompt {
+    color: #fff;
+}
+.fact-body {
+    padding: 0 26px;
+}
+.fact-text {
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 15.5px;
+}
+
+/* Chips: solid pastel slabs */
+.sample-questions {
+    gap: 18px;
+}
+.sample-q {
+    border-radius: 999px;
+    padding: 14px 26px;
+    font-size: 15.5px;
+    color: var(--c-ink-on-fill);
+}
+.sample-q.accent-amber { --fill: var(--c-butter); }
+.sample-q.accent-phosphor { --fill: var(--c-mint); }
+.sample-q.accent-ultra { --fill: var(--c-peri); }
+.sample-q.destructive { --fill: var(--c-pink); color: var(--c-ink-on-fill); }
+.sample-q:hover,
+.sample-q.destructive:hover {
+    color: var(--c-ink-on-fill);
+}
+.sample-q::before {
+    width: 11px;
+    height: 11px;
+    background: #fff;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+}
+
+.quick-actions {
+    gap: 14px;
+}
+.action-btn {
+    color: var(--ink);
+    padding: 10px 20px;
+}
+.action-btn:hover {
+    color: var(--ink);
+}
+
+.title-block {
+    border-radius: 20px;
+    overflow: hidden;
+}
+.title-block .tb-row,
+.title-block .tb-label,
+.title-block .tb-value + .tb-label {
+    border-color: color-mix(in srgb, var(--graphite) 20%, transparent);
+}
+
+/* ===== Type: rounded and chunky everywhere ===== */
+.chat-title { font-weight: 800; }
+.sample-q,
+.new-chat-btn,
+.action-btn,
+.project-link { font-weight: 800; }
+.tagline,
+.prompt-intro,
+.section-title,
+.status-badge,
+.fact-header,
+.telemetry,
+.logo,
+.menu-idx,
+.message .sender-name,
+.contact-label,
+.title-block {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+}
+.tagline { font-size: 14px; }
+.prompt-intro,
+.section-title { letter-spacing: 0.08em; font-weight: 800; }
+.logo { font-weight: 900; font-size: 18px; }
+.fourth-wall-text { font-weight: 700; }
+.chat-input { font-weight: 600; }
+.message.msg-ai .message-content,
+.message.msg-ai .markdown-content {
+    font-size: 15.5px;
+    line-height: 1.7;
+}
+.message-content h2,
+.message-content h3,
+.markdown-content h2,
+.markdown-content h3,
+.project-title {
+    font-weight: 900;
+}
+/* Red-pen notes keep their color and tilt, in chunky rounded type */
+.redline-note,
+.message-content p.redline-note,
+.markdown-content p.redline-note,
+.message-content .redline-note,
+.strike-correction,
+.easter-egg-footer p {
+    font-weight: 800;
+}
+
+/* ===== Messages ===== */
+/* .chat-content clips overflow (styles.css): give slab shadows room inside it;
+   max-width grows by the padding so the text column stays 900px */
+.chat-content {
+    max-width: calc(900px + 96px);
+    padding: 12px 48px 56px;
+}
+.avatar {
+    --depth: 3px;
+}
+.message.msg-user .message-content {
+    --fill: var(--c-peri);
+    color: var(--c-ink-on-fill);
+    font-weight: 600;
+    border-radius: 24px 24px 8px 24px;
+    padding: 14px 20px;
+}
+.message.msg-ai .message-content:not(:empty),
+.message.msg-doc .message-content {
+    --depth: 8px;
+    border-radius: 8px 28px 28px 28px;
+    padding: 22px 26px;
+}
+
+.skill-tag {
+    --fill: var(--c-lav);
+    --depth: 3px;
+    border-radius: 999px;
+    padding: 6px 14px;
+    color: var(--c-ink-on-fill);
+    font-weight: 700;
+}
+.skill-tag:nth-child(4n+2) { --fill: var(--c-mint); }
+.skill-tag:nth-child(4n+3) { --fill: var(--c-butter); }
+.skill-tag:nth-child(4n+4) { --fill: var(--c-pink); }
+.skill-tag:hover { border: none; }
+
+.project-card,
+.contact-item {
+    --depth: 7px;
+    border-radius: 26px;
+}
+.project-link {
+    --fill: var(--c-peri);
+    --depth: 4px;
+    border-radius: 999px;
+    color: var(--c-ink-on-fill);
+    padding: 10px 20px;
+}
+.project-link:hover {
+    color: var(--c-ink-on-fill);
+}
+
+.markdown-content code,
+.message-content code {
+    border: none;
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+}
+.markdown-content pre,
+.message-content pre,
+.markdown-content blockquote,
+.message-content blockquote {
+    border: none;
+    border-radius: 18px;
+    background: var(--bg-tertiary);
+    box-shadow: var(--well);
+}
+.markdown-content blockquote,
+.message-content blockquote {
+    padding: 14px 18px;
+}
+
+/* ===== Input: a lavender slab holding a pressed-in cream track (the search-bar icon) ===== */
+.chat-input-area {
+    background: transparent;
+    border-top: none;
+    padding: 10px 20px 24px;
+}
+.input-container {
+    --fill: var(--c-lav);
+    --depth: 7px;
+    border-radius: 999px;
+    padding: 8px;
+    gap: 8px;
+}
+.input-container:focus-within {
+    --depth: 8px;
+}
+.chat-input {
+    background: var(--c-cream);
+    border-radius: 999px;
+    box-shadow: var(--well);
+    padding: 12px 22px;
+}
+.send-btn {
+    --fill: var(--c-peri-deep);
+    --depth: 4px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+}
+.send-btn:hover:not(:disabled) {
+    filter: none;
+}
+.voice-btn {
+    --depth: 4px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+}
+
+/* Server/local switch: a cream slab with a pressed track and a clay ball knob */
+.mode-toggle-container {
+    --depth: 4px;
+    border-radius: 999px;
+}
+.toggle-slider {
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.22), inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+}
+.toggle-slider::before {
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18), inset 0 2px 1px rgba(255, 255, 255, 0.9);
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+    .sidebar {
+        border-radius: 0 30px 30px 0;
+    }
+    .chat-header {
+        background: color-mix(in srgb, var(--paper) 92%, transparent);
+        border-radius: 0 0 26px 26px;
+        box-shadow: 0 6px 0 oklch(from var(--paper) calc(l - 0.07) calc(c + 0.02) h), 0 12px 20px -8px var(--contact);
+    }
+    /* On mobile .message clips too (styles.css), so the shadow room lives there */
+    .chat-content {
+        padding: 8px 0 16px;
+    }
+    .message {
+        padding: 4px 10px 46px 6px;
+        margin-bottom: 6px;
+    }
+    .message.msg-user .message-content {
+        margin-right: 0;
+    }
+    .message.msg-ai .message-content:not(:empty),
+    .message.msg-doc .message-content {
+        margin-left: 0;
+        padding: 18px 20px;
+    }
+    .sample-q {
+        padding: 13px 20px;
+    }
+    .chat-input {
+        padding: 10px 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .new-chat-btn,
+    .sample-q,
+    .action-btn,
+    .send-btn,
+    .project-card,
+    .contact-item,
+    .fun-fact-card {
+        transition: none;
+    }
+}
+
+/* Slabs are thick: give the fact card's side wall + shadow air before the prompt line */
+.fun-facts-section {
+    margin-bottom: 44px;
+}
+
+/* Scrolled content melts away under the header instead of being sliced off */
+.chat-messages {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 36px);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 36px);
+}
+
+/* Scrollbars: a thin pastel clay thumb, no grey track */
+.chat-messages,
+.nav-menu {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-lav) transparent;
+}
+.chat-messages::-webkit-scrollbar,
+.nav-menu::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-messages::-webkit-scrollbar-track,
+.nav-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+.chat-messages::-webkit-scrollbar-thumb,
+.nav-menu::-webkit-scrollbar-thumb {
+    background: var(--c-lav);
+    border-radius: 999px;
+    box-shadow: inset 0 1px 1px var(--rim);
+}
+
+/* Project buttons live inside messages, where styles.css colors every link
+   periwinkle (and fades/underlines on hover). On a periwinkle slab that made
+   the label vanish — keep them dark ink, opaque, no underline. */
+.message-content a.project-link,
+.markdown-content a.project-link,
+.message-content a.project-link:hover,
+.markdown-content a.project-link:hover {
+    color: var(--c-ink-on-fill);
+    text-decoration: none;
+    border-bottom: none;
+    opacity: 1;
+}
+
+/* White on pastel periwinkle is too faint (~2.3:1) — pastel slabs carry dark ink */
+.menu-item.active .menu-text,
+.menu-item.active .menu-idx,
+.sidebar-header .logo,
+.fact-header,
+.fact-prompt,
+[data-theme="dark"] .fact-header {
+    color: var(--c-ink-on-fill);
+}
+.sidebar-header .logo::before {
+    color: var(--c-ink-on-fill);
+}

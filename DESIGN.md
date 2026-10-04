@@ -1,4 +1,32 @@
-# Design System — Engineer's Redline (vishalpandey.ai)
+# Design System — Clay (vishalpandey.ai)
+
+> **Current visual layer: Clay (2026-10-04).** `clay.css` loads after `styles.css` and
+> overrides the Engineer's Redline look below. Where this section and the Redline
+> sections disagree (color, type, surfaces, background), **this section wins**.
+> Redline still governs everything Clay doesn't touch: layout, chat structure,
+> motion/GSAP choreography, copy voice, the one-red-pen-mark rule.
+
+## Clay — the current look
+- **Reference:** pastel 3D clay UI icons — thick matte slabs sitting on a table.
+- **The slab recipe (one rule in clay.css, per-element `--fill` + `--depth`):**
+  - rolled rim: `inset 0 2px 1px` white highlight on the top edge + soft inner shading at the bottom of the face
+  - side wall: `0 var(--depth) 0 var(--side)`, where `--side` is the element's own fill darkened in oklch (`oklch(from var(--fill) calc(l - 0.09) calc(c + 0.025) h)`) — never a grey or a fixed tint
+  - contact shadow: tight + tucked under (negative spread), plus a faint wide ambient. No sideways offset.
+  - depth: ~3px tags, 4–5px buttons/chips, 7–8px cards, 10px sidebar
+- **Interaction:** hover lifts (depth +2, translateY -2px); press sinks (depth 1px, translateY +4px). No rotation wiggle.
+- **Wells (sunken):** the chat input track, telemetry, code/quote blocks — inset shadow, no side wall.
+- **Background:** flat pastel wash `linear-gradient(160deg, #FCEFE6, #F6E4EC, #E8E3F6)`. No grid, no blobs, no scanlines.
+- **Palette (light):** cream `#FBF6F0` (default slab), periwinkle `#9DA8E8`, deep periwinkle `#6F7EDC` (send/primary), mint `#95D8C2`, pink `#F1A3B0`, lavender `#C2B2EE`, butter `#F5DA98`. Ink `#352F52`, muted `#6F6790`, red pen `#E05A62`.
+- **Dark:** same slabs on plum (`#241E33`), deeper pastels, black-based contact shadows.
+- **Text on pastel fills is always dark ink** (`--c-ink-on-fill`). White on pastel fails contrast — don't.
+- **Motifs:** sidebar and fact card get a periwinkle "window" title bar; the fact card's has pink/butter/mint dots. Chips: butter / mint / periwinkle / pink (Roast him = pink).
+- **Type:** one rounded voice — **Nunito** (400–900) for display, body, labels and AI replies. Mono, Fraunces, General Sans and Shantell Sans are retired visually (their tokens all resolve to Nunito). Red-pen notes keep their color and tilt, in Nunito 800.
+- **Loading (TODO):** Nunito currently loads from Google Fonts; self-host woff2 in `assets/` and precache in sw.js to match the PWA ethos.
+- **Gotchas:** `.chat-content` (and `.message` on mobile) clip overflow, so slab shadows need padding room inside them; links inside messages are colored by `.message-content a`, so slab-style links need higher-specificity overrides.
+
+---
+
+## Engineer's Redline (previous layer — still governs layout, motion and voice)
 
 > A senior engineer's drafting pad that talks back. The document carries competence;
 > the red pen carries the jokes — in that order.
@@ -85,3 +113,4 @@
 | 2026-07-03 | System implemented; Rough.js dropped | Restyle shipped across styles.css/index.html/script.js; strikethrough gag + marks are inline SVG so the rough.js CDN dependency was removed. Dark mode follows prefers-color-scheme. Old webp textures deleted. SW cache → v7 |
 | 2026-07-03 | GSAP motion layer (Polish tier) | gsap@3.15.0 + DrawSVG pinned/SRI, new motion.js; welcome timeline, DrawSVG pen strike, section stagger with late red-pen notes, fact-card log slides. Progressive enhancement: CSS fallbacks intact, reduced-motion respected. SW → v8 |
 | 2026-07-03 | Personality layer added (owner: "too generic") | Personality returns through the engineer lens, not ornament: sidebar telemetry (live session clock, IST + awake status), drafting title block stamp ("CHECKED BY: HIS AI (BIASED)"), fact card as `~/vishal/facts` log with counter, one accent per chip/action (dot + colored icon: ultramarine/phosphor/amber/redpen), ±1° hover wiggle (reduced-motion aware), rotating status badge, and one red-pen margin note per content section. Rule held: hand-drawn = annotation only |
+| 2026-10-04 | Clay layer (claymorphism) | Owner asked for a claymorphism redesign; iterated against a pastel 3D clay icon reference. Added clay.css over styles.css: thick pastel slabs (rim + hue-true side wall + tucked contact shadow), pastel wash backdrop, Nunito everywhere, dark ink on all pastel fills. Rejected along the way: soft neumorphic blobs (read as glass) and an SVG lumpy-edge filter (read as torn paper). SW → v11 |

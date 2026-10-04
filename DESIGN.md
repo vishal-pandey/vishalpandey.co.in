@@ -20,6 +20,7 @@
 - **Dark:** same slabs on plum (`#241E33`), deeper pastels, black-based contact shadows.
 - **Text on pastel fills is always dark ink** (`--c-ink-on-fill`). White on pastel fails contrast — don't.
 - **Motifs:** sidebar and fact card get a periwinkle "window" title bar; the fact card's has pink/butter/mint dots. Chips: butter / mint / periwinkle / pink (Roast him = pink).
+- **Floating clay toys (home only, ≥1180px):** six aria-hidden decorations in the side gutters (code window, chat bubble, server stack, bar chart, check badge, terminal), built from the `.clay` slab class, tilted, fading in after the welcome timeline and bobbing gently (still under reduced motion). Parked at heights where the hero column is narrow — never over chips or the fact card.
 - **Type:** one rounded voice — **Nunito** (400–900) for display, body, labels and AI replies. Mono, Fraunces, General Sans and Shantell Sans are retired visually (their tokens all resolve to Nunito). Red-pen notes keep their color and tilt, in Nunito 800.
 - **Loading (TODO):** Nunito currently loads from Google Fonts; self-host woff2 in `assets/` and precache in sw.js to match the PWA ethos.
 - **Gotchas:** `.chat-content` (and `.message` on mobile) clip overflow, so slab shadows need padding room inside them; links inside messages are colored by `.message-content a`, so slab-style links need higher-specificity overrides.

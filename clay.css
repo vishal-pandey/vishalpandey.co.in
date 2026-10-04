@@ -111,6 +111,7 @@ body,
 }
 
 /* ===== The slab: one recipe, per-element --fill and --depth ===== */
+.clay,
 .sidebar,
 .new-chat-btn,
 .menu-item.active,
@@ -696,4 +697,233 @@ body,
 }
 .sidebar-header .logo::before {
     color: var(--c-ink-on-fill);
+}
+
+/* ===== Floating clay toys: fill the empty side gutters of the home screen =====
+   Pure decoration (aria-hidden). Built from the same .clay slab recipe, parked
+   at heights where the hero column is narrow so they never touch the chips. */
+.clay-floaters {
+    display: none;
+}
+@media (min-width: 1180px) {
+    .chat-messages {
+        overflow-x: hidden;   /* toys may reach into the padding; never scroll sideways */
+    }
+    .welcome-screen {
+        position: relative;
+    }
+    .welcome-screen > :not(.clay-floaters) {
+        position: relative;
+        z-index: 1;
+    }
+    .clay-floaters {
+        --spread: clamp(40px, calc((100vw - 1160px) / 2), 220px);
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: calc(-1 * var(--spread));
+        right: calc(-1 * var(--spread));
+        pointer-events: none;
+        z-index: 0;
+    }
+}
+.floater {
+    position: absolute;
+    --rot: 0deg;
+    transform: rotate(var(--rot));
+    animation:
+        floater-in 0.6s ease-out 1.2s both,
+        floater-bob 6s ease-in-out 1.8s infinite;
+}
+@keyframes floater-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes floater-bob {
+    0%, 100% { transform: translateY(0) rotate(var(--rot)); }
+    50% { transform: translateY(-9px) rotate(var(--rot)); }
+}
+
+/* Code window: periwinkle, three dots, </> */
+.f-window {
+    --fill: var(--c-peri);
+    --depth: 7px;
+    --rot: -7deg;
+    top: 20px;
+    left: 0;
+    width: 108px;
+    height: 82px;
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.fw-bar {
+    display: flex;
+    gap: 5px;
+    padding: 9px 12px;
+    background: oklch(from var(--c-peri) calc(l - 0.06) calc(c + 0.02) h);
+}
+.fw-bar i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c-pink);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+.fw-bar i:nth-child(2) { background: var(--c-butter); }
+.fw-bar i:nth-child(3) { background: var(--c-mint); }
+.fw-body {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--c-cream);
+    text-shadow: 0 2px 0 oklch(from var(--c-peri) calc(l - 0.12) c h);
+}
+
+/* Chat bubble: lavender with three cream dots */
+.f-chat {
+    --fill: var(--c-lav);
+    --depth: 6px;
+    --rot: 6deg;
+    top: 40px;
+    right: 0;
+    width: 96px;
+    height: 66px;
+    border-radius: 24px 24px 24px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    animation-delay: 1.3s, 2.6s;
+}
+.f-chat i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--c-cream);
+    box-shadow: 0 2px 0 oklch(from var(--c-lav) calc(l - 0.12) c h);
+}
+
+/* Homelab server: two stacked cream units with mint LEDs */
+.f-server {
+    --rot: 4deg;
+    top: 260px;
+    left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation-delay: 1.4s, 3.4s;
+}
+.sv-unit {
+    --depth: 5px;
+    width: 88px;
+    height: 32px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+}
+.sv-unit i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c-mint);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+.sv-unit i:nth-child(2) { background: var(--c-butter); }
+.sv-unit::after {
+    content: '';
+    flex: 1;
+    height: 5px;
+    margin-left: 6px;
+    border-radius: 999px;
+    background: var(--bg-tertiary);
+    box-shadow: var(--well);
+}
+
+/* Bar chart: three pastel bars on a cream base */
+.f-bars {
+    --rot: -5deg;
+    top: 250px;
+    right: 6px;
+    width: 104px;
+    height: 92px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 9px;
+    padding-bottom: 14px;
+    animation-delay: 1.5s, 2.2s;
+}
+.f-bars .bar {
+    --depth: 4px;
+    width: 22px;
+    border-radius: 9px 9px 4px 4px;
+}
+.f-bars .bar:nth-child(1) { --fill: var(--c-lav); height: 38px; }
+.f-bars .bar:nth-child(2) { --fill: var(--c-peri); height: 64px; }
+.f-bars .bar:nth-child(3) { --fill: var(--c-mint); height: 48px; }
+.f-bars .bars-base {
+    --depth: 4px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 12px;
+    border-radius: 999px;
+}
+
+/* Check badge: mint ball with a cream tick */
+.f-check {
+    --fill: var(--c-mint);
+    --depth: 6px;
+    --rot: -8deg;
+    top: 540px;
+    left: 30px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    animation-delay: 1.6s, 4s;
+}
+.f-check::after {
+    content: '';
+    position: absolute;
+    left: 22px;
+    top: 21px;
+    width: 26px;
+    height: 13px;
+    border-left: 7px solid var(--c-cream);
+    border-bottom: 7px solid var(--c-cream);
+    border-radius: 3px;
+    transform: rotate(-45deg);
+    filter: drop-shadow(0 2px 0 oklch(from var(--c-mint) calc(l - 0.14) c h));
+}
+
+/* Terminal: butter slab with a prompt */
+.f-term {
+    --fill: var(--c-butter);
+    --depth: 6px;
+    --rot: 7deg;
+    top: 530px;
+    right: 24px;
+    width: 90px;
+    height: 64px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--c-ink-on-fill);
+    animation-delay: 1.7s, 3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .floater {
+        animation: none;
+    }
 }

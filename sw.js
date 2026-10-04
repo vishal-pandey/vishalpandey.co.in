@@ -1,11 +1,11 @@
-const CACHE_NAME = 'vishal-portfolio-v11';
+const CACHE_NAME = 'vishal-portfolio-v12';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
-  '/clay.css',
+  '/clay.css?v=2',
   '/script.js',
   '/motion.js',
   '/manifest.json',

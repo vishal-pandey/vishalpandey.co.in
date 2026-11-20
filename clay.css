@@ -927,3 +927,15 @@ body,
         animation: none;
     }
 }
+
+/* In-browser voice agent states (voice/voice-agent.js): mint bars while the visitor
+   talks, periwinkle while the agent talks; the status line interrupts while speaking */
+.input-container.voice-active.hearing .voice-bar {
+    background: var(--phosphor);
+    animation-duration: 0.35s;
+}
+.input-container.voice-active.speaking .voice-status-text {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+}

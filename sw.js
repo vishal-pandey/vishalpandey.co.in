@@ -1,12 +1,17 @@
-const CACHE_NAME = 'vishal-portfolio-v12';
+const CACHE_NAME = 'vishal-portfolio-v13';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
-  '/clay.css?v=2',
-  '/script.js',
+  '/clay.css?v=3',
+  '/script.js?v=2',
+  // In-browser voice agent (models are fetched and cached on first use, not here)
+  '/voice/voice-agent.js?v=1',
+  '/voice/speech-text.js',
+  '/voice/stt-worker.js',
+  '/voice/tts-worker.js',
   '/motion.js',
   '/manifest.json',
   // Profile image
@@ -47,7 +52,6 @@ const STATIC_ASSETS = [
 // CDN resources to cache
 const CDN_ASSETS = [
   'https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.min.js',
-  'https://cdn.jsdelivr.net/npm/livekit-client@2.20.0/dist/livekit-client.umd.min.js',
   'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js',
   'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/DrawSVGPlugin.min.js'
 ];

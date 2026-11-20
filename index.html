@@ -39,14 +39,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap">
-    <link rel="stylesheet" href="clay.css?v=2"><!-- bump ?v= on every clay.css change: Cloudflare lets browsers cache CSS for 4h -->
+    <link rel="stylesheet" href="clay.css?v=3"><!-- bump ?v= on every clay.css change: Cloudflare lets browsers cache CSS for 4h -->
     <!-- LogRocket tracking -->
     <script src="https://cdn.logr-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
     <script>window.LogRocket && window.LogRocket.init('vl7yy0/vishalpandey');</script>
     <!-- Marked.js for Markdown Parsing (deferred - not render blocking) -->
     <script defer src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.min.js" integrity="sha384-MU0bL51BF1u980ujv+Pk0Z0qCjhzfBIEHIFPkUq81289nkiAr+q1jSxEkdlIeHLJ" crossorigin="anonymous"></script>
-    <!-- LiveKit SDK for voice chat -->
-    <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.20.0/dist/livekit-client.umd.min.js" integrity="sha384-s/eoT8qpr81c6c9MG5V7GA5xi5IzfEUQLyk3liFfzu9seBzZ3beFVjsD3pXTRmUc" crossorigin="anonymous"></script>
     <!-- GSAP for orchestrated motion (deferred; site works without it) -->
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/DrawSVGPlugin.min.js" integrity="sha384-pfZbCpJUiv0Y8664JafRbiKcx2uJmjNjVCoPXGwaxvTSbO11M0htzeEeTC6KSaqa" crossorigin="anonymous"></script>
@@ -113,7 +111,7 @@
             <div class="sidebar-footer">
                 <div class="telemetry" id="telemetryBlock" aria-hidden="true">
                     <div class="tel-line"><span class="tel-dot">●</span> homelab · 2 nodes · online</div>
-                    <div class="tel-line">session <span id="telSession">00:00</span> · sw v12</div>
+                    <div class="tel-line">session <span id="telSession">00:00</span> · sw v13</div>
                     <div class="tel-line">webllm: on-demand · voice: live</div>
                     <div class="tel-line">ist <span id="telIst">--:--</span> · vishal: <span id="telAwake">…</span></div>
                 </div>
@@ -347,7 +345,9 @@
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
+    <!-- In-browser voice agent: speech to text, the chat manager the toggle picks, text to speech -->
+    <script type="module" src="voice/voice-agent.js?v=1"></script>
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {

@@ -18,6 +18,7 @@ const VOICE = 'M2';
 const STT_RATE = 16000;
 const MODEL_TIMEOUT_MS = 120000;  // first visit downloads ~36 MB; give slow connections room
 const MIC_HINT_MS = 8000;         // still waiting on the permission prompt after this: say so
+const FRAME_DROUGHT_MS = 2000;    // no mic frames this long = the audio graph died; rebuild it
 const CHUNK = 1024; // samples per worklet message, ~21 ms at 48 kHz
 
 // Voice activity detection, on RMS loudness against an adaptive noise floor
@@ -73,7 +74,8 @@ async function resample(samples, fromRate, toRate) {
 const VoiceChatManager = {
     state: 'off',           // off | loading | listening | recording | transcribing | thinking | speaking
     muted: false,
-    ctx: null, stream: null, source: null, tap: null, sink: null,
+    ctx: null, stream: null, source: null, tap: null, sink: null, tapUrl: null,
+    watchdog: null, lastFrameAt: 0, recovering: false, recoveries: [],
     stt: null, tts: null, models: null, modelsReady: false,
     sttWaiters: new Map(), nextId: 1,
     turn: 0, turnDone: true, pendingSpeech: 0, playing: new Set(), playhead: 0,
@@ -123,14 +125,7 @@ const VoiceChatManager = {
             this.stream = await navigator.mediaDevices.getUserMedia({
                 audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
             }).finally(() => clearTimeout(micHint));
-            await this.ctx.resume();
-            await this.ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([TAP], { type: 'text/javascript' })));
-            this.source = this.ctx.createMediaStreamSource(this.stream);
-            this.tap = new AudioWorkletNode(this.ctx, 'voice-tap');
-            this.sink = this.ctx.createGain();
-            this.sink.gain.value = 0; // the tap must be pulled by the graph, but we don't want to hear ourselves
-            this.source.connect(this.tap).connect(this.sink).connect(this.ctx.destination);
-            this.tap.port.onmessage = ({ data }) => this.onFrame(data);
+            await this.buildAudio(this.ctx);
 
             await this.loadModels();
             if (this.state === 'off') return; // ended while loading
@@ -142,6 +137,7 @@ const VoiceChatManager = {
             this.system(`🎙️ Voice on. ${where} Speak naturally; tap the status line to interrupt.`);
             this.resetVad();
             this.setState('listening');
+            this.startWatchdog();
         } catch (error) {
             console.error('🎙️ voice start failed:', error);
             const reason = error?.name === 'NotAllowedError' ? 'Microphone permission was denied.' : (error?.message || String(error));
@@ -159,12 +155,93 @@ const VoiceChatManager = {
     teardown() {
         this.turn++;
         this.stopSpeaking();
+        clearInterval(this.watchdog);
         this.stream?.getTracks().forEach((t) => t.stop());
-        try { this.source?.disconnect(); this.tap?.disconnect(); this.sink?.disconnect(); } catch (_) {}
-        this.ctx?.close().catch(() => {});
-        this.ctx = this.stream = this.source = this.tap = this.sink = null;
+        this.closeAudio();
+        this.stream = null;
         this.muted = false;
+        this.recoveries = [];
         this.setState('off');
+    },
+
+    // ---------------------------------------------------------------- audio graph
+    // The graph is disposable. Opening the mic can switch the audio device under the page
+    // (Bluetooth headsets drop into their call profile), and Chrome then kills the
+    // AudioContext ("an error from the audio device or the WebAudio renderer"), after
+    // which no mic frames arrive. So: rebuild on that error, and on any 2 s frame drought.
+    async buildAudio(ctx) {
+        this.closeAudio(ctx);
+        this.ctx = ctx || new AudioContext();
+        this.ctx.onerror = () => this.recoverAudio('the audio device reported an error');
+        await this.ctx.resume();
+        this.tapUrl ||= URL.createObjectURL(new Blob([TAP], { type: 'text/javascript' }));
+        await this.ctx.audioWorklet.addModule(this.tapUrl);
+        this.source = this.ctx.createMediaStreamSource(this.stream);
+        this.tap = new AudioWorkletNode(this.ctx, 'voice-tap');
+        this.sink = this.ctx.createGain();
+        this.sink.gain.value = 0; // the tap must be pulled by the graph, but we don't want to hear ourselves
+        this.source.connect(this.tap).connect(this.sink).connect(this.ctx.destination);
+        this.tap.port.onmessage = ({ data }) => this.onFrame(data);
+        this.lastFrameAt = performance.now();
+    },
+
+    closeAudio(keep) {
+        try { this.source?.disconnect(); this.tap?.disconnect(); this.sink?.disconnect(); } catch (_) {}
+        if (this.tap) this.tap.port.onmessage = null;
+        if (this.ctx && this.ctx !== keep) {
+            this.ctx.onerror = null;
+            this.ctx.close().catch(() => {});
+        }
+        this.ctx = this.source = this.tap = this.sink = null;
+    },
+
+    startWatchdog() {
+        clearInterval(this.watchdog);
+        this.watchdog = setInterval(() => {
+            if (this.state === 'off' || this.state === 'loading' || this.recovering) return;
+            const silentFor = performance.now() - this.lastFrameAt;
+            if (silentFor > FRAME_DROUGHT_MS || this.ctx?.state === 'closed') {
+                this.recoverAudio(`no microphone audio for ${(silentFor / 1000).toFixed(1)} s`);
+            } else if (this.ctx?.state === 'suspended' || this.ctx?.state === 'interrupted') {
+                this.ctx.resume().catch(() => {});
+            }
+        }, 1000);
+    },
+
+    async recoverAudio(reason) {
+        if (this.state === 'off' || this.recovering || !this.stream) return;
+        const now = performance.now();
+        this.recoveries = (this.recoveries || []).filter((t) => now - t < 30000);
+        if (this.recoveries.length >= 3) {
+            console.error('🎙️ audio keeps failing, giving up:', reason);
+            this.teardown();
+            this.system('❌ Voice stopped: the audio device keeps failing. If you switched headphones, click the mic to start again.');
+            return;
+        }
+        this.recoveries.push(now);
+        this.recovering = true;
+        console.warn('🎙️ rebuilding audio:', reason);
+        const wasState = this.state;
+        this.stopSpeaking();          // sources belonged to the dead context
+        this.resetVad();
+        try {
+            await this.buildAudio();
+            if (this.state === 'off') return;
+            // A reply still on its way will play through the new context; anything half
+            // heard or already playing is dropped, so go back to listening
+            if (wasState === 'recording' || wasState === 'speaking' || wasState === 'transcribing') {
+                this.turn++;
+                this.turnDone = true;
+                this.setState('listening');
+            }
+            this.status(this.muted ? 'Muted' : 'Audio device changed, listening again…');
+        } catch (error) {
+            console.error('🎙️ could not rebuild audio:', error);
+            this.teardown();
+            this.system(`❌ Voice stopped: couldn't reopen audio (${error?.message || error}).`);
+        } finally {
+            this.recovering = false;
+        }
     },
 
     // Models stay loaded in their workers across calls; the browser caches the files.
@@ -237,6 +314,7 @@ const VoiceChatManager = {
     },
 
     onFrame(frame) {
+        this.lastFrameAt = performance.now();
         if (!this.ctx || this.muted) return;
         const level = rms(frame);
         const ms = (frame.length / this.ctx.sampleRate) * 1000;

@@ -16,6 +16,8 @@ import { fixName, SentenceBuffer } from './speech-text.js';
 
 const VOICE = 'M2';
 const STT_RATE = 16000;
+const MODEL_TIMEOUT_MS = 120000;  // first visit downloads ~36 MB; give slow connections room
+const MIC_HINT_MS = 8000;         // still waiting on the permission prompt after this: say so
 const CHUNK = 1024; // samples per worklet message, ~21 ms at 48 kHz
 
 // Voice activity detection, on RMS loudness against an adaptive noise floor
@@ -72,7 +74,7 @@ const VoiceChatManager = {
     state: 'off',           // off | loading | listening | recording | transcribing | thinking | speaking
     muted: false,
     ctx: null, stream: null, source: null, tap: null, sink: null,
-    stt: null, tts: null, models: null,
+    stt: null, tts: null, models: null, modelsReady: false,
     sttWaiters: new Map(), nextId: 1,
     turn: 0, turnDone: true, pendingSpeech: 0, playing: new Set(), playhead: 0,
     elements: {},
@@ -114,10 +116,13 @@ const VoiceChatManager = {
         // Created inside the click so browsers let it play sound
         this.ctx = new AudioContext();
         this.setState('loading', 'Starting microphone…');
+        const micHint = setTimeout(() => {
+            if (this.state === 'loading' && !this.stream) this.status('Allow microphone access in your browser’s prompt…');
+        }, MIC_HINT_MS);
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({
                 audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
-            });
+            }).finally(() => clearTimeout(micHint));
             await this.ctx.resume();
             await this.ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([TAP], { type: 'text/javascript' })));
             this.source = this.ctx.createMediaStreamSource(this.stream);
@@ -170,23 +175,59 @@ const VoiceChatManager = {
         this.tts = new Worker(new URL('tts-worker.js', base), { type: 'module' });
         this.stt.onmessage = ({ data }) => this.onStt(data);
         this.tts.onmessage = ({ data }) => this.onTts(data);
+        // A worker that dies mid-conversation must not leave the UI on "Transcribing…" / "Speaking…"
+        const crashed = (name) => (event) => {
+            if (!this.modelsReady) return; // a failed load is reported by loadModels itself
+            console.error(`🎙️ ${name} worker crashed:`, event.message || event);
+            this.models = null; this.modelsReady = false;
+            this.stt?.terminate(); this.tts?.terminate();
+            this.stt = this.tts = null;
+            this.sttWaiters.forEach((resolve) => resolve(''));
+            this.sttWaiters.clear();
+            if (this.state !== 'off') {
+                this.teardown();
+                this.system(`❌ Voice stopped: the ${name} crashed. Click the mic to try again.`);
+            }
+        };
+        this.stt.addEventListener('error', crashed('speech recognition'));
+        this.tts.addEventListener('error', crashed('voice'));
 
-        let sttDone = false, ttsDone = false, pct = 0;
+        let pct = 0;
         const show = () => {
             if (this.state === 'loading') this.status(`Loading voice models on your device… ${pct}%`);
         };
-        const ready = (worker, flag) => new Promise((resolve, reject) => {
+        // Never hang on "Loading…": a worker that can't even start (blocked CDN, bad network)
+        // fires an 'error' event, not a message, and a stalled download gets a deadline.
+        const ready = (worker, name) => new Promise((resolve, reject) => {
+            const done = (fn, value) => {
+                clearTimeout(timer);
+                worker.removeEventListener('message', listener);
+                worker.removeEventListener('error', failed);
+                fn(value);
+            };
             const listener = ({ data }) => {
                 if (data.type === 'progress' && data.total) { pct = Math.round(100 * data.loaded / data.total); show(); }
-                if (data.type === 'ready') { worker.removeEventListener('message', listener); flag(); resolve(); }
-                if (data.type === 'error' && data.id === undefined) { worker.removeEventListener('message', listener); reject(new Error(data.error)); }
+                if (data.type === 'ready') done(resolve);
+                if (data.type === 'error' && data.id === undefined) done(reject, new Error(`${name}: ${data.error}`));
             };
+            const failed = (event) => {
+                event.preventDefault?.();
+                done(reject, new Error(`${name} could not start${event.message ? `: ${event.message}` : ''}`));
+            };
+            const timer = setTimeout(() => done(reject, new Error(`${name} took too long to download`)), MODEL_TIMEOUT_MS);
             worker.addEventListener('message', listener);
+            worker.addEventListener('error', failed);
             worker.postMessage({ type: 'load' });
         });
         show();
-        this.models = Promise.all([ready(this.stt, () => (sttDone = true)), ready(this.tts, () => (ttsDone = true))])
-            .catch((error) => { this.models = null; this.stt?.terminate(); this.tts?.terminate(); throw error; });
+        this.models = Promise.all([ready(this.stt, 'speech recognition'), ready(this.tts, 'the voice')])
+            .then(() => { this.modelsReady = true; })
+            .catch((error) => {
+                this.models = null;
+                this.stt?.terminate(); this.tts?.terminate();
+                this.stt = this.tts = null;
+                throw error;
+            });
         return this.models;
     },
 
@@ -254,8 +295,10 @@ const VoiceChatManager = {
         this.setState('transcribing');
         const id = this.nextId++;
         const pcm = await resample(audio, rate, STT_RATE);
+        if (!this.stt) return;
         const text = await new Promise((resolve) => {
-            this.sttWaiters.set(id, resolve);
+            const timer = setTimeout(() => { this.sttWaiters.delete(id); resolve(''); }, 20000);
+            this.sttWaiters.set(id, (value) => { clearTimeout(timer); resolve(value); });
             this.stt.postMessage({ type: 'transcribe', id, audio: pcm }, [pcm.buffer]);
         });
         if (this.state !== 'transcribing') return; // muted or stopped meanwhile
@@ -300,6 +343,7 @@ const VoiceChatManager = {
 
     // ---------------------------------------------------------------- speaking
     say(text, turn) {
+        if (!this.tts) return;
         this.pendingSpeech++;
         this.tts.postMessage({ type: 'speak', id: turn, text, voice: VOICE });
     },

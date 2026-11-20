@@ -8,7 +8,7 @@ const STATIC_ASSETS = [
   '/clay.css?v=3',
   '/script.js?v=2',
   // In-browser voice agent (models are fetched and cached on first use, not here)
-  '/voice/voice-agent.js?v=1',
+  '/voice/voice-agent.js?v=2',
   '/voice/speech-text.js',
   '/voice/stt-worker.js',
   '/voice/tts-worker.js',

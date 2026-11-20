@@ -75,7 +75,7 @@ const VoiceChatManager = {
     state: 'off',           // off | loading | listening | recording | transcribing | thinking | speaking
     muted: false,
     ctx: null, stream: null, source: null, tap: null, sink: null, tapUrl: null,
-    watchdog: null, lastFrameAt: 0, recovering: false, recoveries: [],
+    watchdog: null, deviceTimer: null, lastFrameAt: 0, recovering: false, recoveries: [],
     stt: null, tts: null, models: null, modelsReady: false,
     sttWaiters: new Map(), nextId: 1,
     turn: 0, turnDone: true, pendingSpeech: 0, playing: new Set(), playhead: 0,
@@ -115,9 +115,11 @@ const VoiceChatManager = {
             this.system('🎙️ Voice needs a recent Chrome, Edge, Safari or Firefox with microphone access.');
             return;
         }
-        // Created inside the click so browsers let it play sound
-        this.ctx = new AudioContext();
         this.setState('loading', 'Starting microphone…');
+        // On "Your Device", start loading the in-browser AI now rather than at the first question
+        if (this.brain() === 'device' && !LocalChatManager.isInitialized && !LocalChatManager.isInitializing) {
+            LocalChatManager.initialize();
+        }
         const micHint = setTimeout(() => {
             if (this.state === 'loading' && !this.stream) this.status('Allow microphone access in your browser’s prompt…');
         }, MIC_HINT_MS);
@@ -125,7 +127,14 @@ const VoiceChatManager = {
             this.stream = await navigator.mediaDevices.getUserMedia({
                 audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
             }).finally(() => clearTimeout(micHint));
-            await this.buildAudio(this.ctx);
+            // The context is created only after the mic is open: opening it can switch the audio
+            // device (Bluetooth call profile), and a context made before that switch dies with it.
+            // Pages that are capturing audio may play sound, so no click is needed for it.
+            await this.buildAudio();
+            navigator.mediaDevices.ondevicechange = () => {
+                clearTimeout(this.deviceTimer);
+                this.deviceTimer = setTimeout(() => this.recoverAudio('the audio device changed', true), 600);
+            };
 
             await this.loadModels();
             if (this.state === 'off') return; // ended while loading
@@ -156,6 +165,8 @@ const VoiceChatManager = {
         this.turn++;
         this.stopSpeaking();
         clearInterval(this.watchdog);
+        clearTimeout(this.deviceTimer);
+        navigator.mediaDevices.ondevicechange = null;
         this.stream?.getTracks().forEach((t) => t.stop());
         this.closeAudio();
         this.stream = null;
@@ -208,17 +219,17 @@ const VoiceChatManager = {
         }, 1000);
     },
 
-    async recoverAudio(reason) {
-        if (this.state === 'off' || this.recovering || !this.stream) return;
+    async recoverAudio(reason, expected = false) {
+        if (this.state === 'off' || this.state === 'loading' || this.recovering || !this.stream) return;
         const now = performance.now();
         this.recoveries = (this.recoveries || []).filter((t) => now - t < 30000);
-        if (this.recoveries.length >= 3) {
+        if (!expected && this.recoveries.length >= 3) {
             console.error('🎙️ audio keeps failing, giving up:', reason);
             this.teardown();
             this.system('❌ Voice stopped: the audio device keeps failing. If you switched headphones, click the mic to start again.');
             return;
         }
-        this.recoveries.push(now);
+        if (!expected) this.recoveries.push(now);
         this.recovering = true;
         console.warn('🎙️ rebuilding audio:', reason);
         const wasState = this.state;
@@ -317,6 +328,10 @@ const VoiceChatManager = {
         this.lastFrameAt = performance.now();
         if (!this.ctx || this.muted) return;
         const level = rms(frame);
+        // The bars follow the mic while listening, so you can see it hears you
+        if (this.state === 'listening' || this.state === 'recording') {
+            this.elements.inputContainer?.style.setProperty('--mic-level', Math.min(1, Math.sqrt(level / 0.08)).toFixed(2));
+        }
         const ms = (frame.length / this.ctx.sampleRate) * 1000;
 
         if (this.state === 'speaking') {
@@ -501,6 +516,7 @@ const VoiceChatManager = {
         inputContainer?.classList.toggle('voice-active', on);
         inputContainer?.classList.toggle('speaking', state === 'speaking');
         inputContainer?.classList.toggle('hearing', state === 'recording');
+        inputContainer?.classList.toggle('live', state === 'listening' || state === 'recording');
         inputContainer?.classList.toggle('muted', on && this.muted);
         if (voiceMuteBtn) {
             voiceMuteBtn.classList.toggle('muted', this.muted);

@@ -939,3 +939,16 @@ body,
     text-decoration: underline dotted;
     text-underline-offset: 3px;
 }
+
+/* Listening: the bars are a live mic meter (--mic-level 0..1 from voice-agent.js)
+   instead of a canned animation, so the visitor can see they're being heard */
+.input-container.voice-active.live .voice-bar {
+    animation: none;
+    height: calc(5px + 19px * var(--mic-level, 0) * var(--bar-k, 1));
+    transition: height 80ms linear;
+}
+.input-container.voice-active.live .voice-bar:nth-child(1) { --bar-k: 0.55; }
+.input-container.voice-active.live .voice-bar:nth-child(2) { --bar-k: 0.85; }
+.input-container.voice-active.live .voice-bar:nth-child(3) { --bar-k: 1; }
+.input-container.voice-active.live .voice-bar:nth-child(4) { --bar-k: 0.8; }
+.input-container.voice-active.live .voice-bar:nth-child(5) { --bar-k: 0.5; }

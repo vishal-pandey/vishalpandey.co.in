@@ -1,14 +1,14 @@
-const CACHE_NAME = 'vishal-portfolio-v13';
+const CACHE_NAME = 'vishal-portfolio-v14';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
-  '/clay.css?v=3',
+  '/clay.css?v=4',
   '/script.js?v=2',
   // In-browser voice agent (models are fetched and cached on first use, not here)
-  '/voice/voice-agent.js?v=3',
+  '/voice/voice-agent.js?v=4',
   '/voice/speech-text.js',
   '/voice/stt-worker.js',
   '/voice/tts-worker.js',
@@ -113,6 +113,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Leave AI model downloads alone: the voice and WebLLM models come from Hugging Face
+  // in ranged pieces, and their libraries keep their own caches. A 206 can't go in the
+  // Cache API, and a stale-while-revalidate would re-download hundreds of MB.
+  if (request.headers.has('range') || /(^|\.)(huggingface\.co|hf\.co|xethub\.hf\.co)$/.test(url.hostname)) {
+    return;
+  }
+
   // Network-first for documents and same-origin code: deploys show up on the
   // FIRST refresh instead of the second. Cache is the offline fallback only.
   const isDocument = request.mode === 'navigate';
@@ -121,10 +128,10 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((networkResponse) => {
-          if (networkResponse.ok) {
+          if (networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
+              cache.put(request, responseClone).catch(() => {});
             });
           }
           return networkResponse;
@@ -148,9 +155,9 @@ self.addEventListener('fetch', (event) => {
         event.waitUntil(
           fetch(request)
             .then((networkResponse) => {
-              if (networkResponse.ok) {
+              if (networkResponse.status === 200) {
                 caches.open(CACHE_NAME).then((cache) => {
-                  cache.put(request, networkResponse);
+                  cache.put(request, networkResponse).catch(() => {});
                 });
               }
             })
@@ -163,10 +170,10 @@ self.addEventListener('fetch', (event) => {
       return fetch(request)
         .then((networkResponse) => {
           // Cache successful responses for future use
-          if (networkResponse.ok) {
+          if (networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
+              cache.put(request, responseClone).catch(() => {});
             });
           }
           return networkResponse;

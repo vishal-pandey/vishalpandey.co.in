@@ -19,6 +19,9 @@ const STT_RATE = 16000;
 const MODEL_TIMEOUT_MS = 120000;  // first visit downloads ~36 MB; give slow connections room
 const MIC_HINT_MS = 8000;         // still waiting on the permission prompt after this: say so
 const FRAME_DROUGHT_MS = 2000;    // no mic frames this long = the audio graph died; rebuild it
+const SILENT_MIC_MS = 4000;       // frames arriving but digitally silent this long = a dead mic
+const SILENT_LEVEL = 0.0004;      // RMS below this is no signal at all (a quiet room is ~0.002+)
+const MIC = { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 };
 const CHUNK = 1024; // samples per worklet message, ~21 ms at 48 kHz
 
 // Voice activity detection, on RMS loudness against an adaptive noise floor
@@ -76,6 +79,7 @@ const VoiceChatManager = {
     muted: false,
     ctx: null, stream: null, source: null, tap: null, sink: null, tapUrl: null,
     watchdog: null, deviceTimer: null, lastFrameAt: 0, recovering: false, recoveries: [],
+    silentMs: 0, switchingMic: false, triedMics: new Set(),
     stt: null, tts: null, models: null, modelsReady: false,
     sttWaiters: new Map(), nextId: 1,
     turn: 0, turnDone: true, pendingSpeech: 0, playing: new Set(), playhead: 0,
@@ -124,9 +128,8 @@ const VoiceChatManager = {
             if (this.state === 'loading' && !this.stream) this.status('Allow microphone access in your browser’s prompt…');
         }, MIC_HINT_MS);
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({
-                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
-            }).finally(() => clearTimeout(micHint));
+            this.stream = await navigator.mediaDevices.getUserMedia({ audio: MIC }).finally(() => clearTimeout(micHint));
+            this.triedMics = new Set([this.micId()]);
             // The context is created only after the mic is open: opening it can switch the audio
             // device (Bluetooth call profile), and a context made before that switch dies with it.
             // Pages that are capturing audio may play sound, so no click is needed for it.
@@ -143,7 +146,7 @@ const VoiceChatManager = {
             const where = this.brain() === 'device'
                 ? 'Everything runs in your browser: listening, thinking and speaking. Nothing you say leaves this device. 🔒'
                 : "Listening and speaking run in your browser; only the transcribed text goes to Vishal's homelab agent.";
-            this.system(`🎙️ Voice on. ${where} Speak naturally; tap the status line to interrupt.`);
+            this.system(`🎙️ Voice on, using ${this.micName()}. ${where} Speak naturally; tap the status line to interrupt.`);
             this.resetVad();
             this.setState('listening');
             this.startWatchdog();
@@ -173,6 +176,45 @@ const VoiceChatManager = {
         this.muted = false;
         this.recoveries = [];
         this.setState('off');
+    },
+
+    // ---------------------------------------------------------------- microphone choice
+    micTrack() { return this.stream?.getAudioTracks()[0] || null; },
+    micId() { return this.micTrack()?.getSettings?.().deviceId || 'default'; },
+    micName() { return `“${this.micTrack()?.label || 'your microphone'}”`; },
+
+    async switchMic() {
+        if (this.switchingMic || !this.stream) return;
+        this.switchingMic = true;
+        const deadName = this.micName();
+        try {
+            const inputs = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'audioinput');
+            // Prefer the system default (what macOS / Windows has selected), then anything untried
+            const next = [...inputs].sort((a, b) => (b.deviceId === 'default') - (a.deviceId === 'default'))
+                .find((d) => d.deviceId && !this.triedMics.has(d.deviceId));
+            if (!next) {
+                this.status('Your microphone is silent');
+                this.system(`🎙️ ${deadName} is sending no sound. Check that your browser may use the microphone `
+                    + '(on a Mac: System Settings → Privacy & Security → Microphone) and pick the right mic from the '
+                    + 'mic icon in the address bar.');
+                return;
+            }
+            this.triedMics.add(next.deviceId);
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: { ...MIC, deviceId: { exact: next.deviceId } } });
+            if (this.state === 'off') { stream.getTracks().forEach((t) => t.stop()); return; }
+            this.stream.getTracks().forEach((t) => t.stop());
+            this.stream = stream;
+            this.triedMics.add(this.micId());
+            await this.buildAudio();
+            this.resetVad();
+            this.setState('listening');
+            this.system(`🎙️ ${deadName} was silent, so I switched to ${this.micName()}.`);
+        } catch (error) {
+            console.warn('🎙️ could not switch microphone:', error);
+            this.status('Your microphone is silent');
+        } finally {
+            this.switchingMic = false;
+        }
     },
 
     // ---------------------------------------------------------------- audio graph
@@ -326,8 +368,15 @@ const VoiceChatManager = {
 
     onFrame(frame) {
         this.lastFrameAt = performance.now();
-        if (!this.ctx || this.muted) return;
+        if (!this.ctx || this.muted) { this.silentMs = 0; return; }
         const level = rms(frame);
+        // A mic that sends pure digital silence (wrong device picked, e.g. a disconnected
+        // iPhone mic, or macOS blocking the browser) looks exactly like a quiet room to the
+        // VAD. Notice it and try another mic instead of "listening" forever.
+        if (this.state === 'listening' && !this.switchingMic) {
+            this.silentMs = level < SILENT_LEVEL ? this.silentMs + (frame.length / this.ctx.sampleRate) * 1000 : 0;
+            if (this.silentMs >= SILENT_MIC_MS) { this.silentMs = 0; this.switchMic(); }
+        }
         // The bars follow the mic while listening, so you can see it hears you
         if (this.state === 'listening' || this.state === 'recording') {
             this.elements.inputContainer?.style.setProperty('--mic-level', Math.min(1, Math.sqrt(level / 0.08)).toFixed(2));

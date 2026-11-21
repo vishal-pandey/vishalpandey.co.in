@@ -1155,7 +1155,8 @@ const ServerChatManager = {
                         role: 'user',
                         parts: [{ text: userMessage }]
                     },
-                    streaming: true
+                    streaming: true,
+                    replay: window.replayId || null // replay.js: the WhatsApp alert links to this visit's recording
                 }));
             });
             

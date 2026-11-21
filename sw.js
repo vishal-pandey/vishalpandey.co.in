@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vishal-portfolio-v14';
+const CACHE_NAME = 'vishal-portfolio-v15';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -6,7 +6,8 @@ const STATIC_ASSETS = [
   '/index.html',
   '/styles.css',
   '/clay.css?v=4',
-  '/script.js?v=2',
+  '/script.js?v=3',
+  '/replay.js?v=1',
   // In-browser voice agent (models are fetched and cached on first use, not here)
   '/voice/voice-agent.js?v=5',
   '/voice/speech-text.js',
